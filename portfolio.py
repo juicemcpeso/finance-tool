@@ -249,7 +249,7 @@ class Portfolio(sql_database.Database):
     def add_from_csv_account(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
-        INSERT INTO account_account(name, account_type_id, institution_id, owner_id) 
+        INSERT INTO account_account(id, name, account_type_id, institution_id, owner_id) 
         VALUES(?, ?, ?, ?)
         """
 
@@ -258,7 +258,7 @@ class Portfolio(sql_database.Database):
     def add_from_csv_account_type(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
-        INSERT INTO account_type(name, tax_in, tax_growth, tax_out) 
+        INSERT INTO account_type(id, name, tax_in, tax_growth, tax_out) 
         VALUES(?, ?, ?, ?)
         """
 
@@ -267,7 +267,7 @@ class Portfolio(sql_database.Database):
     def add_from_csv_asset(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
-        INSERT INTO asset(name, symbol) 
+        INSERT INTO asset(id, name, symbol) 
         VALUES(?, ?)
         """
 
@@ -276,7 +276,7 @@ class Portfolio(sql_database.Database):
     def add_from_csv_balance(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
-        INSERT INTO balance(account_id, asset_id, balance_date, quantity) 
+        INSERT INTO balance(id, account_id, asset_id, balance_date, quantity) 
         VALUES(?, ?, ?, ?)
         """
 
@@ -285,7 +285,7 @@ class Portfolio(sql_database.Database):
     def add_from_csv_institution(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
-        INSERT INTO institution(name) 
+        INSERT INTO institution(id, name) 
         VALUES(?)
         """
 
@@ -294,7 +294,7 @@ class Portfolio(sql_database.Database):
     def add_from_csv_location(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
-        INSERT INTO location(name) 
+        INSERT INTO location(id, name) 
         VALUES(?)
         """
 
@@ -303,7 +303,7 @@ class Portfolio(sql_database.Database):
     def add_from_csv_owner(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
-        INSERT INTO owner(name, birthday) 
+        INSERT INTO owner(id, name, birthday) 
         VALUES(?, ?)
         """
 
@@ -312,7 +312,7 @@ class Portfolio(sql_database.Database):
     def add_from_csv_price(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
-        INSERT INTO price(asset_id, price_date, amount) 
+        INSERT INTO price(id, asset_id, price_date, amount) 
         VALUES(?, ?, ?)
         """
 
