@@ -84,7 +84,7 @@ id INTEGER PRIMARY KEY,
 asset_id INTEGER,
 price_date TEXT,
 value REAL,
-FOREIGN KEY(asset) REFERENCES asset(id)
+FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
 
 create_commands = [create_account_table,
