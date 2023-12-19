@@ -11,11 +11,12 @@ create_account_table = """
 CREATE TABLE IF NOT EXISTS account (
 id INTEGER PRIMARY KEY,
 name TEXT,
-owner_id INTEGER,
-institution TEXT,
 account_type_id INTEGER,
-FOREIGN KEY(owner_id) REFERENCES owner(id),
+institution INTEGER,
+owner_id INTEGER,
 FOREIGN KEY(account_type_id) REFERENCES account_type(id)
+FOREIGN KEY(owner_id) REFERENCES owner(id),
+FOREIGN KEY(institution_id) REFERENCES institution(id)
 );"""
 
 create_account_type_table = """
@@ -64,6 +65,12 @@ FOREIGN KEY(asset_class_id) REFERENCES asset_class(id),
 FOREIGN KEY(location_id) REFERENCES location(id)
 );"""
 
+create_institution_table = """
+CREATE TABLE IF NOT EXISTS institution(
+id INTEGER PRIMARY KEY,
+name TEXT
+);"""
+
 create_location_table = """
 CREATE TABLE IF NOT EXISTS location (
 id INTEGER PRIMARY KEY,
@@ -92,6 +99,7 @@ create_commands = [create_account_table,
                    create_asset_class_table,
                    create_balance_table,
                    create_component_table,
+                   create_institution_table,
                    create_location_table,
                    create_owner_table,
                    create_price_table]
@@ -102,6 +110,7 @@ drop_commands = ['DROP TABLE IF EXISTS account',
                  'DROP TABLE IF EXISTS asset_class',
                  'DROP TABLE IF EXISTS balance',
                  'DROP TABLE IF EXISTS component',
+                 'DROP TABLE IF EXISTS institution',
                  'DROP TABLE IF EXISTS location',
                  'DROP TABLE IF EXISTS owner',
                  'DROP TABLE IF EXISTS price']
@@ -126,6 +135,9 @@ class Portfolio(sql_database.Database):
 
     def balances(self):
         return self.sql_fetch_all_dict("SELECT * FROM balance")
+
+    def institutions(self):
+        return self.sql_fetch_all_dict("SELECT * FROM institution")
 
     def locations(self):
         return self.sql_fetch_all_dict("SELECT * FROM location")
