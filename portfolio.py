@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS account (
 id INTEGER PRIMARY KEY,
 name TEXT,
 account_type_id INTEGER,
-institution INTEGER,
+institution_id INTEGER,
 owner_id INTEGER,
 FOREIGN KEY(account_type_id) REFERENCES account_type(id)
 FOREIGN KEY(owner_id) REFERENCES owner(id),
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS price (
 id INTEGER PRIMARY KEY,
 asset_id INTEGER,
 price_date TEXT,
-value REAL,
+amount REAL,
 FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
 
@@ -119,6 +119,31 @@ drop_commands = ['DROP TABLE IF EXISTS account',
 class Portfolio(sql_database.Database):
     def __init__(self, portfolio_path):
         super().__init__(portfolio_path, create_commands, drop_commands)
+
+        self._lookup = {}
+        self._construct_lookup()
+
+    def __iter__(self):
+        return iter(self._lookup.keys())
+
+    def __getitem__(self, key):
+        return self._lookup[key]
+
+    def __setitem__(self, key, value):
+        self._lookup[key] = value
+
+    def _construct_lookup(self):
+        getters = {self.accounts,
+                   self.account_types,
+                   self.assets,
+                   self.balances,
+                   self.institutions,
+                   self.locations,
+                   self.owners,
+                   self.prices}
+
+        for item in getters:
+            self._lookup[item.__name__] = item
 
     # Table dictionaries
     def accounts(self):
@@ -151,8 +176,8 @@ class Portfolio(sql_database.Database):
         """Add account"""
         name = input('Enter account name: ')
         institution = str(input('Enter institution name: '))
-        account_type = select.by_name(self.account_types())
-        owner = select.by_name(self.owners())
+        account_type = selection.by_name(self.account_types())
+        owner = selection.by_name(self.owners())
         new_account = (name, account_type, owner, institution)
 
         sql = """
@@ -168,8 +193,8 @@ class Portfolio(sql_database.Database):
 
     def add_balance(self):
         """Add balance"""
-        account = select.by_name(self.accounts())
-        asset = select.by_name(self.accounts())
+        account = selection.by_name(self.accounts())
+        asset = selection.by_name(self.accounts())
         date = input('Enter date in YYYY-MM-DD format: ')
         quantity = float(input('Enter number of shares: '))
         new_balance = (account, asset, date, quantity)
@@ -187,7 +212,7 @@ class Portfolio(sql_database.Database):
 
     def add_price(self):
         """Add price"""
-        asset = select.by_name(self.assets())
+        asset = selection.by_name(self.assets())
         date = input('Enter date in YYYY-MM-DD format: ')
         amount = float(input('Enter price: $'))
         new_price = (asset, date, amount)
@@ -246,8 +271,8 @@ class Portfolio(sql_database.Database):
     def add_from_csv_account(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
-        INSERT INTO account_account(id, name, account_type_id, institution_id, owner_id) 
-        VALUES(?, ?, ?, ?)
+        INSERT INTO account(id, name, account_type_id, institution_id, owner_id) 
+        VALUES(?, ?, ?, ?, ?)
         """
 
         self.execute_many(sql, csv_values)
@@ -256,7 +281,7 @@ class Portfolio(sql_database.Database):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
         INSERT INTO account_type(id, name, tax_in, tax_growth, tax_out) 
-        VALUES(?, ?, ?, ?)
+        VALUES(?, ?, ?, ?, ?)
         """
 
         self.execute_many(sql, csv_values)
@@ -265,7 +290,7 @@ class Portfolio(sql_database.Database):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
         INSERT INTO asset(id, name, symbol) 
-        VALUES(?, ?)
+        VALUES(?, ?, ?)
         """
 
         self.execute_many(sql, csv_values)
@@ -274,7 +299,7 @@ class Portfolio(sql_database.Database):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
         INSERT INTO balance(id, account_id, asset_id, balance_date, quantity) 
-        VALUES(?, ?, ?, ?)
+        VALUES(?, ?, ?, ?, ?)
         """
 
         self.execute_many(sql, csv_values)
@@ -283,7 +308,7 @@ class Portfolio(sql_database.Database):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
         INSERT INTO institution(id, name) 
-        VALUES(?)
+        VALUES(?, ?)
         """
 
         self.execute_many(sql, csv_values)
@@ -292,7 +317,7 @@ class Portfolio(sql_database.Database):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
         INSERT INTO location(id, name) 
-        VALUES(?)
+        VALUES(?, ?)
         """
 
         self.execute_many(sql, csv_values)
@@ -301,7 +326,7 @@ class Portfolio(sql_database.Database):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
         INSERT INTO owner(id, name, birthday) 
-        VALUES(?, ?)
+        VALUES(?, ?, ?)
         """
 
         self.execute_many(sql, csv_values)
@@ -310,7 +335,7 @@ class Portfolio(sql_database.Database):
         csv_values = file_processing.get_split_lines(file_name)
         sql = """
         INSERT INTO price(id, asset_id, price_date, amount) 
-        VALUES(?, ?, ?)
+        VALUES(?, ?, ?, ?)
         """
 
         self.execute_many(sql, csv_values)
@@ -328,3 +353,14 @@ class Portfolio(sql_database.Database):
     # def add_initial_owners():
     #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_owners.csv')
     #     sql_execute_many("INSERT INTO owner(name, birthday) VALUES(?, ?)", initial_values)
+
+    def populate_test_portfolio(self):
+        self.drop_all_tables()
+        self.create_all_tables()
+        self.add_from_csv_account('./tests/test_data/test_accounts.csv')
+        self.add_from_csv_account_type('./tests/test_data/test_account_types.csv')
+        self.add_from_csv_asset('./tests/test_data/test_assets.csv')
+        self.add_from_csv_balance('./tests/test_data/test_balances.csv')
+        self.add_from_csv_institution('./tests/test_data/test_institutions.csv')
+        self.add_from_csv_owner('./tests/test_data/test_owners.csv')
+        self.add_from_csv_price('./tests/test_data/test_prices.csv')

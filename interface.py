@@ -72,6 +72,7 @@ class Interface:
         options = {1: self.add_menu,
                    2: self.view_menu,
                    3: self.remove_menu,
+                   4: self.export_menu,
                    0: self.exit_program}
 
         while True:
@@ -114,6 +115,17 @@ class Interface:
 
         options[selection.verified_input(options.keys())]()
 
+    def export_menu(self):
+        """Export"""
+        options = {1: self.markdown_export(),
+                   0: self.main_menu}
+
+        print("\n" + self.export_menu.__doc__)
+        for option in options:
+            print(f"{option} | {options[option].__doc__}")
+
+        options[selection.verified_input(options.keys())]()
+
     def exit_program(self):
         """Exit"""
         self.active = False
@@ -123,11 +135,9 @@ class Interface:
     # Views
     def view_accounts(self):
         """Account balances"""
+        print(self.portfolio.accounts())
         print(markdown_table_string(self.portfolio.accounts()))
 
-        # accounts = self.portfolio.accounts()
-        # for account in accounts:
-        #     print(f"{account['name']} | $")
 
     def view_balance_history(self):
         """Balance history"""
@@ -162,13 +172,18 @@ class Interface:
         options.update({0: 'Cancel'})
         return options
 
+    def markdown_export(self):
+        for table_name in self.portfolio:
+            print(f"# {table_name}")
+            print(markdown_table_string(self.portfolio[table_name]()))
+
 
 def markdown_table_string(sql_list):
-    string = '|'
+    string = ''
     if sql_list:
-        string.append(markdown_table_column_names(sql_list[0].keys()))
-        string.append(markdown_table_topper(len(sql_list[0].keys())))
-        string.append(markdown_table_rows(sql_list))
+        string += markdown_table_column_names(sql_list[0].keys())
+        string += markdown_table_topper(len(sql_list[0].keys()))
+        string += markdown_table_rows(sql_list)
 
     return string
 
@@ -176,27 +191,29 @@ def markdown_table_string(sql_list):
 def markdown_table_column_names(column_keys):
     string = '|'
     for column_name in column_keys:
-        string.append(column_name)
-        string.append('|')
-    string.append('\n')
+        string += column_name
+        string += '|'
+    string += '\n'
 
     return string
 
 
 def markdown_table_topper(number_of_columns):
     string = '|'
-    for _ in number_of_columns:
-        string.append('---|')
-    string.append('\n')
+    for _ in range(number_of_columns):
+        string += '---|'
+    string += '\n'
 
     return string
 
 
 def markdown_table_rows(sql_list):
-    string = '|'
+    string = ''
     for row in sql_list:
         for item in row.keys():
-            string.append(row[item])
-        string.append('\n')
+            string += '|'
+            string += str(row[item])
+
+        string += '|\n'
 
     return string
