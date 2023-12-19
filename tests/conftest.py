@@ -3,5 +3,6 @@ import portfolio
 
 
 @pytest.fixture
-def test_portfolio():
-    return portfolio.Portfolio('./portfolios/test.db')
+def portfolio():
+    test_portfolio = portfolio.Portfolio('./portfolios/test.db')
+    test_portfolio.add_account()

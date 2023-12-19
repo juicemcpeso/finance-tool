@@ -3,6 +3,7 @@
 # 2023-12-18
 # @juicemcpeso
 
+import file_processing
 import sql_database
 import select
 
@@ -232,34 +233,89 @@ class Portfolio(sql_database.Database):
         """
         print(self.sql_fetch_all_dict(sql))
 
-#
-#
-# def add_initial_account_types():
-#     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_account_types.csv')
-#     sql_execute_many("INSERT INTO account_type(name, tax_in, tax_growth, tax_out) VALUES(?, ?, ?, ?)", initial_values)
-#
-#
-# def add_initial_assets():
-#     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_assets.csv')
-#     sql_execute_many("INSERT INTO asset(symbol, name) VALUES(?, ?)", initial_values)
-#
-#
-# def add_initial_locations():
-#     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_locations.csv')
-#     sql_execute_many("INSERT INTO location(name) VALUES(?)", initial_values)
-#
-#
-# def add_initial_owners():
-#     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_owners.csv')
-#     sql_execute_many("INSERT INTO owner(name, birthday) VALUES(?, ?)", initial_values)
-#
+    # CSV loader
+    def add_from_csv_account(self, file_name):
+        csv_values = file_processing.get_split_lines(file_name)
+        sql = """
+        INSERT INTO account_account(name, account_type_id, institution_id, owner_id) 
+        VALUES(?, ?, ?, ?)
+        """
 
-# def reset_initial_values():
-#     drop_all_tables()
-#
-#     create_all_tables()
-#
-#     add_initial_account_types()
-#     add_initial_assets()
-#     add_initial_locations()
-#     add_initial_owners()
+        self.execute_many(sql, csv_values)
+
+    def add_from_csv_account_type(self, file_name):
+        csv_values = file_processing.get_split_lines(file_name)
+        sql = """
+        INSERT INTO account_type(name, tax_in, tax_growth, tax_out) 
+        VALUES(?, ?, ?, ?)
+        """
+
+        self.execute_many(sql, csv_values)
+
+    def add_from_csv_asset(self, file_name):
+        csv_values = file_processing.get_split_lines(file_name)
+        sql = """
+        INSERT INTO asset(name, symbol) 
+        VALUES(?, ?)
+        """
+
+        self.execute_many(sql, csv_values)
+
+    def add_from_csv_balance(self, file_name):
+        csv_values = file_processing.get_split_lines(file_name)
+        sql = """
+        INSERT INTO balance(account_id, asset_id, balance_date, quantity) 
+        VALUES(?, ?, ?, ?)
+        """
+
+        self.execute_many(sql, csv_values)
+
+    def add_from_csv_institution(self, file_name):
+        csv_values = file_processing.get_split_lines(file_name)
+        sql = """
+        INSERT INTO institution(name) 
+        VALUES(?)
+        """
+
+        self.execute_many(sql, csv_values)
+
+    def add_from_csv_location(self, file_name):
+        csv_values = file_processing.get_split_lines(file_name)
+        sql = """
+        INSERT INTO location(name) 
+        VALUES(?)
+        """
+
+        self.execute_many(sql, csv_values)
+
+    def add_from_csv_owner(self, file_name):
+        csv_values = file_processing.get_split_lines(file_name)
+        sql = """
+        INSERT INTO owner(name, birthday) 
+        VALUES(?, ?)
+        """
+
+        self.execute_many(sql, csv_values)
+
+    def add_from_csv_price(self, file_name):
+        csv_values = file_processing.get_split_lines(file_name)
+        sql = """
+        INSERT INTO price(asset_id, price_date, amount) 
+        VALUES(?, ?, ?)
+        """
+
+        self.execute_many(sql, csv_values)
+
+    # def add_initial_assets():
+    #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_assets.csv')
+    #     sql_execute_many("INSERT INTO asset(symbol, name) VALUES(?, ?)", initial_values)
+    #
+    #
+    # def add_initial_locations():
+    #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_locations.csv')
+    #     sql_execute_many("INSERT INTO location(name) VALUES(?)", initial_values)
+    #
+    #
+    # def add_initial_owners():
+    #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_owners.csv')
+    #     sql_execute_many("INSERT INTO owner(name, birthday) VALUES(?, ?)", initial_values)
