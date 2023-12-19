@@ -5,7 +5,7 @@
 
 import os
 import portfolio
-import select
+import selection
 
 
 class Interface:
