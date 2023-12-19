@@ -13,6 +13,7 @@ class Interface:
         self.active = True
         self.portfolio = None
         self.portfolio_directory = './portfolios'
+        self.pipe = '|'
 
     # Portfolio selection/deletion
     def portfolio_menu(self):
@@ -122,9 +123,11 @@ class Interface:
     # Views
     def view_accounts(self):
         """Account balances"""
-        accounts = self.portfolio.accounts()
-        for account in accounts:
-            print(f"{account['name']} | $")
+        print(markdown_table_string(self.portfolio.accounts()))
+
+        # accounts = self.portfolio.accounts()
+        # for account in accounts:
+        #     print(f"{account['name']} | $")
 
     def view_balance_history(self):
         """Balance history"""
@@ -158,3 +161,42 @@ class Interface:
 
         options.update({0: 'Cancel'})
         return options
+
+
+def markdown_table_string(sql_list):
+    string = '|'
+    if sql_list:
+        string.append(markdown_table_column_names(sql_list[0].keys()))
+        string.append(markdown_table_topper(len(sql_list[0].keys())))
+        string.append(markdown_table_rows(sql_list))
+
+    return string
+
+
+def markdown_table_column_names(column_keys):
+    string = '|'
+    for column_name in column_keys:
+        string.append(column_name)
+        string.append('|')
+    string.append('\n')
+
+    return string
+
+
+def markdown_table_topper(number_of_columns):
+    string = '|'
+    for _ in number_of_columns:
+        string.append('---|')
+    string.append('\n')
+
+    return string
+
+
+def markdown_table_rows(sql_list):
+    string = '|'
+    for row in sql_list:
+        for item in row.keys():
+            string.append(row[item])
+        string.append('\n')
+
+    return string
