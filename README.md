@@ -1,1 +1,1 @@
-# finance_tool
+# Finance tool
