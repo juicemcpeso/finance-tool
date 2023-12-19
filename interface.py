@@ -27,7 +27,7 @@ class Interface:
         for option in options:
             print(f"{option} | {options[option].__doc__}")
 
-        options[select.verified_input(options.keys())]()
+        options[selection.verified_input(options.keys())]()
 
     def load_portfolio(self):
         """Load portfolio"""
@@ -36,9 +36,9 @@ class Interface:
         options = self.file_options()
         self.print_options(options)
 
-        selection = select.verified_input(options)
-        if selection:
-            file_path = './portfolios/' + options[selection]
+        user_input = selection.verified_input(options)
+        if user_input:
+            file_path = './portfolios/' + options[user_input]
             self.portfolio = portfolio.Portfolio(file_path)
             self.main_menu()
         else:
@@ -58,9 +58,9 @@ class Interface:
         options = self.file_options()
         self.print_options(options)
 
-        selection = select.verified_input(options)
-        if selection:
-            file_path = './portfolios/' + options[selection]
+        user_input = selection.verified_input(options)
+        if user_input:
+            file_path = './portfolios/' + options[user_input]
             os.remove(file_path)
             self.portfolio_menu()
         else:
@@ -79,7 +79,7 @@ class Interface:
             for option in options:
                 print(f"{option} | {options[option].__doc__}")
 
-            options[select.verified_input(options.keys())]()
+            options[selection.verified_input(options.keys())]()
 
     def add_menu(self):
         """Add"""
@@ -94,7 +94,7 @@ class Interface:
         for option in options:
             print(f"{option} | {options[option].__doc__}")
 
-        options[select.verified_input(options.keys())]()
+        options[selection.verified_input(options.keys())]()
 
     def remove_menu(self):
         """Remove"""
@@ -112,7 +112,7 @@ class Interface:
         for option in options:
             print(f"{option} | {options[option].__doc__}")
 
-        options[select.verified_input(options.keys())]()
+        options[selection.verified_input(options.keys())]()
 
     def exit_program(self):
         """Exit"""
@@ -143,7 +143,7 @@ class Interface:
     def view_price_history(self):
         """Price history"""
         print("Select asset:")
-        history = self.portfolio.price_history(select.by_name(self.portfolio.assets()))
+        history = self.portfolio.price_history(selection.by_name(self.portfolio.assets()))
         for price in history:
             print(f"{price['price_date']} | ${price['amount']}")
 
