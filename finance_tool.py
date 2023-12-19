@@ -4,8 +4,8 @@
 # @juicemcpeso
 
 import interface
-import portfolio
+import os
 
 if __name__ == "__main__":
-    program = interface.Interface(portfolio.Portfolio())
-    program.main_menu()
+    program = interface.Interface()
+    program.portfolio_menu()

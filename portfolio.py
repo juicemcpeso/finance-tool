@@ -6,8 +6,6 @@
 import sql_database
 import select
 
-portfolio_db = "portfolio.db"
-
 create_account_table = """
 CREATE TABLE IF NOT EXISTS account (
 id INTEGER PRIMARY KEY,
@@ -109,8 +107,8 @@ drop_commands = ['DROP TABLE IF EXISTS account',
 
 
 class Portfolio(sql_database.Database):
-    def __init__(self):
-        super().__init__(portfolio_db, create_commands, drop_commands)
+    def __init__(self, portfolio_path):
+        super().__init__(portfolio_path, create_commands, drop_commands)
 
     def drop_all_tables(self):
         self.execute_list_commands(self.drop_table_commands)

@@ -19,3 +19,5 @@ def verified_input(acceptable_options):
 
         if selection in acceptable_options:
             return selection
+        else:
+            selection = None
