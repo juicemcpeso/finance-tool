@@ -3,8 +3,8 @@
 # 2023-12-18
 # @juicemcpeso
 
-import interface
+import app
 
 if __name__ == "__main__":
-    program = interface.Interface()
-    program.portfolio_menu()
+    program = app.App()
+    program()

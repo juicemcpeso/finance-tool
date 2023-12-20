@@ -5,7 +5,7 @@
 
 import file_processing
 import sql_database
-import selection
+import select_a
 
 create_account_table = """
 CREATE TABLE IF NOT EXISTS account (
@@ -176,8 +176,8 @@ class Portfolio(sql_database.Database):
         """Add account"""
         name = input('Enter account name: ')
         institution = str(input('Enter institution name: '))
-        account_type = selection.by_name(self.account_types())
-        owner = selection.by_name(self.owners())
+        account_type = select_a.by_name(self.account_types())
+        owner = select_a.by_name(self.owners())
         new_account = (name, account_type, owner, institution)
 
         sql = """
@@ -194,7 +194,7 @@ class Portfolio(sql_database.Database):
     def add_balance(self):
         """Add balance"""
         account = selection.by_name(self.accounts())
-        asset = selection.by_name(self.accounts())
+        asset = select_a.by_name(self.accounts())
         date = input('Enter date in YYYY-MM-DD format: ')
         quantity = float(input('Enter number of shares: '))
         new_balance = (account, asset, date, quantity)
