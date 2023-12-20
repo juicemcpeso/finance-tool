@@ -3,10 +3,11 @@
 # 2023-12-18
 # @juicemcpeso
 
-def get_split_lines(file_name):
+def get_split_lines(file_path):
     split_lines = []
-    full_file_path = '/Users/ryan/PycharmProjects' + file_name
-    with open(full_file_path, 'r') as handle:
+    # # full_file_path = '/Users/ryan/PycharmProjects' + file_name
+    # full_file_path = file_name
+    with open(file_path, 'r') as handle:
         handle.readline()  # Removes header
         lines = handle.read().splitlines()
 

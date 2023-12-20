@@ -17,7 +17,13 @@ class Database:
         self.create_table_commands = create_list
         self.drop_table_commands = drop_list
 
+        self.create_all_tables()
+
+    def create_all_tables(self):
         self.execute_list_commands(self.create_table_commands)
+
+    def drop_all_tables(self):
+        self.execute_list_commands(self.drop_table_commands)
 
     def execute(self, command):
         """Execute a single command"""
