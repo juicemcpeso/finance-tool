@@ -26,6 +26,8 @@ class Action:
 
 
 class Selection(collections.abc.MutableSequence):
+    _options = []
+
     def __init__(self, name, app, option_list=[]):
         self.name = name
         self.app = app
@@ -33,8 +35,10 @@ class Selection(collections.abc.MutableSequence):
         self.selected_option = None
 
     def __call__(self):
+        self.create_options()
         self.select_option()
-        if self.selected_option:
+
+        if self.selected_option is not None:
             self.selected_option()
 
     def __delitem__(self, key):
@@ -72,19 +76,23 @@ class Selection(collections.abc.MutableSequence):
 
 
 class Menu(Selection):
-    def __call__(self):
-        self.print_options()
-        super().__call__()
-
     def select_option(self):
-        while not self.selected_option:
+        self.print_options()
+        while True:
             try:
                 option_number = int(input('Select option number: '))
             except ValueError:
                 pass
             else:
-                self.selected_option = self[option_number] if option_number in range(len(self)) else None
-
+                if option_number in range(len(self)):
+                    self.selected_option = self[option_number]
+                    break
+                # else:
+                #     print('no')
+                #     self.selected_option = None
+                # print(self.selected_option)
+                # self.selected_option = self[option_number] if option_number in range(len(self)) else None
+                # print(self.selected_option)
         #
         # self.selected_option = None if self.selected_option not in  else pass
         # if selection in range(len(self.options)):
@@ -115,7 +123,7 @@ class Menu(Selection):
 
 
 class DatabaseSelectionMenu(Menu):
-    def __init__(self, name, app):
+    def __init__(self, app):
         options = [ExitAction(app),
                    NewFileAction(app),
                    LoadFileSelection(app),
@@ -124,7 +132,16 @@ class DatabaseSelectionMenu(Menu):
         #                actions.Option('Load', self['load']),
         #                actions.Option('New', self.new_portfolio),
         #                actions.Option('Delete', self.delete_portfolio)]]
-        super().__init__(name, app, options)
+        super().__init__('Database menu', app, options)
+
+
+class BackAction(Action):
+    def __init__(self, app, action):
+        super().__init__('<- Back', app)
+        self.action = action
+
+    def __call__(self):
+        self.action()
 
 
 class ExitAction(Action):
@@ -152,15 +169,16 @@ class LoadFileAction(FileAction):
         self.app.portfolio = portfolio.Portfolio(self.file_path())
 
 
-class LoadFileSelection(Selection):
+class LoadFileSelection(Menu):
     def __init__(self, app):
         super().__init__('Load', app)
-        self.create_options()
 
     def create_options(self):
-        # self.append(DatabaseSelectionMenu('<- Back', self.app))
+        self._options = []
+        self.append(BackAction(self.app, DatabaseSelectionMenu(self.app)))
+        # self.append(DatabaseSelectionMenu(self.app))
         for file_name in os.listdir(self.app.portfolio_directory):
-            self.append(LoadFileAction(self.name, self.app, file_name))
+            self.append(LoadFileAction(file_name, self.app, file_name))
 
 
 class DeleteFileAction(FileAction):
@@ -168,14 +186,15 @@ class DeleteFileAction(FileAction):
         os.remove(self.file_path())
 
 
-class DeleteFileSelection(Selection):
+class DeleteFileSelection(Menu):
     def __init__(self, app):
         super().__init__('Delete', app)
 
     def create_options(self):
-        # self.append(DatabaseSelectionMenu('<- Back', self.app))
-        for file_name in os.listdir(self.portfolio_directory):
-            self.append(DeleteFileAction(self.name, self.app, file_name))
+        self._options = []
+        self.append(BackAction(self.app, DatabaseSelectionMenu(self.app)))
+        for file_name in os.listdir(self.app.portfolio_directory):
+            self.append(DeleteFileAction(file_name, self.app, file_name))
 
 
 class NewFileAction(FileAction):
@@ -185,3 +204,40 @@ class NewFileAction(FileAction):
     def __call__(self):
         self.file_name = str(input("Enter new portfolio name: "))
         self.app.portfolio = portfolio.Portfolio(self.file_path())
+
+
+class MainMenu(Menu):
+    def __init__(self, app):
+        options = [ExitAction(app),
+                   AddMenu(app)]
+
+        #     option_list = [options.Option('Exit', self.exit_program),
+        #                    actions.Option('Add', self.add_menu),
+        #                    actions.Option('Remove', self.remove_menu),
+        #                    actions.Option('View', self.view_menu),
+        #                    options.Option('Export', self.export_menu)]
+
+        super().__init__('Main menu', app, options)
+
+
+class AddMenu(Menu):
+    def __init__(self, app):
+        options = [ExitAction(app),
+                   AddAccountAction(app)]
+        super().__init__('Add menu', app, options)
+
+    # option_list = [actions.Option('<--Back', self._menus['main']),
+    #                actions.Option('Account', self.portfolio.add_account),
+    #                actions.Option('Asset', self.portfolio.add_asset),
+    #                actions.Option('Balance', self.portfolio.add_balance),
+    #                actions.Option('Owner', self.portfolio.add_owner),
+    #                actions.Option('Price', self.portfolio.add_price)]
+
+
+# Add actions
+class AddAccountAction(Action):
+    def __init__(self, app):
+        super().__init__('Add account', app)
+
+    def __call__(self):
+        self.app.portfolio.add_account()

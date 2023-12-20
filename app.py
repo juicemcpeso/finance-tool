@@ -17,14 +17,19 @@ class App:
         self.portfolio_directory = './portfolios/'
 
         self._menus = {'add': None,
-                       'database': None,
+                       'database menu': None,
                        'load': None,
                        'main': None}
 
         self._construct_database_menus()
 
     def __call__(self):
-        self['database']()
+        while True:
+            self['database menu']()
+
+            if self.portfolio is not None:
+                self._construct_menus()
+                self['main menu']()
         # self._construct_menus()
         # self['main']()
 
@@ -35,21 +40,24 @@ class App:
         self._menus[key] = value
 
     def _construct_database_menus(self):
-        self['database'] = menus.DatabaseSelectionMenu('Database menu', self)
+        self['database menu'] = menus.DatabaseSelectionMenu(self)
         # self._construct_database_main_menu()
 
     def _construct_menus(self):
-        self._construct_main_menu()
-        self._construct_add_menu()
+        self['main menu'] = menus.MainMenu(self)
 
-    def _construct_main_menu(self):
-        option_list = [options.Option('Exit', self.exit_program),
-                       actions.Option('Add', self.add_menu),
-                       actions.Option('Remove', self.remove_menu),
-                       actions.Option('View', self.view_menu),
-                       options.Option('Export', self.export_menu)]
+        #
+        # self._construct_main_menu()
+        # self._construct_add_menu()
+    #
+    # def _construct_main_menu(self):
+    #     option_list = [options.Option('Exit', self.exit_program),
+    #                    actions.Option('Add', self.add_menu),
+    #                    actions.Option('Remove', self.remove_menu),
+    #                    actions.Option('View', self.view_menu),
+    #                    options.Option('Export', self.export_menu)]
 
-        self._menus['main'] = menus.CommandLine('Main menu', option_list)
+
 
         # options = [menus.Command'1', '' self.add_menu,
         #            2: self.view_menu,
