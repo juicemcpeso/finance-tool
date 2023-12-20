@@ -155,8 +155,7 @@ class LoadFile(Menu):
 # Portfolio menus
 class Main(Menu):
     def __init__(self, app):
-        options = [action.Exit(app),
-                   AddMenu(app)]
+        # options = [action.Exit(app), AddMenu(app)]
 
         #     option_list = [options.Option('Exit', self.exit_program),
         #                    actions.Option('Add', self.add_menu),
@@ -164,14 +163,20 @@ class Main(Menu):
         #                    actions.Option('View', self.view_menu),
         #                    options.Option('Export', self.export_menu)]
 
-        super().__init__('Main menu', app, options)
+        super().__init__('Main menu', app)
+
+    def create_options(self):
+        self._options = [action.Exit(self.app),
+                         AddMenu(self.app)]
 
 
 class AddMenu(Menu):
     def __init__(self, app):
-        options = [action.Exit(app),
-                   action.AddAccount(app)]
-        super().__init__('Add menu', app, options)
+        super().__init__('Add menu', app)
+
+    def create_options(self):
+        self._options = [action.Back(self.app, Main(self.app)),
+                         action.AddAccount(self.app)]
 
     # option_list = [actions.Option('<--Back', self._menus['main']),
     #                actions.Option('Account', self.portfolio.add_account),
@@ -180,6 +185,4 @@ class AddMenu(Menu):
     #                actions.Option('Owner', self.portfolio.add_owner),
     #                actions.Option('Price', self.portfolio.add_price)]
 
-
 # Add actions
-
