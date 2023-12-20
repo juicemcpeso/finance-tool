@@ -74,7 +74,6 @@ class Selection(collections.abc.MutableSequence):
 class Menu(Selection):
     def __call__(self):
         self.print_options()
-        self.select_option()
         super().__call__()
 
     def select_option(self):
