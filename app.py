@@ -3,8 +3,8 @@
 # 2023-12-18
 # @juicemcpeso
 
-import menus
-import actions
+import menu
+import action
 import os
 import portfolio
 import select_a
@@ -40,11 +40,11 @@ class App:
         self._menus[key] = value
 
     def _construct_database_menus(self):
-        self['database menu'] = menus.DatabaseSelectionMenu(self)
+        self['database menu'] = menu.Database(self)
         # self._construct_database_main_menu()
 
     def _construct_menus(self):
-        self['main menu'] = menus.MainMenu(self)
+        self['main menu'] = menu.Main(self)
 
         #
         # self._construct_main_menu()
@@ -66,11 +66,11 @@ class App:
         #            0: self.main_menu]
 
     def _construct_add_menu(self):
-        option_list = [actions.Option('<--Back', self._menus['main']),
-                       actions.Option('Account', self.portfolio.add_account),
+        option_list = [action.Option('<--Back', self._menus['main']),
+                       action.Option('Account', self.portfolio.add_account),
                        actions.Option('Asset', self.portfolio.add_asset),
-                       actions.Option('Balance', self.portfolio.add_balance),
-                       actions.Option('Owner', self.portfolio.add_owner),
+                       action.Option('Balance', self.portfolio.add_balance),
+                       action.Option('Owner', self.portfolio.add_owner),
                        actions.Option('Price', self.portfolio.add_price)]
 
         self._menus['add'] = menus.CommandLine('Add...', option_list)
@@ -247,10 +247,10 @@ class App:
         return options
 
     def file_list(self, back_function):
-        option_list = [actions.Option('<- Back', back_function)]
+        option_list = [action.Option('<- Back', back_function)]
 
         for file_name in os.listdir(self.portfolio_directory):
-            option_list.append(actions.Option(file_name, self.return_file_name))
+            option_list.append(action.Option(file_name, self.return_file_name))
 
         return option_list
 
