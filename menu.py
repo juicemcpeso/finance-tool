@@ -76,7 +76,7 @@ class Main(Menu):
 
     def create_options(self):
         self._options = [action.Exit(self.app),
-                         AddMenu(self.app)]
+                         Add(self.app)]
         #     option_list = [options.Option('Exit', self.exit_program),
         #                    actions.Option('Add', self.add_menu),
         #                    actions.Option('Remove', self.remove_menu),
@@ -84,7 +84,7 @@ class Main(Menu):
         #                    options.Option('Export', self.export_menu)]
 
 
-class AddMenu(Menu):
+class Add(Menu):
     def __init__(self, app):
         super().__init__('Add menu', app)
 
@@ -98,3 +98,23 @@ class AddMenu(Menu):
     #                actions.Option('Balance', self.portfolio.add_balance),
     #                actions.Option('Owner', self.portfolio.add_owner),
     #                actions.Option('Price', self.portfolio.add_price)]
+
+
+class Export(Menu):
+    pass
+    # options = {1: self.markdown_export(),
+    #            0: self.main_menu}
+
+
+class Remove(Menu):
+    pass
+
+
+class View(Menu):
+    pass
+
+    # options = {1: self.view_accounts,
+    #            2: self.view_balance_history,
+    #            3: self.view_net_worth,
+    #            4: self.view_price_history,
+    #            0: self.main_menu}
