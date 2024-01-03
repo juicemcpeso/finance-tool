@@ -173,80 +173,39 @@ class Portfolio(sql_database.Database):
 
     # IO
     # Add
-    # def add_account(self):
-    #     """Add account"""
-    #     name = input('Enter account name: ')
-    #     institution = str(input('Enter institution name: '))
-    #     account_type = select_a.by_name(self.account_types())
-    #     owner = select_a.by_name(self.owners())
-    #     new_account = (name, account_type, owner, institution)
-    #
-    #     sql = """
-    #     INSERT INTO account(name, account_type_id, owner_id, institution)
-    #     VALUES(?, ?, ?, ?)
-    #     """
-    #
-    #     self.execute_parameters(sql, new_account)
-
     def add_account(self, **kwargs):
-        """Add account"""
         sql = """
         INSERT INTO account(name, account_type_id, institution_id, owner_id) 
         VALUES(:name, :account_type_id, :institution_id, :owner_id)
         """
+
         self.execute_many(sql, kwargs.values())
 
     def add_asset(self):
-        """Add asset"""
         pass
 
     def add_balance(self, **kwargs):
-        """Add balance"""
-        # account = selection.by_name(self.accounts())
-        # asset = select_a.by_name(self.accounts())
-        # date = input('Enter date in YYYY-MM-DD format: ')
-        # quantity = float(input('Enter number of shares: '))
-        # new_balance = (account, asset, date, quantity)
-        #
-        # sql = """
-        # INSERT INTO balance(account_id, asset_id, balance_date, quantity)
-        # VALUES(?, ?, ?, ?)
-        # """
-        #
-        # self.execute_parameters(sql, new_balance)
-
         sql = """
         INSERT INTO balance(account_id, asset_id, balance_date, quantity) 
         VALUES(:account_id, :asset_id, :balance_date, :quantity)
         """
+
         self.execute_many(sql, kwargs.values())
 
     def add_owner(self, **kwargs):
-        """Add owner"""
         sql = """
         INSERT INTO owner(name, birthday) 
         VALUES(:name, :birthday)
         """
+
         self.execute_many(sql, kwargs.values())
 
     def add_price(self, **kwargs):
-        """Add price"""
-        # asset = selection.by_name(self.assets())
-        # date = input('Enter date in YYYY-MM-DD format: ')
-        # amount = float(input('Enter price: $'))
-        # new_price = (asset, date, amount)
-        #
-        # sql = """
-        # INSERT INTO price(asset_id, price_date, amount)
-        # VALUES(?, ?, ?)
-        # """
-        #
-        # self.execute_parameters(sql, new_price)
-
         sql = """
         INSERT INTO price(asset_id, price_date, amount) 
         VALUES(:asset_id, :price_date, :amount)
         """
+
         self.execute_many(sql, kwargs.values())
 
     # Remove
