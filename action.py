@@ -78,6 +78,10 @@ class AddAccount(AppAction):
         super().__init__('Add account', app)
 
     def __call__(self):
+        sql = """
+        "INSERT INTO account 
+        VALUES (:name, :account_type_id, :owner_id, :institution)"
+        """
         self.app.portfolio.add_account()
 
 # Export actions

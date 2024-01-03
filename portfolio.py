@@ -6,6 +6,7 @@
 import file_processing
 import sql_database
 import select_a
+import sqlite3
 
 create_account_table = """
 CREATE TABLE IF NOT EXISTS account (
@@ -206,9 +207,13 @@ class Portfolio(sql_database.Database):
 
         self.execute_parameters(sql, new_balance)
 
-    def add_owner(self):
+    def add_owner(self, **kwargs):
         """Add owner"""
-        pass
+        sql = """
+        INSERT INTO owner(name, birthday) 
+        VALUES(:name, :birthday)
+        """
+        self.execute_many(sql, kwargs.values())
 
     def add_price(self):
         """Add price"""
@@ -357,10 +362,10 @@ class Portfolio(sql_database.Database):
     def populate_test_portfolio(self):
         self.drop_all_tables()
         self.create_all_tables()
-        self.add_from_csv_account('./tests/test_data/test_accounts.csv')
-        self.add_from_csv_account_type('./tests/test_data/test_account_types.csv')
-        self.add_from_csv_asset('./tests/test_data/test_assets.csv')
-        self.add_from_csv_balance('./tests/test_data/test_balances.csv')
-        self.add_from_csv_institution('./tests/test_data/test_institutions.csv')
-        self.add_from_csv_owner('./tests/test_data/test_owners.csv')
-        self.add_from_csv_price('./tests/test_data/test_prices.csv')
+        self.add_from_csv_account('./test_data/test_accounts.csv')
+        self.add_from_csv_account_type('./test_data/test_account_types.csv')
+        self.add_from_csv_asset('./test_data/test_assets.csv')
+        self.add_from_csv_balance('./test_data/test_balances.csv')
+        self.add_from_csv_institution('./test_data/test_institutions.csv')
+        self.add_from_csv_owner('./test_data/test_owners.csv')
+        self.add_from_csv_price('./test_data/test_prices.csv')

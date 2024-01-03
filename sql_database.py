@@ -41,6 +41,13 @@ class Database:
         con.commit()
         con.close()
 
+    def execute_kwargs(self, command, kwargs):
+        con = sqlite3.connect(self.database)
+        cur = con.cursor()
+        cur.execute(command, kwargs)
+        con.commit()
+        con.close()
+
     def execute_list_commands(self, command_list):
         """Execute a list of commands"""
         for command in command_list:
@@ -85,6 +92,15 @@ class Database:
         con.row_factory = dict_factory
         cur = con.cursor()
         result = cur.execute(command_text, params).fetchone()
+        con.commit()
+        con.close()
+        return result
+
+    def sql_fetch_one(self, command, params=None):
+        con = sqlite3.connect(self.database)
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        result = cur.execute(command, params).fetchone() if params is not None else cur.execute(command).fetchone()
         con.commit()
         con.close()
         return result
