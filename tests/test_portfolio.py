@@ -69,18 +69,24 @@ def test_add_price(test_portfolio):
     assert entry == test_portfolio.sql_fetch_one(sql)
 
 
-def test_add_from_csv_owner(test_portfolio):
-    entry = list(csv.DictReader(open('./test_data/test_owners.csv')))
+def test_add_from_csv_owner(empty_portfolio):
+    file_name = './test_data/test_owners.csv'
+    empty_portfolio.add_from_csv_owner(file_name)
+
+    entry = list(csv.DictReader(open(file_name)))
     for row in entry:
         row['id'] = int(row['id'])
 
     sql = """SELECT * FROM owner"""
 
-    assert entry == test_portfolio.sql_fetch_all_dict(sql)
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
-def test_add_from_csv_account(test_portfolio):
-    entry = list(csv.DictReader(open('./test_data/test_accounts.csv')))
+def test_add_from_csv_account(empty_portfolio):
+    file_name = './test_data/test_accounts.csv'
+    empty_portfolio.add_from_csv_account(file_name)
+
+    entry = list(csv.DictReader(open(file_name)))
     for row in entry:
         row['id'] = int(row['id'])
         row['account_type_id'] = int(row['account_type_id'])
@@ -89,11 +95,14 @@ def test_add_from_csv_account(test_portfolio):
 
     sql = """SELECT * FROM account"""
 
-    assert entry == test_portfolio.sql_fetch_all_dict(sql)
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
-def test_add_from_csv_account_type(test_portfolio):
-    entry = list(csv.DictReader(open('./test_data/test_account_types.csv')))
+def test_add_from_csv_account_type(empty_portfolio):
+    file_name = './test_data/test_account_types.csv'
+    empty_portfolio.add_from_csv_account_type(file_name)
+
+    entry = list(csv.DictReader(open(file_name)))
     for row in entry:
         row['id'] = int(row['id'])
         row['tax_in'] = int(row['tax_in'])
@@ -102,4 +111,4 @@ def test_add_from_csv_account_type(test_portfolio):
 
     sql = """SELECT * FROM account_type"""
 
-    assert entry == test_portfolio.sql_fetch_all_dict(sql)
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)

@@ -320,14 +320,3 @@ class Portfolio(sql_database.Database):
         """
 
         self.execute_many(sql, csv_values)
-
-    def populate_test_portfolio(self):
-        self.drop_all_tables()
-        self.create_all_tables()
-        self.add_from_csv_account('./test_data/test_accounts.csv')
-        self.add_from_csv_account_type('./test_data/test_account_types.csv')
-        self.add_from_csv_asset('./test_data/test_assets.csv')
-        self.add_from_csv_balance('./test_data/test_balances.csv')
-        self.add_from_csv_institution('./test_data/test_institutions.csv')
-        self.add_from_csv_owner('./test_data/test_owners.csv')
-        self.add_from_csv_price('./test_data/test_prices.csv')
