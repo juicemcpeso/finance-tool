@@ -180,6 +180,14 @@ class Portfolio(sql_database.Database):
 
         self.execute_many(sql, kwargs.values())
 
+    def add_account_type(self, **kwargs):
+        sql = """
+        INSERT INTO account_type(name, tax_in, tax_growth, tax_out) 
+        VALUES(:name, :tax_in, :tax_growth, :tax_out)
+        """
+
+        self.execute_many(sql, kwargs.values())
+
     def add_asset(self, **kwargs):
         sql = """
         INSERT INTO asset(name, symbol) 

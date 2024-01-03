@@ -14,6 +14,17 @@ def test_add_account(test_portfolio):
     assert entry == test_portfolio.sql_fetch_one(sql)
 
 
+def test_add_account_type(test_portfolio):
+    entry = {'name': 'Traditional IRA', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}
+    test_portfolio.add_account_type(args=entry)
+
+    sql = """
+    SELECT name, tax_in, tax_growth, tax_out FROM account_type WHERE id = 4
+    """
+
+    assert entry == test_portfolio.sql_fetch_one(sql)
+
+
 def test_add_asset(test_portfolio):
     entry = {'name': 'Test Index Fund', 'symbol': 'TEST'}
     test_portfolio.add_asset(args=entry)
