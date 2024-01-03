@@ -1,5 +1,6 @@
 import pytest
 import portfolio
+import csv
 
 
 def test_add_account(test_portfolio):
@@ -58,8 +59,9 @@ def test_add_price(test_portfolio):
 
 
 def test_add_from_csv_owner(test_portfolio):
-    entry = [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'},
-             {'id': 2, 'name': 'Anna', 'birthday': '1991-05-04'}]
+    entry = list(csv.DictReader(open('./test_data/test_owners.csv')))
+    for row in entry:
+        row['id'] = int(row['id'])
 
     sql = """SELECT * FROM owner"""
 
