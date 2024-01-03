@@ -2,16 +2,6 @@ import pytest
 import portfolio
 
 
-#
-#
-# @pytest.fixture
-# def test_portfolio():
-#     test_portfolio = portfolio.Portfolio('./portfolios/test.db')
-#     test_portfolio.populate_test_portfolio()
-#
-#     return test_portfolio
-
-
 def test_add_account(test_portfolio):
     entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 3}
     test_portfolio.add_account(args=entry)
@@ -65,3 +55,12 @@ def test_add_price(test_portfolio):
     """
 
     assert entry == test_portfolio.sql_fetch_one(sql)
+
+
+def test_add_from_csv_owner(test_portfolio):
+    entry = [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'},
+             {'id': 2, 'name': 'Anna', 'birthday': '1991-05-04'}]
+
+    sql = """SELECT * FROM owner"""
+
+    assert entry == test_portfolio.sql_fetch_all_dict(sql)

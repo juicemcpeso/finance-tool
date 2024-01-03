@@ -3,6 +3,7 @@
 # 2023-12-18
 # @juicemcpeso
 
+import csv
 import file_processing
 import sql_database
 
@@ -310,13 +311,17 @@ class Portfolio(sql_database.Database):
         self.execute_many(sql, csv_values)
 
     def add_from_csv_owner(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO owner(id, name, birthday) 
-        VALUES(?, ?, ?)
-        """
+        reader = csv.DictReader(open(file_name))
+        for line in reader:
+            self.add_owner(kwargs=line)
 
-        self.execute_many(sql, csv_values)
+        # csv_values = file_processing.get_split_lines(file_name)
+        # sql = """
+        # INSERT INTO owner(id, name, birthday)
+        # VALUES(?, ?, ?)
+        # """
+        #
+        # self.execute_many(sql, csv_values)
 
     def add_from_csv_price(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
