@@ -23,6 +23,17 @@ def test_add_account(test_portfolio):
     assert entry == test_portfolio.sql_fetch_one(sql)
 
 
+def test_add_asset(test_portfolio):
+    entry = {'name': 'Test Index Fund', 'symbol': 'TEST'}
+    test_portfolio.add_asset(args=entry)
+
+    sql = """
+    SELECT name, symbol FROM asset WHERE id = 6
+    """
+
+    assert entry == test_portfolio.sql_fetch_one(sql)
+
+
 def test_add_balance(test_portfolio):
     entry = {'account_id': 1, 'asset_id': 4, 'balance_date': '2023-01-01', 'quantity': 12}
     test_portfolio.add_balance(args=entry)

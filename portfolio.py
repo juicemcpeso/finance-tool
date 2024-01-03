@@ -181,8 +181,13 @@ class Portfolio(sql_database.Database):
 
         self.execute_many(sql, kwargs.values())
 
-    def add_asset(self):
-        pass
+    def add_asset(self, **kwargs):
+        sql = """
+        INSERT INTO asset(name, symbol) 
+        VALUES(:name, :symbol)
+        """
+
+        self.execute_many(sql, kwargs.values())
 
     def add_balance(self, **kwargs):
         sql = """
