@@ -90,3 +90,16 @@ def test_add_from_csv_account(test_portfolio):
     sql = """SELECT * FROM account"""
 
     assert entry == test_portfolio.sql_fetch_all_dict(sql)
+
+
+def test_add_from_csv_account_type(test_portfolio):
+    entry = list(csv.DictReader(open('./test_data/test_account_types.csv')))
+    for row in entry:
+        row['id'] = int(row['id'])
+        row['tax_in'] = int(row['tax_in'])
+        row['tax_growth'] = int(row['tax_growth'])
+        row['tax_out'] = int(row['tax_out'])
+
+    sql = """SELECT * FROM account_type"""
+
+    assert entry == test_portfolio.sql_fetch_all_dict(sql)
