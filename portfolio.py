@@ -265,13 +265,11 @@ class Portfolio(sql_database.Database):
 
     # CSV loader
     def add_from_csv_account(self, file_name):
-        reader = csv.DictReader(open(file_name))
-        for line in reader:
+        for line in csv.DictReader(open(file_name)):
             self.add_account(kwargs=line)
 
     def add_from_csv_account_type(self, file_name):
-        reader = csv.DictReader(open(file_name))
-        for line in reader:
+        for line in csv.DictReader(open(file_name)):
             self.add_account_type(kwargs=line)
 
     def add_from_csv_asset(self, file_name):
@@ -311,17 +309,8 @@ class Portfolio(sql_database.Database):
         self.execute_many(sql, csv_values)
 
     def add_from_csv_owner(self, file_name):
-        reader = csv.DictReader(open(file_name))
-        for line in reader:
+        for line in csv.DictReader(open(file_name)):
             self.add_owner(kwargs=line)
-
-        # csv_values = file_processing.get_split_lines(file_name)
-        # sql = """
-        # INSERT INTO owner(id, name, birthday)
-        # VALUES(?, ?, ?)
-        # """
-        #
-        # self.execute_many(sql, csv_values)
 
     def add_from_csv_price(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
