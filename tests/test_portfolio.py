@@ -15,8 +15,20 @@ import portfolio
 def test_add_account(test_portfolio):
     entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 3}
     test_portfolio.add_account(args=entry)
+
     sql = """
     SELECT name, account_type_id, institution_id, owner_id FROM account WHERE id = 6
+    """
+
+    assert entry == test_portfolio.sql_fetch_one(sql)
+
+
+def test_add_balance(test_portfolio):
+    entry = {'account_id': 1, 'asset_id': 4, 'balance_date': '2023-01-01', 'quantity': 12}
+    test_portfolio.add_balance(args=entry)
+
+    sql = """
+    SELECT account_id, asset_id, balance_date, quantity FROM balance WHERE id = 11
     """
 
     assert entry == test_portfolio.sql_fetch_one(sql)
@@ -36,6 +48,7 @@ def test_add_owner(test_portfolio):
 def test_add_price(test_portfolio):
     entry = {'asset_id': 2, 'price_date': '2023-01-01', 'amount': 3.61}
     test_portfolio.add_price(args=entry)
+
     sql = """
     SELECT asset_id, price_date, amount FROM price WHERE id = 10
     """

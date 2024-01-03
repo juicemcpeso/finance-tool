@@ -200,20 +200,26 @@ class Portfolio(sql_database.Database):
         """Add asset"""
         pass
 
-    def add_balance(self):
+    def add_balance(self, **kwargs):
         """Add balance"""
-        account = selection.by_name(self.accounts())
-        asset = select_a.by_name(self.accounts())
-        date = input('Enter date in YYYY-MM-DD format: ')
-        quantity = float(input('Enter number of shares: '))
-        new_balance = (account, asset, date, quantity)
+        # account = selection.by_name(self.accounts())
+        # asset = select_a.by_name(self.accounts())
+        # date = input('Enter date in YYYY-MM-DD format: ')
+        # quantity = float(input('Enter number of shares: '))
+        # new_balance = (account, asset, date, quantity)
+        #
+        # sql = """
+        # INSERT INTO balance(account_id, asset_id, balance_date, quantity)
+        # VALUES(?, ?, ?, ?)
+        # """
+        #
+        # self.execute_parameters(sql, new_balance)
 
         sql = """
         INSERT INTO balance(account_id, asset_id, balance_date, quantity) 
-        VALUES(?, ?, ?, ?)
+        VALUES(:account_id, :asset_id, :balance_date, :quantity)
         """
-
-        self.execute_parameters(sql, new_balance)
+        self.execute_many(sql, kwargs.values())
 
     def add_owner(self, **kwargs):
         """Add owner"""
