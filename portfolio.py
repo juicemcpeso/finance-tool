@@ -257,13 +257,9 @@ class Portfolio(sql_database.Database):
 
     # CSV loader
     def add_from_csv_account(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO account(id, name, account_type_id, institution_id, owner_id) 
-        VALUES(?, ?, ?, ?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        reader = csv.DictReader(open(file_name))
+        for line in reader:
+            self.add_account(kwargs=line)
 
     def add_from_csv_account_type(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
