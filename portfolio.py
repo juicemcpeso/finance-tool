@@ -5,8 +5,6 @@
 
 import file_processing
 import sql_database
-import select_a
-import sqlite3
 
 create_account_table = """
 CREATE TABLE IF NOT EXISTS account (
@@ -328,20 +326,6 @@ class Portfolio(sql_database.Database):
         """
 
         self.execute_many(sql, csv_values)
-
-    # def add_initial_assets():
-    #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_assets.csv')
-    #     sql_execute_many("INSERT INTO asset(symbol, name) VALUES(?, ?)", initial_values)
-    #
-    #
-    # def add_initial_locations():
-    #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_locations.csv')
-    #     sql_execute_many("INSERT INTO location(name) VALUES(?)", initial_values)
-    #
-    #
-    # def add_initial_owners():
-    #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_owners.csv')
-    #     sql_execute_many("INSERT INTO owner(name, birthday) VALUES(?, ?)", initial_values)
 
     def populate_test_portfolio(self):
         self.drop_all_tables()
