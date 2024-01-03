@@ -173,20 +173,28 @@ class Portfolio(sql_database.Database):
 
     # IO
     # Add
-    def add_account(self):
+    # def add_account(self):
+    #     """Add account"""
+    #     name = input('Enter account name: ')
+    #     institution = str(input('Enter institution name: '))
+    #     account_type = select_a.by_name(self.account_types())
+    #     owner = select_a.by_name(self.owners())
+    #     new_account = (name, account_type, owner, institution)
+    #
+    #     sql = """
+    #     INSERT INTO account(name, account_type_id, owner_id, institution)
+    #     VALUES(?, ?, ?, ?)
+    #     """
+    #
+    #     self.execute_parameters(sql, new_account)
+
+    def add_account(self, **kwargs):
         """Add account"""
-        name = input('Enter account name: ')
-        institution = str(input('Enter institution name: '))
-        account_type = select_a.by_name(self.account_types())
-        owner = select_a.by_name(self.owners())
-        new_account = (name, account_type, owner, institution)
-
         sql = """
-        "INSERT INTO account(name, account_type_id, owner_id, institution) 
-        VALUES(?, ?, ?, ?)"
+        INSERT INTO account(name, account_type_id, institution_id, owner_id) 
+        VALUES(:name, :account_type_id, :institution_id, :owner_id)
         """
-
-        self.execute_parameters(sql, new_account)
+        self.execute_many(sql, kwargs.values())
 
     def add_asset(self):
         """Add asset"""

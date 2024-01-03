@@ -1,5 +1,7 @@
 import pytest
 import portfolio
+
+
 #
 #
 # @pytest.fixture
@@ -8,6 +10,16 @@ import portfolio
 #     test_portfolio.populate_test_portfolio()
 #
 #     return test_portfolio
+
+
+def test_add_account(test_portfolio):
+    entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 3}
+    test_portfolio.add_account(args=entry)
+    sql = """
+    SELECT name, account_type_id, institution_id, owner_id FROM account WHERE id = 6
+    """
+
+    assert entry == test_portfolio.sql_fetch_one(sql)
 
 
 def test_add_owner(test_portfolio):
@@ -19,3 +31,4 @@ def test_add_owner(test_portfolio):
     """
 
     assert entry == test_portfolio.sql_fetch_one(sql)
+
