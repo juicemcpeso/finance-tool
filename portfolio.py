@@ -223,19 +223,25 @@ class Portfolio(sql_database.Database):
         """
         self.execute_many(sql, kwargs.values())
 
-    def add_price(self):
+    def add_price(self, **kwargs):
         """Add price"""
-        asset = selection.by_name(self.assets())
-        date = input('Enter date in YYYY-MM-DD format: ')
-        amount = float(input('Enter price: $'))
-        new_price = (asset, date, amount)
+        # asset = selection.by_name(self.assets())
+        # date = input('Enter date in YYYY-MM-DD format: ')
+        # amount = float(input('Enter price: $'))
+        # new_price = (asset, date, amount)
+        #
+        # sql = """
+        # INSERT INTO price(asset_id, price_date, amount)
+        # VALUES(?, ?, ?)
+        # """
+        #
+        # self.execute_parameters(sql, new_price)
 
         sql = """
         INSERT INTO price(asset_id, price_date, amount) 
-        VALUES(?, ?, ?)
+        VALUES(:asset_id, :price_date, :amount)
         """
-
-        self.execute_parameters(sql, new_price)
+        self.execute_many(sql, kwargs.values())
 
     # Remove
 

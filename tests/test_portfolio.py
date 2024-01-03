@@ -32,3 +32,12 @@ def test_add_owner(test_portfolio):
 
     assert entry == test_portfolio.sql_fetch_one(sql)
 
+
+def test_add_price(test_portfolio):
+    entry = {'asset_id': 2, 'price_date': '2023-01-01', 'amount': 3.61}
+    test_portfolio.add_price(args=entry)
+    sql = """
+    SELECT asset_id, price_date, amount FROM price WHERE id = 10
+    """
+
+    assert entry == test_portfolio.sql_fetch_one(sql)
