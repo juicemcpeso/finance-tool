@@ -2,6 +2,7 @@ import pytest
 import portfolio
 import csv
 
+
 # Helper functions
 def csv_to_numeric_dict_list(file_name):
     entry = list(csv.DictReader(open(file_name)))
@@ -143,3 +144,12 @@ def test_add_from_csv_balance(empty_portfolio):
 
     assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
+
+def test_add_from_csv_institution(empty_portfolio):
+    file_name = './test_data/test_institutions.csv'
+    empty_portfolio.add_from_csv_institution(file_name)
+    entry = csv_to_numeric_dict_list(file_name)
+
+    sql = """SELECT * FROM institution"""
+
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)

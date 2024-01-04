@@ -204,6 +204,14 @@ class Portfolio(sql_database.Database):
 
         self.execute_many(sql, kwargs.values())
 
+    def add_institution(self, **kwargs):
+        sql = """
+        INSERT INTO institution(name) 
+        VALUES(:name)
+        """
+
+        self.execute_many(sql, kwargs.values())
+
     def add_owner(self, **kwargs):
         sql = """
         INSERT INTO owner(name, birthday) 
@@ -281,13 +289,8 @@ class Portfolio(sql_database.Database):
             self.add_balance(kwargs=line)
 
     def add_from_csv_institution(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO institution(id, name) 
-        VALUES(?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_institution(kwargs=line)
 
     def add_from_csv_location(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)
