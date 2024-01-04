@@ -273,13 +273,8 @@ class Portfolio(sql_database.Database):
             self.add_account_type(kwargs=line)
 
     def add_from_csv_asset(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO asset(id, name, symbol) 
-        VALUES(?, ?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_asset(kwargs=line)
 
     def add_from_csv_balance(self, file_name):
         csv_values = file_processing.get_split_lines(file_name)

@@ -112,3 +112,16 @@ def test_add_from_csv_account_type(empty_portfolio):
     sql = """SELECT * FROM account_type"""
 
     assert entry == empty_portfolio.sql_fetch_all_dict(sql)
+
+
+def test_add_from_csv_asset(empty_portfolio):
+    file_name = './test_data/test_assets.csv'
+    empty_portfolio.add_from_csv_asset(file_name)
+
+    entry = list(csv.DictReader(open(file_name)))
+    for row in entry:
+        row['id'] = int(row['id'])
+
+    sql = """SELECT * FROM asset"""
+
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)
