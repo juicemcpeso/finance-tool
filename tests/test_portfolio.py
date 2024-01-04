@@ -3,70 +3,70 @@ import portfolio
 import csv
 
 
-def test_add_account(test_portfolio):
-    entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 3}
-    test_portfolio.add_account(args=entry)
+def test_add_account(empty_portfolio):
+    entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 1}
+    empty_portfolio.add_account(args=entry)
 
     sql = """
-    SELECT name, account_type_id, institution_id, owner_id FROM account WHERE id = 6
+    SELECT name, account_type_id, institution_id, owner_id FROM account WHERE id = 1
     """
 
-    assert entry == test_portfolio.sql_fetch_one(sql)
+    assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
-def test_add_account_type(test_portfolio):
+def test_add_account_type(empty_portfolio):
     entry = {'name': 'Traditional IRA', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}
-    test_portfolio.add_account_type(args=entry)
+    empty_portfolio.add_account_type(args=entry)
 
     sql = """
-    SELECT name, tax_in, tax_growth, tax_out FROM account_type WHERE id = 4
+    SELECT name, tax_in, tax_growth, tax_out FROM account_type WHERE id = 1
     """
 
-    assert entry == test_portfolio.sql_fetch_one(sql)
+    assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
-def test_add_asset(test_portfolio):
+def test_add_asset(empty_portfolio):
     entry = {'name': 'Test Index Fund', 'symbol': 'TEST'}
-    test_portfolio.add_asset(args=entry)
+    empty_portfolio.add_asset(args=entry)
 
     sql = """
-    SELECT name, symbol FROM asset WHERE id = 6
+    SELECT name, symbol FROM asset WHERE id = 1
     """
 
-    assert entry == test_portfolio.sql_fetch_one(sql)
+    assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
-def test_add_balance(test_portfolio):
+def test_add_balance(empty_portfolio):
     entry = {'account_id': 1, 'asset_id': 4, 'balance_date': '2023-01-01', 'quantity': 12}
-    test_portfolio.add_balance(args=entry)
+    empty_portfolio.add_balance(args=entry)
 
     sql = """
-    SELECT account_id, asset_id, balance_date, quantity FROM balance WHERE id = 11
+    SELECT account_id, asset_id, balance_date, quantity FROM balance WHERE id = 1
     """
 
-    assert entry == test_portfolio.sql_fetch_one(sql)
+    assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
-def test_add_owner(test_portfolio):
+def test_add_owner(empty_portfolio):
     entry = {'name': 'Carlos', 'birthday': '2000-01-01'}
-    test_portfolio.add_owner(args=entry)
+    empty_portfolio.add_owner(args=entry)
 
     sql = """
-    SELECT name, birthday FROM owner WHERE id = 3
+    SELECT name, birthday FROM owner WHERE id = 1
     """
 
-    assert entry == test_portfolio.sql_fetch_one(sql)
+    assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
-def test_add_price(test_portfolio):
+def test_add_price(empty_portfolio):
     entry = {'asset_id': 2, 'price_date': '2023-01-01', 'amount': 3.61}
-    test_portfolio.add_price(args=entry)
+    empty_portfolio.add_price(args=entry)
 
     sql = """
-    SELECT asset_id, price_date, amount FROM price WHERE id = 10
+    SELECT asset_id, price_date, amount FROM price WHERE id = 1
     """
 
-    assert entry == test_portfolio.sql_fetch_one(sql)
+    assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
 def test_add_from_csv_owner(empty_portfolio):
