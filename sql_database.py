@@ -25,6 +25,7 @@ class Database:
     def drop_all_tables(self):
         self.execute_list_commands(self.drop_table_commands)
 
+    # TODO - clean up which of these are actully used
     def execute(self, command):
         """Execute a single command"""
         con = sqlite3.connect(self.database)
