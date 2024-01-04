@@ -23,7 +23,8 @@ def convert_to_numeric(item):
     except ValueError:
         pass
     else:
-        if numeric_output.is_integer():
+        # if numeric_output.is_integer():
+        if isinstance(numeric_output, int):
             numeric_output = int(item)
 
     return numeric_output
@@ -95,16 +96,6 @@ def test_add_price(empty_portfolio):
     assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
-def test_add_from_csv_owner(empty_portfolio):
-    file_name = './test_data/test_owners.csv'
-    empty_portfolio.add_from_csv_owner(file_name)
-    entry = csv_to_numeric_dict_list(file_name)
-
-    sql = """SELECT * FROM owner"""
-
-    assert entry == empty_portfolio.sql_fetch_all_dict(sql)
-
-
 def test_add_from_csv_account(empty_portfolio):
     file_name = './test_data/test_accounts.csv'
     empty_portfolio.add_from_csv_account(file_name)
@@ -161,5 +152,25 @@ def test_add_from_csv_location(empty_portfolio):
     entry = csv_to_numeric_dict_list(file_name)
 
     sql = """SELECT * FROM location"""
+
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)
+
+
+def test_add_from_csv_owner(empty_portfolio):
+    file_name = './test_data/test_owners.csv'
+    empty_portfolio.add_from_csv_owner(file_name)
+    entry = csv_to_numeric_dict_list(file_name)
+
+    sql = """SELECT * FROM owner"""
+
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)
+
+
+def test_add_from_csv_price(empty_portfolio):
+    file_name = './test_data/test_prices.csv'
+    empty_portfolio.add_from_csv_price(file_name)
+    entry = csv_to_numeric_dict_list(file_name)
+
+    sql = """SELECT * FROM price"""
 
     assert entry == empty_portfolio.sql_fetch_all_dict(sql)
