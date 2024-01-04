@@ -127,48 +127,63 @@ class Portfolio(sql_database.Database):
         return iter(self._lookup.keys())
 
     def __getitem__(self, key):
-        return self._lookup[key]
+        return self.sql_fetch_all_dict(self._lookup[key])
+        # return self._lookup[key]
 
     def __setitem__(self, key, value):
         self._lookup[key] = value
 
-    def _construct_lookup(self):
-        getters = {self.accounts,
-                   self.account_types,
-                   self.assets,
-                   self.balances,
-                   self.institutions,
-                   self.locations,
-                   self.owners,
-                   self.prices}
+    # def _construct_lookup(self):
+    #     getters = {self.accounts,
+    #                self.account_types,
+    #                self.assets,
+    #                self.balances,
+    #                self.institutions,
+    #                self.locations,
+    #                self.owners,
+    #                self.prices}
+    #
+    #     for item in getters:
+    #         self._lookup[item.__name__] = item
 
-        for item in getters:
-            self._lookup[item.__name__] = item
+    def _construct_lookup(self):
+        get_commands = {'accounts': "SELECT * FROM account",
+                        'account_types': "SELECT * FROM account_type",
+                        'assets': "SELECT * FROM asset",
+                        'balances': "SELECT * FROM balance",
+                        'institutions': "SELECT * FROM institution",
+                        'locations': "SELECT * FROM location",
+                        'owners': "SELECT * FROM owner",
+                        'prices': "SELECT * FROM price"}
+
+        for item in get_commands:
+            self._lookup[item] = get_commands[item]
 
     # Table dictionaries
-    def accounts(self):
-        return self.sql_fetch_all_dict("SELECT * FROM account")
+    # def accounts(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM account")
+    #
+    # def account_types(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM account_type")
+    #
+    # def assets(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM asset")
+    #
+    # def balances(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM balance")
+    #
+    # def institutions(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM institution")
+    #
+    # def locations(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM location")
+    #
+    # def owners(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM owner")
 
-    def account_types(self):
-        return self.sql_fetch_all_dict("SELECT * FROM account_type")
-
-    def assets(self):
-        return self.sql_fetch_all_dict("SELECT * FROM asset")
-
-    def balances(self):
-        return self.sql_fetch_all_dict("SELECT * FROM balance")
-
-    def institutions(self):
-        return self.sql_fetch_all_dict("SELECT * FROM institution")
-
-    def locations(self):
-        return self.sql_fetch_all_dict("SELECT * FROM location")
-
-    def owners(self):
-        return self.sql_fetch_all_dict("SELECT * FROM owner")
-
-    def prices(self):
-        return self.sql_fetch_all_dict("SELECT * FROM price")
+    #
+    # def prices(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM price")
 
     # IO
     # Add

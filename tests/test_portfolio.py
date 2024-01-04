@@ -173,3 +173,10 @@ def test_add_from_csv_price(empty_portfolio):
     sql = """SELECT * FROM price"""
 
     assert entry == empty_portfolio.sql_fetch_all_dict(sql)
+
+
+def test_portfolio_owners(test_portfolio):
+    file_name = './test_data/test_owners.csv'
+    entry = csv_to_numeric_dict_list(file_name)
+
+    assert entry == test_portfolio['owners']
