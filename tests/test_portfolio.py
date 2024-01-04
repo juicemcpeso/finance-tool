@@ -23,7 +23,6 @@ def convert_to_numeric(item):
     except ValueError:
         pass
     else:
-        # if numeric_output.is_integer():
         if isinstance(numeric_output, int):
             numeric_output = int(item)
 
