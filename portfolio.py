@@ -3,9 +3,9 @@
 # 2023-12-18
 # @juicemcpeso
 
+import csv
 import file_processing
 import sql_database
-import select_a
 
 create_account_table = """
 CREATE TABLE IF NOT EXISTS account (
@@ -127,102 +127,129 @@ class Portfolio(sql_database.Database):
         return iter(self._lookup.keys())
 
     def __getitem__(self, key):
-        return self._lookup[key]
+        return self.sql_fetch_all_dict(self._lookup[key])
+        # return self._lookup[key]
 
     def __setitem__(self, key, value):
         self._lookup[key] = value
 
-    def _construct_lookup(self):
-        getters = {self.accounts,
-                   self.account_types,
-                   self.assets,
-                   self.balances,
-                   self.institutions,
-                   self.locations,
-                   self.owners,
-                   self.prices}
+    # def _construct_lookup(self):
+    #     getters = {self.accounts,
+    #                self.account_types,
+    #                self.assets,
+    #                self.balances,
+    #                self.institutions,
+    #                self.locations,
+    #                self.owners,
+    #                self.prices}
+    #
+    #     for item in getters:
+    #         self._lookup[item.__name__] = item
 
-        for item in getters:
-            self._lookup[item.__name__] = item
+    def _construct_lookup(self):
+        get_commands = {'accounts': "SELECT * FROM account",
+                        'account_types': "SELECT * FROM account_type",
+                        'assets': "SELECT * FROM asset",
+                        'balances': "SELECT * FROM balance",
+                        'institutions': "SELECT * FROM institution",
+                        'locations': "SELECT * FROM location",
+                        'owners': "SELECT * FROM owner",
+                        'prices': "SELECT * FROM price"}
+
+        for item in get_commands:
+            self._lookup[item] = get_commands[item]
 
     # Table dictionaries
-    def accounts(self):
-        return self.sql_fetch_all_dict("SELECT * FROM account")
+    # def accounts(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM account")
+    #
+    # def account_types(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM account_type")
+    #
+    # def assets(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM asset")
+    #
+    # def balances(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM balance")
+    #
+    # def institutions(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM institution")
+    #
+    # def locations(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM location")
+    #
+    # def owners(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM owner")
 
-    def account_types(self):
-        return self.sql_fetch_all_dict("SELECT * FROM account_type")
-
-    def assets(self):
-        return self.sql_fetch_all_dict("SELECT * FROM asset")
-
-    def balances(self):
-        return self.sql_fetch_all_dict("SELECT * FROM balance")
-
-    def institutions(self):
-        return self.sql_fetch_all_dict("SELECT * FROM institution")
-
-    def locations(self):
-        return self.sql_fetch_all_dict("SELECT * FROM location")
-
-    def owners(self):
-        return self.sql_fetch_all_dict("SELECT * FROM owner")
-
-    def prices(self):
-        return self.sql_fetch_all_dict("SELECT * FROM price")
+    #
+    # def prices(self):
+    #     return self.sql_fetch_all_dict("SELECT * FROM price")
 
     # IO
     # Add
-    def add_account(self):
-        """Add account"""
-        name = input('Enter account name: ')
-        institution = str(input('Enter institution name: '))
-        account_type = select_a.by_name(self.account_types())
-        owner = select_a.by_name(self.owners())
-        new_account = (name, account_type, owner, institution)
-
+    def add_account(self, **kwargs):
         sql = """
-        "INSERT INTO account(name, account_type_id, owner_id, institution) 
-        VALUES(?, ?, ?, ?)"
+        INSERT INTO account(name, account_type_id, institution_id, owner_id) 
+        VALUES(:name, :account_type_id, :institution_id, :owner_id)
         """
 
-        self.execute_parameters(sql, new_account)
+        self.execute_many(sql, kwargs.values())
 
-    def add_asset(self):
-        """Add asset"""
-        pass
+    def add_account_type(self, **kwargs):
+        sql = """
+        INSERT INTO account_type(name, tax_in, tax_growth, tax_out) 
+        VALUES(:name, :tax_in, :tax_growth, :tax_out)
+        """
 
-    def add_balance(self):
-        """Add balance"""
-        account = selection.by_name(self.accounts())
-        asset = select_a.by_name(self.accounts())
-        date = input('Enter date in YYYY-MM-DD format: ')
-        quantity = float(input('Enter number of shares: '))
-        new_balance = (account, asset, date, quantity)
+        self.execute_many(sql, kwargs.values())
 
+    def add_asset(self, **kwargs):
+        sql = """
+        INSERT INTO asset(name, symbol) 
+        VALUES(:name, :symbol)
+        """
+
+        self.execute_many(sql, kwargs.values())
+
+    def add_balance(self, **kwargs):
         sql = """
         INSERT INTO balance(account_id, asset_id, balance_date, quantity) 
-        VALUES(?, ?, ?, ?)
+        VALUES(:account_id, :asset_id, :balance_date, :quantity)
         """
 
-        self.execute_parameters(sql, new_balance)
+        self.execute_many(sql, kwargs.values())
 
-    def add_owner(self):
-        """Add owner"""
-        pass
+    def add_institution(self, **kwargs):
+        sql = """
+        INSERT INTO institution(name) 
+        VALUES(:name)
+        """
 
-    def add_price(self):
-        """Add price"""
-        asset = selection.by_name(self.assets())
-        date = input('Enter date in YYYY-MM-DD format: ')
-        amount = float(input('Enter price: $'))
-        new_price = (asset, date, amount)
+        self.execute_many(sql, kwargs.values())
 
+    def add_location(self, **kwargs):
+        sql = """
+        INSERT INTO location(name) 
+        VALUES(:name)
+        """
+
+        self.execute_many(sql, kwargs.values())
+
+    def add_owner(self, **kwargs):
+        sql = """
+        INSERT INTO owner(name, birthday) 
+        VALUES(:name, :birthday)
+        """
+
+        self.execute_many(sql, kwargs.values())
+
+    def add_price(self, **kwargs):
         sql = """
         INSERT INTO price(asset_id, price_date, amount) 
-        VALUES(?, ?, ?)
+        VALUES(:asset_id, :price_date, :amount)
         """
 
-        self.execute_parameters(sql, new_price)
+        self.execute_many(sql, kwargs.values())
 
     # Remove
 
@@ -269,98 +296,33 @@ class Portfolio(sql_database.Database):
 
     # CSV loader
     def add_from_csv_account(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO account(id, name, account_type_id, institution_id, owner_id) 
-        VALUES(?, ?, ?, ?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_account(kwargs=line)
 
     def add_from_csv_account_type(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO account_type(id, name, tax_in, tax_growth, tax_out) 
-        VALUES(?, ?, ?, ?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_account_type(kwargs=line)
 
     def add_from_csv_asset(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO asset(id, name, symbol) 
-        VALUES(?, ?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_asset(kwargs=line)
 
     def add_from_csv_balance(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO balance(id, account_id, asset_id, balance_date, quantity) 
-        VALUES(?, ?, ?, ?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_balance(kwargs=line)
 
     def add_from_csv_institution(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO institution(id, name) 
-        VALUES(?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_institution(kwargs=line)
 
     def add_from_csv_location(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO location(id, name) 
-        VALUES(?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_location(kwargs=line)
 
     def add_from_csv_owner(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO owner(id, name, birthday) 
-        VALUES(?, ?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_owner(kwargs=line)
 
     def add_from_csv_price(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO price(id, asset_id, price_date, amount) 
-        VALUES(?, ?, ?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
-
-    # def add_initial_assets():
-    #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_assets.csv')
-    #     sql_execute_many("INSERT INTO asset(symbol, name) VALUES(?, ?)", initial_values)
-    #
-    #
-    # def add_initial_locations():
-    #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_locations.csv')
-    #     sql_execute_many("INSERT INTO location(name) VALUES(?)", initial_values)
-    #
-    #
-    # def add_initial_owners():
-    #     initial_values = file_processing.get_split_lines('/asset-allocator/initial_values/initial_owners.csv')
-    #     sql_execute_many("INSERT INTO owner(name, birthday) VALUES(?, ?)", initial_values)
-
-    def populate_test_portfolio(self):
-        self.drop_all_tables()
-        self.create_all_tables()
-        self.add_from_csv_account('./tests/test_data/test_accounts.csv')
-        self.add_from_csv_account_type('./tests/test_data/test_account_types.csv')
-        self.add_from_csv_asset('./tests/test_data/test_assets.csv')
-        self.add_from_csv_balance('./tests/test_data/test_balances.csv')
-        self.add_from_csv_institution('./tests/test_data/test_institutions.csv')
-        self.add_from_csv_owner('./tests/test_data/test_owners.csv')
-        self.add_from_csv_price('./tests/test_data/test_prices.csv')
+        for line in csv.DictReader(open(file_name)):
+            self.add_price(kwargs=line)

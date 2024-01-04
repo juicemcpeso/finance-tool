@@ -15,3 +15,19 @@ def get_split_lines(file_path):
         split_lines.append(tuple(line.split(',')))
 
     return split_lines
+
+#
+# def get_named_split_lines(file_path):
+#     split_lines = []
+#     # # full_file_path = '/Users/ryan/PycharmProjects' + file_name
+#     # full_file_path = file_name
+#     with open(file_path, 'r') as handle:
+#         column_names = handle.readline()  # Removes header
+#         lines = handle.read().splitlines()
+#
+#     for i, line in enumerate(lines):
+#         line_dict = {}
+#         line_dict
+#         split_lines.append(tuple(line.split(',')))
+#
+#     return split_lines

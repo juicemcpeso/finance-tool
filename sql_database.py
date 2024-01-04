@@ -25,6 +25,7 @@ class Database:
     def drop_all_tables(self):
         self.execute_list_commands(self.drop_table_commands)
 
+    # TODO - clean up which of these are actully used
     def execute(self, command):
         """Execute a single command"""
         con = sqlite3.connect(self.database)
@@ -38,6 +39,13 @@ class Database:
         con = sqlite3.connect(self.database)
         cur = con.cursor()
         cur.execute(command, parameters)
+        con.commit()
+        con.close()
+
+    def execute_kwargs(self, command, kwargs):
+        con = sqlite3.connect(self.database)
+        cur = con.cursor()
+        cur.execute(command, kwargs)
         con.commit()
         con.close()
 
@@ -85,6 +93,15 @@ class Database:
         con.row_factory = dict_factory
         cur = con.cursor()
         result = cur.execute(command_text, params).fetchone()
+        con.commit()
+        con.close()
+        return result
+
+    def sql_fetch_one(self, command, params=None):
+        con = sqlite3.connect(self.database)
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        result = cur.execute(command, params).fetchone() if params is not None else cur.execute(command).fetchone()
         con.commit()
         con.close()
         return result

@@ -12,6 +12,7 @@ class AppAction(structures.Action):
     def __init__(self, name, app):
         super().__init__(name)
         self.app = app
+        self.data = {}
 
     def __call__(self):
         pass
@@ -78,7 +79,32 @@ class AddAccount(AppAction):
         super().__init__('Add account', app)
 
     def __call__(self):
+        sql = """
+        "INSERT INTO account 
+        VALUES (:name, :account_type_id, :owner_id, :institution)"
+        """
         self.app.portfolio.add_account()
+
+
+class AddOwner(AppAction):
+    def __init__(self, app):
+        super().__init__('Add owner', app)
+
+    def __call__(self):
+        self.app.portfolio.add_owner(kwargs=self.data)
+
+
+# Input actions
+class UserInput:
+    pass
+
+
+class InputDate(UserInput):
+    pass
+
+
+class InputText(UserInput):
+    pass
 
 # Export actions
 # TODO - write export actions. May want this to be in it's own module.
