@@ -180,3 +180,19 @@ def test_portfolio_owners(test_portfolio):
     entry = csv_to_numeric_dict_list(file_name)
 
     assert entry == test_portfolio['owners']
+
+
+# Calculations
+def test_newest_prices(test_portfolio):
+    # expected = {'1': 1.0,
+    #             '2': 2.81,
+    #             '3': 11.39,
+    #             '4': 47.89,
+    #             '5': 1.0}
+    expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 1.0},
+                {'asset_id': 2, 'price_date': '2022-01-01', 'amount': 2.81},
+                {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 11.39},
+                {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 47.89},
+                {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 1.0}]
+
+    assert expected == test_portfolio.current_prices()
