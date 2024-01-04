@@ -2,6 +2,31 @@ import pytest
 import portfolio
 import csv
 
+# Helper functions
+def csv_to_numeric_dict_list(file_name):
+    entry = list(csv.DictReader(open(file_name)))
+    convert_dict_list_to_numeric(entry)
+    return entry
+
+
+def convert_dict_list_to_numeric(dict_list):
+    for row in dict_list:
+        for key in row:
+            row.update({key: convert_to_numeric(row[key])})
+
+
+def convert_to_numeric(item):
+    numeric_output = item
+    try:
+        numeric_output = float(item)
+    except ValueError:
+        pass
+    else:
+        if numeric_output.is_integer():
+            numeric_output = int(item)
+
+    return numeric_output
+
 
 def test_add_account(empty_portfolio):
     entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 1}
@@ -72,10 +97,12 @@ def test_add_price(empty_portfolio):
 def test_add_from_csv_owner(empty_portfolio):
     file_name = './test_data/test_owners.csv'
     empty_portfolio.add_from_csv_owner(file_name)
+    entry = csv_to_numeric_dict_list(file_name)
 
-    entry = list(csv.DictReader(open(file_name)))
-    for row in entry:
-        row['id'] = int(row['id'])
+    #
+    # entry = list(csv.DictReader(open(file_name)))
+    # for row in entry:
+    #     row['id'] = int(row['id'])
 
     sql = """SELECT * FROM owner"""
 
@@ -85,13 +112,14 @@ def test_add_from_csv_owner(empty_portfolio):
 def test_add_from_csv_account(empty_portfolio):
     file_name = './test_data/test_accounts.csv'
     empty_portfolio.add_from_csv_account(file_name)
-
-    entry = list(csv.DictReader(open(file_name)))
-    for row in entry:
-        row['id'] = int(row['id'])
-        row['account_type_id'] = int(row['account_type_id'])
-        row['institution_id'] = int(row['institution_id'])
-        row['owner_id'] = int(row['owner_id'])
+    entry = csv_to_numeric_dict_list(file_name)
+    #
+    # entry = list(csv.DictReader(open(file_name)))
+    # for row in entry:
+    #     row['id'] = int(row['id'])
+    #     row['account_type_id'] = int(row['account_type_id'])
+    #     row['institution_id'] = int(row['institution_id'])
+    #     row['owner_id'] = int(row['owner_id'])
 
     sql = """SELECT * FROM account"""
 
@@ -101,13 +129,14 @@ def test_add_from_csv_account(empty_portfolio):
 def test_add_from_csv_account_type(empty_portfolio):
     file_name = './test_data/test_account_types.csv'
     empty_portfolio.add_from_csv_account_type(file_name)
-
-    entry = list(csv.DictReader(open(file_name)))
-    for row in entry:
-        row['id'] = int(row['id'])
-        row['tax_in'] = int(row['tax_in'])
-        row['tax_growth'] = int(row['tax_growth'])
-        row['tax_out'] = int(row['tax_out'])
+    entry = csv_to_numeric_dict_list(file_name)
+    #
+    # entry = list(csv.DictReader(open(file_name)))
+    # for row in entry:
+    #     row['id'] = int(row['id'])
+    #     row['tax_in'] = int(row['tax_in'])
+    #     row['tax_growth'] = int(row['tax_growth'])
+    #     row['tax_out'] = int(row['tax_out'])
 
     sql = """SELECT * FROM account_type"""
 
@@ -117,11 +146,31 @@ def test_add_from_csv_account_type(empty_portfolio):
 def test_add_from_csv_asset(empty_portfolio):
     file_name = './test_data/test_assets.csv'
     empty_portfolio.add_from_csv_asset(file_name)
+    entry = csv_to_numeric_dict_list(file_name)
 
-    entry = list(csv.DictReader(open(file_name)))
-    for row in entry:
-        row['id'] = int(row['id'])
+    # entry = list(csv.DictReader(open(file_name)))
+    # for row in entry:
+    #     row['id'] = int(row['id'])
 
     sql = """SELECT * FROM asset"""
 
     assert entry == empty_portfolio.sql_fetch_all_dict(sql)
+
+
+def test_add_from_csv_balance(empty_portfolio):
+    file_name = './test_data/test_balances.csv'
+    empty_portfolio.add_from_csv_balance(file_name)
+    entry = csv_to_numeric_dict_list(file_name)
+
+    # entry = list(csv.DictReader(open(file_name)))
+    # convert_dict_list_to_numeric(entry)
+
+    # row['id'] = int(row['id'])
+    # row['account_id'] = int(row['account_id'])
+    # row['asset_id'] = int(row['asset_id'])
+    # row['quantity'] = float(row['quantity'])
+
+    sql = """SELECT * FROM balance"""
+
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)
+
