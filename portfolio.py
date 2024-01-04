@@ -301,13 +301,6 @@ class Portfolio(sql_database.Database):
             self.add_institution(kwargs=line)
 
     def add_from_csv_location(self, file_name):
-        # csv_values = file_processing.get_split_lines(file_name)
-        # sql = """
-        # INSERT INTO location(id, name)
-        # VALUES(?, ?)
-        # """
-        #
-        # self.execute_many(sql, csv_values)
         for line in csv.DictReader(open(file_name)):
             self.add_location(kwargs=line)
 
