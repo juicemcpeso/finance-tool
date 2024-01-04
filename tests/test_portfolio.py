@@ -184,11 +184,6 @@ def test_portfolio_owners(test_portfolio):
 
 # Calculations
 def test_newest_prices(test_portfolio):
-    # expected = {'1': 1.0,
-    #             '2': 2.81,
-    #             '3': 11.39,
-    #             '4': 47.89,
-    #             '5': 1.0}
     expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 1.0},
                 {'asset_id': 2, 'price_date': '2022-01-01', 'amount': 2.81},
                 {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 11.39},

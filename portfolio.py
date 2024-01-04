@@ -267,29 +267,12 @@ class Portfolio(sql_database.Database):
 
     # Assets
     def newest_prices(self):
-        # This gives the most recent date for each asset
-        # sql = """
-        # SELECT asset_id, MAX(price_date) newest
-        # FROM price
-        # GROUP BY asset_id
-        # """AR
-
         sql = """
         SELECT asset_id, MAX(price_date) price_date, amount
         FROM price
         GROUP BY asset_id
         """
 
-        # sql = """
-        # SELECT asset_id, amount
-        # FROM price p1
-        # WHERE p1.price_date = (SELECT MAX(p2.price_date), amount FROM price p2 WHERE p2.asset_id = p1.asset_id)
-        # """
-        # sql = """
-        # SELECT asset_id, amount
-        # FROM price
-        # WHERE price_date = (SELECT MAX(price_date) FROM price)
-        # """
         return self.sql_fetch_all_dict(sql)
 
     def asset_price_current(self, asset_id):
