@@ -153,3 +153,13 @@ def test_add_from_csv_institution(empty_portfolio):
     sql = """SELECT * FROM institution"""
 
     assert entry == empty_portfolio.sql_fetch_all_dict(sql)
+
+
+def test_add_from_csv_location(empty_portfolio):
+    file_name = './test_data/test_locations.csv'
+    empty_portfolio.add_from_csv_location(file_name)
+    entry = csv_to_numeric_dict_list(file_name)
+
+    sql = """SELECT * FROM location"""
+
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)

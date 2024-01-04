@@ -212,6 +212,14 @@ class Portfolio(sql_database.Database):
 
         self.execute_many(sql, kwargs.values())
 
+    def add_location(self, **kwargs):
+        sql = """
+        INSERT INTO location(name) 
+        VALUES(:name)
+        """
+
+        self.execute_many(sql, kwargs.values())
+
     def add_owner(self, **kwargs):
         sql = """
         INSERT INTO owner(name, birthday) 
@@ -293,13 +301,15 @@ class Portfolio(sql_database.Database):
             self.add_institution(kwargs=line)
 
     def add_from_csv_location(self, file_name):
-        csv_values = file_processing.get_split_lines(file_name)
-        sql = """
-        INSERT INTO location(id, name) 
-        VALUES(?, ?)
-        """
-
-        self.execute_many(sql, csv_values)
+        # csv_values = file_processing.get_split_lines(file_name)
+        # sql = """
+        # INSERT INTO location(id, name)
+        # VALUES(?, ?)
+        # """
+        #
+        # self.execute_many(sql, csv_values)
+        for line in csv.DictReader(open(file_name)):
+            self.add_location(kwargs=line)
 
     def add_from_csv_owner(self, file_name):
         for line in csv.DictReader(open(file_name)):
