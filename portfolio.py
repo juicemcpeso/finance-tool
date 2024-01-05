@@ -283,6 +283,35 @@ class Portfolio(sql_database.Database):
         """
         return self.sql_fetch_all_dict(sql)
 
+    def value_of_balances(self):
+        # Most recent balances
+        sql_balances = """
+        SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
+        FROM balance
+        GROUP BY account_id, asset_id
+        """
+        # Newest prices
+        sql_prices = """
+        SELECT asset_id, MAX(price_date) price_date, amount
+        FROM price
+        GROUP BY asset_id
+                GROUP BY account_id, asset_id
+        """
+        sql_1 = """
+        SELECT account_id, b.asset_id, MAX(balance_date) balance_date, quantity, amount
+        FROM balance AS b, price AS p
+        WHERE b.asset_id = p.asset_id
+        """
+        sql = """
+        SELECT account_id, b.asset_id, MAX(balance_date) balance_date, quantity*amount AS current_value
+        FROM balance AS b, price AS p
+        WHERE b.asset_id = p.asset_id
+        GROUP BY account_id, b.asset_id
+        """
+        print(self.sql_fetch_all_dict(sql))
+        return self.sql_fetch_all_dict(sql)
+
+
     # def asset_price_current(self, asset_id):
     #     sql = """
     #     SELECT amount
