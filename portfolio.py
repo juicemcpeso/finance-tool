@@ -354,8 +354,6 @@ class Portfolio(sql_database.Database):
     #     """
     #     return self.sql_fetch_all_dict_params(sql, (asset_id,))
 
-
-
     # CSV loader
     def add_from_csv_account(self, file_name):
         for line in csv.DictReader(open(file_name)):
