@@ -184,33 +184,33 @@ def test_portfolio_owners(test_portfolio):
 
 # Calculations
 def test_newest_prices(test_portfolio):
-    expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 1.0},
-                {'asset_id': 2, 'price_date': '2022-01-01', 'amount': 2.81},
-                {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 11.39},
-                {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 47.89},
-                {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 1.0}]
+    expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 10000},
+                {'asset_id': 2, 'price_date': '2022-01-01', 'amount': 28100},
+                {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 113900},
+                {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 478900},
+                {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 10000}]
 
     assert expected == test_portfolio.newest_prices()
 
 
 def test_current_balances(test_portfolio):
-    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'quantity': 10},
-                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'quantity': 7.5},
-                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'quantity': 10000},
-                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'quantity': 8},
-                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 6},
-                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 6000}]
+    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'quantity': 100000},
+                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'quantity': 75000},
+                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'quantity': 100000000},
+                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'quantity': 80000},
+                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 60000},
+                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 60000000}]
 
     assert expected == test_portfolio.current_balances()
 
 
 def test_value_of_balances(test_portfolio):
-    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 478.90},
-                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 85.425},
-                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 10000.0},
-                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 22.48},
-                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 68.34},
-                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 6000.0}]
+    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 4789000},
+                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 854250},
+                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 100000000},
+                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 224800},
+                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 683400},
+                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 60000000}]
 
     assert expected == test_portfolio.value_of_balances()
 
@@ -244,3 +244,11 @@ def test_value_of_balances(test_portfolio):
 #  {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 22.48},
 #  {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 68.34},
 #  {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 6000.0}]
+
+# Balances
+# 1,4,2022-01-01,100000 * 478900
+# 2,3,2022-01-01,75000 * 113900
+# 3,5,2021-12-15,100000000 * 10000
+# 4,3,2021-01-01,60000 * 113900
+# 4,2,2022-01-01,80000 * 28100
+# 5,1,2022-01-01,60000000 * 10000

@@ -41,7 +41,7 @@ id INTEGER PRIMARY KEY,
 account_id INTEGER,
 asset_id INTEGER,
 balance_date TEXT,
-quantity REAL,
+quantity INT,
 FOREIGN KEY(account_id) REFERENCES account(id),
 FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
@@ -59,7 +59,7 @@ name TEXT,
 asset_id INTEGER,
 asset_class_id INTEGER,
 location_id INTEGER,
-percentage REAL,
+percentage INT,
 FOREIGN KEY(asset_id) REFERENCES asset(id),
 FOREIGN KEY(asset_class_id) REFERENCES asset_class(id),
 FOREIGN KEY(location_id) REFERENCES location(id)
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS price (
 id INTEGER PRIMARY KEY,
 asset_id INTEGER,
 price_date TEXT,
-amount REAL,
+amount INT,
 FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
 
@@ -322,14 +322,19 @@ class Portfolio(sql_database.Database):
                 GROUP BY asset_id) AS p ON b.asset_id = p.asset_id
         """
         sql = """
-        SELECT b.account_id, b.asset_id, MAX(b.balance_date) balance_date, b.quantity * p.amount AS current_value
-        FROM balance AS b
-        JOIN (  SELECT asset_id, MAX(price_date) price_date, amount
-                FROM price
-                GROUP BY asset_id) AS p ON b.asset_id = p.asset_id
+        SELECT 
+            b.account_id, b.asset_id, MAX(b.balance_date) balance_date, b.quantity * p.amount / 10000 AS current_value
+        FROM 
+            balance AS b
+        JOIN 
+            (SELECT 
+                asset_id, MAX(price_date) price_date, amount
+            FROM 
+                price
+            GROUP BY asset_id) AS p ON b.asset_id = p.asset_id
         GROUP BY b.account_id, b.asset_id
         """
-        print(self.sql_fetch_all_dict(sql))
+
         return self.sql_fetch_all_dict(sql)
 
 
