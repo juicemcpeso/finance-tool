@@ -306,6 +306,34 @@ class Portfolio(sql_database.Database):
 
         return self.sql_fetch_all_dict(sql)
 
+    # Net worth
+    def net_worth(self):
+        sql = """
+        SELECT 
+            SUM(current_values.current_value) AS net_worth
+        FROM (
+            SELECT 
+                b.account_id, 
+                b.asset_id, 
+                MAX(b.balance_date) balance_date, 
+                b.quantity * p.amount / 10000 AS current_value
+            FROM 
+                balance AS b
+            JOIN (
+                SELECT 
+                    asset_id, MAX(price_date) price_date, amount
+                FROM 
+                    price
+                GROUP BY 
+                    asset_id
+                ) AS p ON b.asset_id = p.asset_id
+            GROUP BY 
+                b.account_id, b.asset_id
+            ) AS current_values
+        """
+
+        return self.sql_fetch_all_dict(sql)
+
 
     # def asset_price_current(self, asset_id):
     #     sql = """
@@ -326,14 +354,7 @@ class Portfolio(sql_database.Database):
     #     """
     #     return self.sql_fetch_all_dict_params(sql, (asset_id,))
 
-    # Net worth
-    def net_worth(self):
-        sql = """
-        SELECT account_id, asset_id, MAX(balance_date)
-        FROM balance
-        GROUP BY account_id, asset_id
-        """
-        print(self.sql_fetch_all_dict(sql))
+
 
     # CSV loader
     def add_from_csv_account(self, file_name):

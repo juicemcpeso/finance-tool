@@ -213,3 +213,8 @@ def test_value_of_balances(test_portfolio):
                 {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 60000000}]
 
     assert expected == test_portfolio.value_of_balances()
+
+
+def test_net_worth(test_portfolio):
+    expected = [{'net_worth': 166551450}]
+    assert expected == test_portfolio.net_worth()
