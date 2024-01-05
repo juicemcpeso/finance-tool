@@ -190,4 +190,15 @@ def test_newest_prices(test_portfolio):
                 {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 47.89},
                 {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 1.0}]
 
-    assert expected == test_portfolio.current_prices()
+    assert expected == test_portfolio.newest_prices()
+
+
+def test_current_balances(test_portfolio):
+    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'quantity': 10},
+                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'quantity': 7.5},
+                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'quantity': 10000},
+                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'quantity': 8},
+                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 6},
+                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 6000}]
+
+    assert expected == test_portfolio.current_balances()

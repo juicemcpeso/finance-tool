@@ -275,24 +275,32 @@ class Portfolio(sql_database.Database):
 
         return self.sql_fetch_all_dict(sql)
 
-    def asset_price_current(self, asset_id):
+    def current_balances(self):
         sql = """
-        SELECT amount 
-        FROM price 
-        WHERE asset_id = ? 
-        ORDER BY price_date DESC LIMIT 1
+        SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
+        FROM balance
+        GROUP BY account_id, asset_id
         """
-        if asset_id:
-            return self.sql_fetch_one_params(sql, (asset_id,))['amount']
+        return self.sql_fetch_all_dict(sql)
 
-    def asset_price_history(self, asset_id):
-        sql = """
-        SELECT price_date, amount 
-        FROM price 
-        WHERE asset_id = ? 
-        ORDER BY price_date DESC
-        """
-        return self.sql_fetch_all_dict_params(sql, (asset_id,))
+    # def asset_price_current(self, asset_id):
+    #     sql = """
+    #     SELECT amount
+    #     FROM price
+    #     WHERE asset_id = ?
+    #     ORDER BY price_date DESC LIMIT 1
+    #     """
+    #     if asset_id:
+    #         return self.sql_fetch_one_params(sql, (asset_id,))['amount']
+    #
+    # def asset_price_history(self, asset_id):
+    #     sql = """
+    #     SELECT price_date, amount
+    #     FROM price
+    #     WHERE asset_id = ?
+    #     ORDER BY price_date DESC
+    #     """
+    #     return self.sql_fetch_all_dict_params(sql, (asset_id,))
 
     # Net worth
     def net_worth(self):
