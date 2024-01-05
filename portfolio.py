@@ -41,7 +41,7 @@ id INTEGER PRIMARY KEY,
 account_id INTEGER,
 asset_id INTEGER,
 balance_date TEXT,
-quantity REAL,
+quantity INT,
 FOREIGN KEY(account_id) REFERENCES account(id),
 FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
@@ -59,7 +59,7 @@ name TEXT,
 asset_id INTEGER,
 asset_class_id INTEGER,
 location_id INTEGER,
-percentage REAL,
+percentage INT,
 FOREIGN KEY(asset_id) REFERENCES asset(id),
 FOREIGN KEY(asset_class_id) REFERENCES asset_class(id),
 FOREIGN KEY(location_id) REFERENCES location(id)
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS price (
 id INTEGER PRIMARY KEY,
 asset_id INTEGER,
 price_date TEXT,
-amount REAL,
+amount INT,
 FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
 
@@ -266,33 +266,93 @@ class Portfolio(sql_database.Database):
         # print(value)
 
     # Assets
-    def asset_price_current(self, asset_id):
+    def newest_prices(self):
         sql = """
-        SELECT amount 
-        FROM price 
-        WHERE asset_id = ? 
-        ORDER BY price_date DESC LIMIT 1
+        SELECT asset_id, MAX(price_date) price_date, amount
+        FROM price
+        GROUP BY asset_id
         """
-        if asset_id:
-            return self.sql_fetch_one_params(sql, (asset_id,))['amount']
 
-    def asset_price_history(self, asset_id):
+        return self.sql_fetch_all_dict(sql)
+
+    def current_balances(self):
         sql = """
-        SELECT price_date, amount 
-        FROM price 
-        WHERE asset_id = ? 
-        ORDER BY price_date DESC
+        SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
+        FROM balance
+        GROUP BY account_id, asset_id
         """
-        return self.sql_fetch_all_dict_params(sql, (asset_id,))
+        return self.sql_fetch_all_dict(sql)
+
+    def value_of_balances(self):
+        sql = """
+        SELECT 
+            b.account_id, 
+            b.asset_id, 
+            MAX(b.balance_date) balance_date, 
+            b.quantity * p.amount / 10000 AS current_value
+        FROM 
+            balance AS b
+        JOIN (
+            SELECT 
+                asset_id, MAX(price_date) price_date, amount
+            FROM 
+                price
+            GROUP BY 
+                asset_id
+            ) AS p ON b.asset_id = p.asset_id
+        GROUP BY 
+            b.account_id, b.asset_id
+        """
+
+        return self.sql_fetch_all_dict(sql)
 
     # Net worth
     def net_worth(self):
         sql = """
-        SELECT account_id, asset_id, MAX(balance_date)
-        FROM balance
-        GROUP BY account_id, asset_id
+        SELECT 
+            SUM(current_values.current_value) AS net_worth
+        FROM (
+            SELECT 
+                b.account_id, 
+                b.asset_id, 
+                MAX(b.balance_date) balance_date, 
+                b.quantity * p.amount / 10000 AS current_value
+            FROM 
+                balance AS b
+            JOIN (
+                SELECT 
+                    asset_id, MAX(price_date) price_date, amount
+                FROM 
+                    price
+                GROUP BY 
+                    asset_id
+                ) AS p ON b.asset_id = p.asset_id
+            GROUP BY 
+                b.account_id, b.asset_id
+            ) AS current_values
         """
-        print(self.sql_fetch_all_dict(sql))
+
+        return self.sql_fetch_all_dict(sql)
+
+
+    # def asset_price_current(self, asset_id):
+    #     sql = """
+    #     SELECT amount
+    #     FROM price
+    #     WHERE asset_id = ?
+    #     ORDER BY price_date DESC LIMIT 1
+    #     """
+    #     if asset_id:
+    #         return self.sql_fetch_one_params(sql, (asset_id,))['amount']
+    #
+    # def asset_price_history(self, asset_id):
+    #     sql = """
+    #     SELECT price_date, amount
+    #     FROM price
+    #     WHERE asset_id = ?
+    #     ORDER BY price_date DESC
+    #     """
+    #     return self.sql_fetch_all_dict_params(sql, (asset_id,))
 
     # CSV loader
     def add_from_csv_account(self, file_name):

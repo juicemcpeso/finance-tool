@@ -180,3 +180,41 @@ def test_portfolio_owners(test_portfolio):
     entry = csv_to_numeric_dict_list(file_name)
 
     assert entry == test_portfolio['owners']
+
+
+# Calculations
+def test_newest_prices(test_portfolio):
+    expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 10000},
+                {'asset_id': 2, 'price_date': '2022-01-01', 'amount': 28100},
+                {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 113900},
+                {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 478900},
+                {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 10000}]
+
+    assert expected == test_portfolio.newest_prices()
+
+
+def test_current_balances(test_portfolio):
+    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'quantity': 100000},
+                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'quantity': 75000},
+                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'quantity': 100000000},
+                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'quantity': 80000},
+                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 60000},
+                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 60000000}]
+
+    assert expected == test_portfolio.current_balances()
+
+
+def test_value_of_balances(test_portfolio):
+    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 4789000},
+                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 854250},
+                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 100000000},
+                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 224800},
+                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 683400},
+                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 60000000}]
+
+    assert expected == test_portfolio.value_of_balances()
+
+
+def test_net_worth(test_portfolio):
+    expected = [{'net_worth': 166551450}]
+    assert expected == test_portfolio.net_worth()
