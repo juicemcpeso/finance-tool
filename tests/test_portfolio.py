@@ -205,12 +205,12 @@ def test_current_balances(test_portfolio):
 
 
 def test_value_of_balances(test_portfolio):
-    expected = [{'account_id': 1, 'asset_id': 4, 'current_value': 478.90},
-                {'account_id': 2, 'asset_id': 3, 'current_value': 85.425},
-                {'account_id': 3, 'asset_id': 5, 'current_value': 10000.0},
-                {'account_id': 4, 'asset_id': 2, 'current_value': 22.48},
-                {'account_id': 4, 'asset_id': 3, 'current_value': 68.34},
-                {'account_id': 5, 'asset_id': 1, 'current_value': 6000.0}]
+    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 478.90},
+                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 85.425},
+                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 10000.0},
+                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 22.48},
+                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 68.34},
+                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 6000.0}]
 
     assert expected == test_portfolio.value_of_balances()
 
@@ -220,4 +220,27 @@ def test_value_of_balances(test_portfolio):
 #  {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 10000.0},
 #  {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 19.76},
 #  {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 48.78},
+#  {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 6000.0}]
+
+# [100%][{'account_id': 1, 'asset_id': 4, 'balance_date': '2021-01-01', 'current_value': 5.0},
+# {'account_id': 2, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 9.0},
+# {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 10000.0},
+# {'account_id': 4, 'asset_id': 2, 'balance_date': '2020-01-01', 'current_value': 4.0},
+# {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 6.0},
+# {'account_id': 5, 'asset_id': 1, 'balance_date': '2021-01-01', 'current_value': 5000.0}]4
+
+# sql 3 - result
+# [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 10.0},
+#  {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 7.5},
+#  {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 10000.0},
+#  {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 8.0},
+#  {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 6.0},
+#  {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 6000.0}]
+
+# sql 5 - result
+# [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 478.9},
+#  {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 85.42500000000001},
+#  {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 10000.0},
+#  {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 22.48},
+#  {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 68.34},
 #  {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 6000.0}]

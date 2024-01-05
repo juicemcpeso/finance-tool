@@ -302,11 +302,32 @@ class Portfolio(sql_database.Database):
         FROM balance AS b, price AS p
         WHERE b.asset_id = p.asset_id
         """
-        sql = """
-        SELECT account_id, b.asset_id, MAX(balance_date) balance_date, quantity*amount AS current_value
+        sql_2 = """
+        SELECT account_id, b.asset_id,  quantity*amount AS current_value
         FROM balance AS b, price AS p
         WHERE b.asset_id = p.asset_id
         GROUP BY account_id, b.asset_id
+        """
+        sql_3 = """
+        SELECT account_id, b.asset_id, MAX(balance_date) balance_date, quantity*amount AS current_value
+        FROM balance AS b
+        CROSS JOIN price
+        GROUP BY account_id, b.asset_id
+        """
+        sql_start = """
+        SELECT b.*, p.amount
+        FROM balance AS b
+        JOIN (  SELECT asset_id, MAX(price_date) price_date, amount
+                FROM price
+                GROUP BY asset_id) AS p ON b.asset_id = p.asset_id
+        """
+        sql = """
+        SELECT b.account_id, b.asset_id, MAX(b.balance_date) balance_date, b.quantity * p.amount AS current_value
+        FROM balance AS b
+        JOIN (  SELECT asset_id, MAX(price_date) price_date, amount
+                FROM price
+                GROUP BY asset_id) AS p ON b.asset_id = p.asset_id
+        GROUP BY b.account_id, b.asset_id
         """
         print(self.sql_fetch_all_dict(sql))
         return self.sql_fetch_all_dict(sql)
