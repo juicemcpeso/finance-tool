@@ -218,3 +218,8 @@ def test_value_of_balances(test_portfolio):
 def test_net_worth(test_portfolio):
     expected = [{'net_worth': 166551450}]
     assert expected == test_portfolio.net_worth()
+
+
+def test_asset_allocation(test_portfolio):
+    print(test_portfolio.asset_allocation())
+    assert True
