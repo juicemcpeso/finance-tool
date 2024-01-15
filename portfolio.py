@@ -55,7 +55,6 @@ name TEXT
 create_component_table = """
 CREATE TABLE IF NOT EXISTS component (
 id INTEGER PRIMARY KEY,
-name TEXT,
 asset_id INTEGER,
 asset_class_id INTEGER,
 location_id INTEGER,
@@ -356,7 +355,6 @@ class Portfolio(sql_database.Database):
         """
 
         return self.sql_fetch_all_dict(sql)
-
 
     # def asset_price_current(self, asset_id):
     #     sql = """
