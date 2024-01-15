@@ -253,3 +253,13 @@ def test_balance_by_asset_type(test_portfolio):
                 {'asset_id': 5, 'quantity': 100000000}]
 
     assert expected == test_portfolio.balance_by_asset_type()
+
+
+def test_value_by_asset_type(test_portfolio):
+    expected = [{'asset_id': 1, 'current_value': 60000000},
+                {'asset_id': 2, 'current_value': 224800},
+                {'asset_id': 3, 'current_value': 1537650},
+                {'asset_id': 4, 'current_value': 4789000},
+                {'asset_id': 5, 'current_value': 100000000}]
+
+    assert expected == test_portfolio.value_by_asset_type()
