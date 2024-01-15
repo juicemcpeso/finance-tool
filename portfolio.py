@@ -328,6 +328,18 @@ class Portfolio(sql_database.Database):
         """
         return self.sql_fetch_all_dict(sql)
 
+    def balance_by_asset_type(self):
+        sql = """
+        SELECT asset_id, SUM(quantity) quantity
+        FROM (
+            SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
+            FROM balance
+            GROUP BY account_id, asset_id)
+        GROUP BY asset_id
+        ORDER BY asset_id
+        """
+        return self.sql_fetch_all_dict(sql)
+
     def value_of_balances(self):
         sql = """
         SELECT 
