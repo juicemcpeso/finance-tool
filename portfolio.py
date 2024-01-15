@@ -287,6 +287,29 @@ class Portfolio(sql_database.Database):
 
         return self.sql_fetch_all_dict(sql)
 
+    def value_of_asset_classes(self):
+        sql = """
+        SELECT 
+            b.account_id, 
+            b.asset_id, 
+            MAX(b.balance_date) balance_date, 
+            b.quantity * p.amount / 10000 AS current_value
+        FROM 
+            balance AS b
+        JOIN (
+            SELECT 
+                asset_id, MAX(price_date) price_date, amount
+            FROM 
+                price
+            GROUP BY 
+                asset_id
+            ) AS p ON b.asset_id = p.asset_id
+        GROUP BY 
+            b.account_id, b.asset_id
+        """
+
+        return self.sql_fetch_all_dict(sql)
+
     # Assets
     def newest_prices(self):
         sql = """
