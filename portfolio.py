@@ -35,6 +35,12 @@ name TEXT,
 symbol TEXT
 );"""
 
+create_asset_class_table = """
+CREATE TABLE IF NOT EXISTS asset_class (
+id INTEGER PRIMARY KEY,
+name TEXT
+);"""
+
 create_balance_table = """
 CREATE TABLE IF NOT EXISTS balance (
 id INTEGER PRIMARY KEY,
@@ -149,7 +155,9 @@ class Portfolio(sql_database.Database):
         get_commands = {'accounts': "SELECT * FROM account",
                         'account_types': "SELECT * FROM account_type",
                         'assets': "SELECT * FROM asset",
+                        'asset_classes': "SELECT * FROM asset_class",
                         'balances': "SELECT * FROM balance",
+                        'components': "SELECT * FROM component",
                         'institutions': "SELECT * FROM institution",
                         'locations': "SELECT * FROM location",
                         'owners': "SELECT * FROM owner",
@@ -210,10 +218,26 @@ class Portfolio(sql_database.Database):
 
         self.execute_many(sql, kwargs.values())
 
+    def add_asset_class(self, **kwargs):
+        sql = """
+        INSERT INTO asset_class(name) 
+        VALUES(:name)
+        """
+
+        self.execute_many(sql, kwargs.values())
+
     def add_balance(self, **kwargs):
         sql = """
         INSERT INTO balance(account_id, asset_id, balance_date, quantity) 
         VALUES(:account_id, :asset_id, :balance_date, :quantity)
+        """
+
+        self.execute_many(sql, kwargs.values())
+
+    def add_component(self, **kwargs):
+        sql = """
+        INSERT INTO component(asset_id, asset_class_id, location_id, percentage) 
+        VALUES(:asset_id, :asset_class_id, :location_id, :percentage)
         """
 
         self.execute_many(sql, kwargs.values())
@@ -288,24 +312,80 @@ class Portfolio(sql_database.Database):
         return self.sql_fetch_all_dict(sql)
 
     def value_of_asset_classes(self):
+        # sql = """
+        # SELECT
+        #     asset_class_id, SUM(current_value) current_value
+        # FROM (
+        #     SELECT
+        #         c.asset_id,
+        #         c.asset_class_id,
+        #         current_value
+        #     FROM
+        #         component AS c
+        #     JOIN (
+        #         SELECT
+        #             asset_id,
+        #             SUM(current_value) current_value
+        #         FROM (
+        #             SELECT
+        #                 b.account_id,
+        #                 b.asset_id,
+        #                 MAX(b.balance_date) balance_date,
+        #                 b.quantity * p.amount / 10000 AS current_value
+        #             FROM
+        #                 balance AS b
+        #             JOIN (
+        #                 SELECT
+        #                     asset_id, MAX(price_date) price_date, amount
+        #                 FROM
+        #                     price
+        #                 GROUP BY
+        #                     asset_id
+        #                 ) AS p ON b.asset_id = p.asset_id
+        #             GROUP BY
+        #                 b.account_id, b.asset_id
+        #         )
+        #         GROUP BY asset_id
+        #         ORDER BY asset_id
+        #     ) AS v ON c.asset_id = v.asset_id
+        # )
+        # GROUP BY
+        #     asset_class_id
+        # """
+
         sql = """
         SELECT 
-            b.account_id, 
-            b.asset_id, 
-            MAX(b.balance_date) balance_date, 
-            b.quantity * p.amount / 10000 AS current_value
-        FROM 
-            balance AS b
+            c.asset_id, 
+            c.asset_class_id, 
+            current_value
+        FROM
+            component AS c
         JOIN (
             SELECT 
-                asset_id, MAX(price_date) price_date, amount
-            FROM 
-                price
-            GROUP BY 
-                asset_id
-            ) AS p ON b.asset_id = p.asset_id
-        GROUP BY 
-            b.account_id, b.asset_id
+                asset_id, 
+                SUM(current_value) current_value
+            FROM (
+                SELECT 
+                    b.account_id, 
+                    b.asset_id, 
+                    MAX(b.balance_date) balance_date, 
+                    b.quantity * p.amount / 10000 AS current_value
+                FROM 
+                    balance AS b
+                JOIN (
+                    SELECT 
+                        asset_id, MAX(price_date) price_date, amount
+                    FROM 
+                        price
+                    GROUP BY 
+                        asset_id
+                    ) AS p ON b.asset_id = p.asset_id
+                GROUP BY 
+                    b.account_id, b.asset_id
+            )
+            GROUP BY asset_id
+            ORDER BY asset_id
+        ) AS v ON c.asset_id = v.asset_id        
         """
 
         return self.sql_fetch_all_dict(sql)
@@ -450,9 +530,17 @@ class Portfolio(sql_database.Database):
         for line in csv.DictReader(open(file_name)):
             self.add_asset(kwargs=line)
 
+    def add_from_csv_asset_class(self, file_name):
+        for line in csv.DictReader(open(file_name)):
+            self.add_asset_class(kwargs=line)
+
     def add_from_csv_balance(self, file_name):
         for line in csv.DictReader(open(file_name)):
             self.add_balance(kwargs=line)
+
+    def add_from_csv_component(self, file_name):
+        for line in csv.DictReader(open(file_name)):
+            self.add_component(kwargs=line)
 
     def add_from_csv_institution(self, file_name):
         for line in csv.DictReader(open(file_name)):
