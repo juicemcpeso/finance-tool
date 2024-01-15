@@ -222,16 +222,10 @@ def test_net_worth(test_portfolio):
 
 def test_asset_allocation(test_portfolio):
     # TODO - updated expected for stocks and bonds (asset_class_id 1 and 2)
-    expected = [{'asset_class_id': 1, 'current_value': 0},
-                {'asset_class_id': 2, 'current_value': 0},
-                {'asset_class_id': 3, 'current_value': ((1000000 / 1000000) * 60000000 / 166551450)},
-                {'asset_class_id': 4, 'current_value': ((50000 / 1000000) * 100000 / 166551450)}]
-
-    # {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 854250},
-    # {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 100000000},
-    # {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 224800},
-    # {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 683400},
-    # {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 60000000}]
+    expected = [{'asset_class_id': 1, 'current_value': 5593650 / 166551450},
+                {'asset_class_id': 2, 'current_value': 100718350 / 166551450},
+                {'asset_class_id': 3, 'current_value': 60000000 / 166551450},
+                {'asset_class_id': 4, 'current_value': 239450 / 166551450}]
 
     assert expected == test_portfolio.asset_allocation()
 
