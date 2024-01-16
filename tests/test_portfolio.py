@@ -221,8 +221,7 @@ def test_net_worth(test_portfolio):
 
 
 def test_asset_allocation(test_portfolio):
-    # TODO - updated expected for stocks and bonds (asset_class_id 1 and 2)
-    expected = [{'asset_class_id': 1, 'allocation': 100.0 * 15593650 / 166551450},
+    expected = [{'asset_class_id': 1, 'allocation': 100.0 * 5593650 / 166551450},
                 {'asset_class_id': 2, 'allocation': 100.0 * 100718350 / 166551450},
                 {'asset_class_id': 3, 'allocation': 100.0 * 60000000 / 166551450},
                 {'asset_class_id': 4, 'allocation': 100.0 * 239450 / 166551450}]
