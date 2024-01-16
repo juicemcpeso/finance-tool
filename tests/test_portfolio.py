@@ -29,6 +29,14 @@ def convert_to_numeric(item):
     return numeric_output
 
 
+def sum_to_amount(test_function, key_to_sum, expected_amount):
+    total = 0
+    for item in test_function():
+        total += item[key_to_sum]
+
+    return total == expected_amount
+
+
 def test_add_account(empty_portfolio):
     entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 1}
     empty_portfolio.add_account(args=entry)
@@ -236,6 +244,21 @@ def test_value_of_asset_classes(test_portfolio):
                 {'asset_class_id': 4, 'current_value': 239450}]
 
     assert expected == test_portfolio.value_of_asset_classes()
+
+
+def test_value_of_asset_classes_with_locations(test_portfolio):
+    expected = [{'asset_class_id': 1, 'location_id': 1, 'current_value': 4171600},
+                {'asset_class_id': 1, 'location_id': 2, 'current_value': 1422050},
+                {'asset_class_id': 2, 'location_id': 1, 'current_value': 100478900},
+                {'asset_class_id': 2, 'location_id': 2, 'current_value': 239450},
+                {'asset_class_id': 3, 'location_id': 1, 'current_value': 60000000},
+                {'asset_class_id': 4, 'location_id': 'NULL', 'current_value': 239450}]
+
+    assert expected == test_portfolio.value_of_asset_classes_with_locations()
+
+
+def test_value_of_asset_classes_with_locations_sum(test_portfolio):
+    assert sum_to_amount(test_portfolio.value_of_asset_classes_with_locations, 'current_value', 166551450)
 
 
 def test_balance_by_asset_type(test_portfolio):
