@@ -3,6 +3,7 @@
 # 2023-12-18
 # @juicemcpeso
 
+import copy
 import csv
 import sql_database
 
@@ -557,7 +558,6 @@ class Portfolio(sql_database.Database):
         SELECT
             plan.asset_class_id,
             plan.location_id,
-            plan.percentage,
             current_values.current_value
         FROM 
             allocation_plan AS plan
@@ -610,12 +610,109 @@ class Portfolio(sql_database.Database):
 
         return self.sql_fetch_all_dict(sql)
 
-    def where_asset_to_buy(self, purchase_amount):
-        future_value = purchase_amount + self.net_worth()
-        for allocation in self.value_by_asset_type_in_plan():
-            allocation.update({'future value': future_value})
-            allocation.update({'future value': future_value})
+    def value_by_asset_type_in_plan_future_value(self, amount_to_buy):
+        sql_params = {'amount_to_buy': amount_to_buy,
+                      'future_value': self.net_worth() + amount_to_buy}
+        sql = """
+        SELECT
+            plan.asset_class_id,
+            plan.location_id,
+            plan.percentage AS desired,
+            10000 * current_values.current_value / :future_value AS no_buy,
+            10000 * (current_values.current_value + :amount_to_buy) / :future_value AS yes_buy
+        FROM 
+            allocation_plan AS plan
+        JOIN (
+            SELECT
+                asset_class_id, 
+                location_id,
+                SUM(current_value) current_value
+            FROM (
+                SELECT
+                    c.asset_id,
+                    c.asset_class_id,
+                    c.location_id,
+                    c.percentage * v.current_value / (10000 * 100) as current_value
+                FROM
+                    component AS c
+                JOIN (
+                    SELECT
+                        asset_id,
+                        SUM(current_value) current_value
+                    FROM (
+                        SELECT
+                            b.account_id,
+                            b.asset_id,
+                            MAX(b.balance_date) balance_date,
+                            b.quantity * p.amount / 10000 AS current_value
+                        FROM
+                            balance AS b
+                        JOIN (
+                            SELECT
+                                asset_id, MAX(price_date) price_date, amount
+                            FROM
+                                price
+                            GROUP BY
+                                asset_id
+                            ) AS p ON b.asset_id = p.asset_id
+                        GROUP BY
+                            b.account_id, b.asset_id
+                    )
+                    GROUP BY asset_id
+                    ORDER BY asset_id
+                ) AS v ON c.asset_id = v.asset_id
+            )
+            GROUP BY
+                asset_class_id, location_id
+        ) AS current_values ON 
+            current_values.asset_class_id == plan.asset_class_id AND 
+            current_values.location_id == plan.location_id 
+        """
 
+        return self.sql_fetch_all_dict_params(sql, sql_params)
+
+    def which_asset_to_buy(self, purchase_amount):
+        dict_of_tables = {}
+        results_dict = {}
+        base_table_list = self.value_by_asset_type_in_plan_future_value(purchase_amount)
+        for line_number, line in enumerate(base_table_list):
+            line.update({'option': line_number})
+
+        for option_number in range(len(base_table_list)):
+            copy_of_base_table = copy.deepcopy(base_table_list)
+
+            for line in copy_of_base_table:
+                if line['option'] == option_number:
+                    line.update({'amount': line['yes_buy']})
+                else:
+                    line.update({'amount': line['no_buy']})
+
+                del line['no_buy']
+                del line['yes_buy']
+
+            dict_of_tables.update({option_number: copy_of_base_table})
+
+        for table in dict_of_tables:
+            print(dict_of_tables[table])
+
+        for option in dict_of_tables:
+            score = 0.0
+            for line in dict_of_tables[option]:
+                score += abs(line['amount'] - line['desired'])
+            results_dict.update({option: score})
+
+        lowest_option = 0
+
+        for option in results_dict:
+            print(results_dict[option])
+
+            if results_dict[option] < results_dict[lowest_option]:
+                lowest_option = option
+
+        for line in base_table_list:
+            if line['option'] == lowest_option:
+                return [{'asset_class_id': line['asset_class_id'],
+                         'location_id': line['location_id']}]
 
     # CSV loader
     def add_from_csv_account(self, file_name):
