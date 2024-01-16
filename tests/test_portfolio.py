@@ -123,6 +123,16 @@ def test_add_from_csv_account_type(empty_portfolio):
     assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
+def test_add_from_csv_allocation_plan(empty_portfolio):
+    file_name = './test_data/test_allocation_plan.csv'
+    empty_portfolio.add_from_csv_allocation_plan(file_name)
+    entry = csv_to_numeric_dict_list(file_name)
+
+    sql = """SELECT * FROM allocation_plan"""
+
+    assert entry == empty_portfolio.sql_fetch_all_dict(sql)
+
+
 def test_add_from_csv_asset(empty_portfolio):
     file_name = './test_data/test_assets.csv'
     empty_portfolio.add_from_csv_asset(file_name)
