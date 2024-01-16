@@ -692,9 +692,6 @@ class Portfolio(sql_database.Database):
 
             dict_of_tables.update({option_number: copy_of_base_table})
 
-        for table in dict_of_tables:
-            print(dict_of_tables[table])
-
         for option in dict_of_tables:
             score = 0.0
             for line in dict_of_tables[option]:
@@ -704,8 +701,6 @@ class Portfolio(sql_database.Database):
         lowest_option = 0
 
         for option in results_dict:
-            print(results_dict[option])
-
             if results_dict[option] < results_dict[lowest_option]:
                 lowest_option = option
 
