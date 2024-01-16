@@ -279,3 +279,7 @@ def test_value_by_asset_type(test_portfolio):
                 {'asset_id': 5, 'current_value': 100000000}]
 
     assert expected == test_portfolio.value_by_asset_type()
+
+
+def test_value_by_asset_type_sum(test_portfolio):
+    assert sum_to_amount(test_portfolio.value_by_asset_type, 'current_value', 166551450)
