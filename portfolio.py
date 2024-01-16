@@ -303,7 +303,7 @@ class Portfolio(sql_database.Database):
         GROUP BY
             asset_class_id
         """
-        return self.sql_fetch_all_dict_params(sql, (self.net_worth()[0]['net_worth'],))
+        return self.sql_fetch_all_dict_params(sql, (self.net_worth(),))
 
     def asset_allocation_with_locations(self):
         sql = """
@@ -349,7 +349,7 @@ class Portfolio(sql_database.Database):
         GROUP BY
             asset_class_id, location_id
         """
-        return self.sql_fetch_all_dict_params(sql, (self.net_worth()[0]['net_worth'],))
+        return self.sql_fetch_all_dict_params(sql, (self.net_worth(),))
 
     def value_of_asset_classes(self):
         sql = """
@@ -549,7 +549,7 @@ class Portfolio(sql_database.Database):
             ) AS current_values
         """
 
-        return self.sql_fetch_all_dict(sql)
+        return self.sql_fetch_all_dict(sql)[0]['net_worth']
 
     # Tools
     def which_asset_type_to_buy(self, amount_to_buy):

@@ -238,7 +238,7 @@ def test_value_of_balances_sum(test_portfolio):
 
 
 def test_net_worth(test_portfolio):
-    expected = [{'net_worth': 166551450}]
+    expected = 166551450
     assert expected == test_portfolio.net_worth()
 
 
@@ -255,7 +255,7 @@ def test_asset_allocation_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_allocation, 'allocation', 100.0)
 
 
-def test_asset_allocation_with_locations_1(test_portfolio):
+def test_asset_allocation_with_locations(test_portfolio):
     expected = [{'asset_class_id': 1, 'location_id': 1, 'allocation': 100.0 * 4171600 / 166551450},
                 {'asset_class_id': 1, 'location_id': 2, 'allocation': 100.0 * 1422050 / 166551450},
                 {'asset_class_id': 2, 'location_id': 1, 'allocation': 100.0 * 100478900 / 166551450},
