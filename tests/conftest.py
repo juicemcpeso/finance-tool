@@ -19,6 +19,7 @@ def test_portfolio():
     test_portfolio.create_all_tables()
     test_portfolio.add_from_csv_account('./test_data/test_accounts.csv')
     test_portfolio.add_from_csv_account_type('./test_data/test_account_types.csv')
+    test_portfolio.add_from_csv_allocation_plan('./test_data/test_allocation_plan.csv')
     test_portfolio.add_from_csv_asset('./test_data/test_assets.csv')
     test_portfolio.add_from_csv_asset_class('./test_data/test_asset_classes.csv')
     test_portfolio.add_from_csv_balance('./test_data/test_balances.csv')
