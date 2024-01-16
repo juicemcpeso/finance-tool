@@ -254,6 +254,10 @@ def test_value_of_asset_classes(test_portfolio):
     assert expected == test_portfolio.value_of_asset_classes()
 
 
+def test_value_of_asset_classes_sum(test_portfolio):
+    assert sum_to_amount(test_portfolio.value_of_asset_classes, 'current_value', 166551450)
+
+
 def test_value_of_asset_classes_with_locations(test_portfolio):
     expected = [{'asset_class_id': 1, 'location_id': 1, 'current_value': 4171600},
                 {'asset_class_id': 1, 'location_id': 2, 'current_value': 1422050},
