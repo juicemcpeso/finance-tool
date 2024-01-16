@@ -223,6 +223,10 @@ def test_value_of_balances(test_portfolio):
     assert expected == test_portfolio.value_of_balances()
 
 
+def test_value_of_balances_sum(test_portfolio):
+    assert sum_to_amount(test_portfolio.value_of_balances, 'current_value', 166551450)
+
+
 def test_net_worth(test_portfolio):
     expected = [{'net_worth': 166551450}]
     assert expected == test_portfolio.net_worth()
