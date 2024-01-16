@@ -323,10 +323,10 @@ def test_value_by_asset_type_sum(test_portfolio):
 
 
 def test_value_by_asset_type_in_plan(test_portfolio):
-    expected = [{'asset_class_id': 1, 'location_id': 1, 'current_value': 4171600},
-                {'asset_class_id': 1, 'location_id': 2, 'current_value': 1422050},
-                {'asset_class_id': 2, 'location_id': 1, 'current_value': 100478900},
-                {'asset_class_id': 2, 'location_id': 2, 'current_value': 239450},
-                {'asset_class_id': 3, 'location_id': 1, 'current_value': 60000000}]
+    expected = [{'asset_class_id': 1, 'location_id': 1, 'percentage': 4000, 'current_value': 4171600},
+                {'asset_class_id': 1, 'location_id': 2, 'percentage': 2000, 'current_value': 1422050},
+                {'asset_class_id': 2, 'location_id': 1, 'percentage': 2500, 'current_value': 100478900},
+                {'asset_class_id': 2, 'location_id': 2, 'percentage': 500, 'current_value': 239450},
+                {'asset_class_id': 3, 'location_id': 1, 'percentage': 1000, 'current_value': 60000000}]
 
     assert expected == test_portfolio.value_by_asset_type_in_plan()

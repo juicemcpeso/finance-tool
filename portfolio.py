@@ -557,6 +557,7 @@ class Portfolio(sql_database.Database):
         SELECT
             plan.asset_class_id,
             plan.location_id,
+            plan.percentage,
             current_values.current_value
         FROM 
             allocation_plan AS plan
@@ -608,6 +609,13 @@ class Portfolio(sql_database.Database):
         """
 
         return self.sql_fetch_all_dict(sql)
+
+    def where_asset_to_buy(self, purchase_amount):
+        future_value = purchase_amount + self.net_worth()
+        for allocation in self.value_by_asset_type_in_plan():
+            allocation.update({'future value': future_value})
+            allocation.update({'future value': future_value})
+
 
     # CSV loader
     def add_from_csv_account(self, file_name):
