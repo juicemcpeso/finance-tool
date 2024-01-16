@@ -4,7 +4,6 @@
 # @juicemcpeso
 
 import csv
-import file_processing
 import sql_database
 
 create_account_table = """
@@ -133,23 +132,9 @@ class Portfolio(sql_database.Database):
 
     def __getitem__(self, key):
         return self.sql_fetch_all_dict(self._lookup[key])
-        # return self._lookup[key]
 
     def __setitem__(self, key, value):
         self._lookup[key] = value
-
-    # def _construct_lookup(self):
-    #     getters = {self.accounts,
-    #                self.account_types,
-    #                self.assets,
-    #                self.balances,
-    #                self.institutions,
-    #                self.locations,
-    #                self.owners,
-    #                self.prices}
-    #
-    #     for item in getters:
-    #         self._lookup[item.__name__] = item
 
     def _construct_lookup(self):
         get_commands = {'accounts': "SELECT * FROM account",
@@ -165,32 +150,6 @@ class Portfolio(sql_database.Database):
 
         for item in get_commands:
             self._lookup[item] = get_commands[item]
-
-    # Table dictionaries
-    # def accounts(self):
-    #     return self.sql_fetch_all_dict("SELECT * FROM account")
-    #
-    # def account_types(self):
-    #     return self.sql_fetch_all_dict("SELECT * FROM account_type")
-    #
-    # def assets(self):
-    #     return self.sql_fetch_all_dict("SELECT * FROM asset")
-    #
-    # def balances(self):
-    #     return self.sql_fetch_all_dict("SELECT * FROM balance")
-    #
-    # def institutions(self):
-    #     return self.sql_fetch_all_dict("SELECT * FROM institution")
-    #
-    # def locations(self):
-    #     return self.sql_fetch_all_dict("SELECT * FROM location")
-    #
-    # def owners(self):
-    #     return self.sql_fetch_all_dict("SELECT * FROM owner")
-
-    #
-    # def prices(self):
-    #     return self.sql_fetch_all_dict("SELECT * FROM price")
 
     # IO
     # Add
@@ -280,62 +239,8 @@ class Portfolio(sql_database.Database):
     # Accounts
     def account_value(self, account_id):
         pass
-        # value = 0
-        # balances = sql_fetch_all_dict_params("SELECT asset_id, quantity FROM balance WHERE account_id = ?",
-        #                                      (account_id,))
-        # for balance in balances:
-        #     pass
-        #
-        # print(value)
 
     def asset_allocation(self):
-        # sql = """
-        # SELECT
-        #     asset_class_id,
-        #     current_value,
-        #     100 * current_value / :net_worth  AS allocation
-        # FROM (
-        #     SELECT
-        #         asset_class_id, SUM(current_value) current_value
-        #     FROM (
-        #         SELECT
-        #             c.asset_id,
-        #             c.asset_class_id,
-        #             c.percentage * v.current_value / (10000 * 100) as current_value
-        #         FROM
-        #             component AS c
-        #         JOIN (
-        #             SELECT
-        #                 asset_id,
-        #                 SUM(current_value) current_value
-        #             FROM (
-        #                 SELECT
-        #                     b.account_id,
-        #                     b.asset_id,
-        #                     MAX(b.balance_date) balance_date,
-        #                     b.quantity * p.amount / 10000 AS current_value
-        #                 FROM
-        #                     balance AS b
-        #                 JOIN (
-        #                     SELECT
-        #                         asset_id, MAX(price_date) price_date, amount
-        #                     FROM
-        #                         price
-        #                     GROUP BY
-        #                         asset_id
-        #                     ) AS p ON b.asset_id = p.asset_id
-        #                 GROUP BY
-        #                     b.account_id, b.asset_id
-        #             )
-        #             GROUP BY asset_id
-        #             ORDER BY asset_id
-        #         ) AS v ON c.asset_id = v.asset_id
-        #     )
-        #     GROUP BY
-        #         asset_class_id
-        # )
-        # """
-        # print(self.net_worth()[0])
         sql = """
         SELECT
             asset_class_id, 
@@ -531,25 +436,6 @@ class Portfolio(sql_database.Database):
         """
 
         return self.sql_fetch_all_dict(sql)
-
-    # def asset_price_current(self, asset_id):
-    #     sql = """
-    #     SELECT amount
-    #     FROM price
-    #     WHERE asset_id = ?
-    #     ORDER BY price_date DESC LIMIT 1
-    #     """
-    #     if asset_id:
-    #         return self.sql_fetch_one_params(sql, (asset_id,))['amount']
-    #
-    # def asset_price_history(self, asset_id):
-    #     sql = """
-    #     SELECT price_date, amount
-    #     FROM price
-    #     WHERE asset_id = ?
-    #     ORDER BY price_date DESC
-    #     """
-    #     return self.sql_fetch_all_dict_params(sql, (asset_id,))
 
     # CSV loader
     def add_from_csv_account(self, file_name):
