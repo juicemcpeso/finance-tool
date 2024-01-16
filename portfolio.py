@@ -551,6 +551,10 @@ class Portfolio(sql_database.Database):
 
         return self.sql_fetch_all_dict(sql)
 
+    # Tools
+    def which_asset_type_to_buy(self, amount_to_buy):
+        pass
+
     # CSV loader
     def add_from_csv_account(self, file_name):
         for line in csv.DictReader(open(file_name)):

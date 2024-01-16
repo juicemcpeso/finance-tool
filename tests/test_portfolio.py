@@ -320,3 +320,7 @@ def test_value_by_asset_type(test_portfolio):
 
 def test_value_by_asset_type_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.value_by_asset_type, 'current_value', 166551450)
+
+
+def test_which_asset_type_to_buy(test_portfolio):
+    assert False
