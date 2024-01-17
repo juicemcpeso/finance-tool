@@ -140,6 +140,18 @@ class Portfolio(sql_database.Database):
         self._lookup = {}
         self._construct_lookup()
 
+        self.add_to_table = {'accounts': self.add_account,
+                             'account_types': self.add_account_type,
+                             'allocation_plan': self.add_allocation_plan,
+                             'assets': self.add_asset,
+                             'asset_classes': self.add_asset_class,
+                             'balances': self.add_balance,
+                             'components': self.add_component,
+                             'institutions': self.add_institution,
+                             'locations': self.add_location,
+                             'owners': self.add_owner,
+                             'prices': self.add_price}
+
     def __iter__(self):
         return iter(self._lookup.keys())
 
@@ -842,46 +854,6 @@ class Portfolio(sql_database.Database):
                          'location_id': line['location_id']}]
 
     # CSV loader
-    def add_from_csv_account(self, file_name):
+    def add_from_csv(self, file_name, table_name):
         for line in csv.DictReader(open(file_name)):
-            self.add_account(kwargs=line)
-
-    def add_from_csv_account_type(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_account_type(kwargs=line)
-
-    def add_from_csv_allocation_plan(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_allocation_plan(kwargs=line)
-
-    def add_from_csv_asset(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_asset(kwargs=line)
-
-    def add_from_csv_asset_class(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_asset_class(kwargs=line)
-
-    def add_from_csv_balance(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_balance(kwargs=line)
-
-    def add_from_csv_component(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_component(kwargs=line)
-
-    def add_from_csv_institution(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_institution(kwargs=line)
-
-    def add_from_csv_location(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_location(kwargs=line)
-
-    def add_from_csv_owner(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_owner(kwargs=line)
-
-    def add_from_csv_price(self, file_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_price(kwargs=line)
+            self.add_to_table[table_name](kwargs=line)

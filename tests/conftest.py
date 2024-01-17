@@ -4,6 +4,10 @@ import app
 import portfolio
 
 
+def test_data_csv(table_name):
+    return './test_data/' + table_name + '.csv'
+
+
 @pytest.fixture
 def empty_portfolio():
     empty_portfolio = portfolio.Portfolio('./test.db')
@@ -17,16 +21,7 @@ def test_portfolio():
     test_portfolio = portfolio.Portfolio('./test.db')
     test_portfolio.drop_all_tables()
     test_portfolio.create_all_tables()
-    test_portfolio.add_from_csv_account('./test_data/test_accounts.csv')
-    test_portfolio.add_from_csv_account_type('./test_data/test_account_types.csv')
-    test_portfolio.add_from_csv_allocation_plan('./test_data/test_allocation_plan.csv')
-    test_portfolio.add_from_csv_asset('./test_data/test_assets.csv')
-    test_portfolio.add_from_csv_asset_class('./test_data/test_asset_classes.csv')
-    test_portfolio.add_from_csv_balance('./test_data/test_balances.csv')
-    test_portfolio.add_from_csv_component('./test_data/test_components.csv')
-    test_portfolio.add_from_csv_institution('./test_data/test_institutions.csv')
-    test_portfolio.add_from_csv_owner('./test_data/test_owners.csv')
-    test_portfolio.add_from_csv_price('./test_data/test_prices.csv')
+    add_all_test_data_from_csv(test_portfolio)
 
     return test_portfolio
 
@@ -37,3 +32,12 @@ def test_app(test_portfolio):
     test_app.portfolio = test_portfolio
 
     return test_app
+
+
+def add_all_test_data_from_csv(test_portfolio):
+    for table_name in test_portfolio.add_to_table:
+        add_test_data_from_csv(test_portfolio, table_name)
+
+
+def add_test_data_from_csv(test_portfolio, table_name):
+    test_portfolio.add_from_csv(test_data_csv(table_name), table_name)
