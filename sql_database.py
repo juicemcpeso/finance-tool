@@ -25,7 +25,7 @@ class Database:
     def drop_all_tables(self):
         self.execute_list_commands(self.drop_table_commands)
 
-    # TODO - clean up which of these are actully used
+    # TODO - clean up which of these are actually used
     def execute(self, command):
         """Execute a single command"""
         con = sqlite3.connect(self.database)
@@ -62,46 +62,47 @@ class Database:
         con.commit()
         con.close()
 
-    def sql_fetch_all(self, command_text):
-        con = sqlite3.connect(self.database)
-        cur = con.cursor()
-        result = cur.execute(command_text).fetchall()
-        con.commit()
-        con.close()
-        return result
+    # def sql_fetch_all_dict(self, command_text):
+    #     con = sqlite3.connect(self.database)
+    #     con.row_factory = dict_factory
+    #     cur = con.cursor()
+    #     result = cur.execute(command_text).fetchall()
+    #     con.commit()
+    #     con.close()
+    #     return result
+    #
+    # def sql_fetch_all_dict_params(self, command_text, params):
+    #     con = sqlite3.connect(self.database)
+    #     con.row_factory = dict_factory
+    #     cur = con.cursor()
+    #     result = cur.execute(command_text, params).fetchall()
+    #     con.commit()
+    #     con.close()
+    #     return result
 
-    def sql_fetch_all_dict(self, command_text):
-        con = sqlite3.connect(self.database)
-        con.row_factory = dict_factory
-        cur = con.cursor()
-        result = cur.execute(command_text).fetchall()
-        con.commit()
-        con.close()
-        return result
-
-    def sql_fetch_all_dict_params(self, command_text, params):
-        con = sqlite3.connect(self.database)
-        con.row_factory = dict_factory
-        cur = con.cursor()
-        result = cur.execute(command_text, params).fetchall()
-        con.commit()
-        con.close()
-        return result
-
-    def sql_fetch_one_params(self, command_text, params):
-        con = sqlite3.connect(self.database)
-        con.row_factory = dict_factory
-        cur = con.cursor()
-        result = cur.execute(command_text, params).fetchone()
-        con.commit()
-        con.close()
-        return result
+    # def sql_fetch_one_params(self, command_text, params):
+    #     con = sqlite3.connect(self.database)
+    #     con.row_factory = dict_factory
+    #     cur = con.cursor()
+    #     result = cur.execute(command_text, params).fetchone()
+    #     con.commit()
+    #     con.close()
+    #     return result
 
     def sql_fetch_one(self, command, params=None):
         con = sqlite3.connect(self.database)
         con.row_factory = dict_factory
         cur = con.cursor()
         result = cur.execute(command, params).fetchone() if params is not None else cur.execute(command).fetchone()
+        con.commit()
+        con.close()
+        return result
+
+    def sql_fetch_all(self, command, params=None):
+        con = sqlite3.connect(self.database)
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        result = cur.execute(command, params).fetchall() if params is not None else cur.execute(command).fetchall()
         con.commit()
         con.close()
         return result
