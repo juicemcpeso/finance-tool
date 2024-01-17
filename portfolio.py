@@ -316,7 +316,7 @@ class Portfolio(sql_database.Database):
         GROUP BY
             asset_class_id
         """
-        return self.sql_fetch_all(sql, {'net_worth': self.net_worth()})
+        return self.sql_fetch_all(sql, self.net_worth_dict())
 
     def asset_allocation_with_locations(self):
         sql = """
@@ -362,7 +362,7 @@ class Portfolio(sql_database.Database):
         GROUP BY
             asset_class_id, location_id
         """
-        return self.sql_fetch_all(sql, {'net_worth': self.net_worth()})
+        return self.sql_fetch_all(sql, self.net_worth_dict())
 
     def value_of_asset_classes(self):
         sql = """
@@ -687,8 +687,6 @@ class Portfolio(sql_database.Database):
         return self.sql_fetch_all(sql, sql_params)
 
     def allocation_difference(self):
-        sql_params = {'net_worth': self.net_worth()}
-
         sql = """
         SELECT
             plan.asset_class_id,
@@ -750,7 +748,7 @@ class Portfolio(sql_database.Database):
             value_difference DESC
         """
 
-        return self.sql_fetch_all(sql, sql_params)
+        return self.sql_fetch_all(sql, self.net_worth_dict())
 
     def allocation_difference_future_value(self, amount_to_add):
         sql_params = {'net_worth': self.net_worth() + amount_to_add}
