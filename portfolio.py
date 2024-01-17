@@ -140,17 +140,17 @@ class Portfolio(sql_database.Database):
         self._lookup = {}
         self._construct_lookup()
 
-        self.add_to_table = {'accounts': self.add_account}
-                        # 'account_types': "SELECT * FROM account_type",
-                        # 'allocation_plan': "SELECT * FROM allocation_plan",
-                        # 'assets': "SELECT * FROM asset",
-                        # 'asset_classes': "SELECT * FROM asset_class",
-                        # 'balances': "SELECT * FROM balance",
-                        # 'components': "SELECT * FROM component",
-                        # 'institutions': "SELECT * FROM institution",
-                        # 'locations': "SELECT * FROM location",
-                        # 'owners': "SELECT * FROM owner",
-                        # 'prices': "SELECT * FROM price"}
+        self.add_to_table = {'accounts': self.add_account,
+                             'account_types': self.add_account_type,
+                             'allocation_plan': self.add_allocation_plan,
+                             'assets': self.add_asset,
+                             'asset_classes': self.add_asset_class,
+                             'balances': self.add_balance,
+                             'components': self.add_component,
+                             'institutions': self.add_institution,
+                             'locations': self.add_location,
+                             'owners': self.add_owner,
+                             'prices': self.add_price}
 
     def __iter__(self):
         return iter(self._lookup.keys())
@@ -857,6 +857,7 @@ class Portfolio(sql_database.Database):
     def add_from_csv(self, file_name, table_name):
         for line in csv.DictReader(open(file_name)):
             self.add_to_table[table_name](kwargs=line)
+
     #
     # def add_from_csv_account(self, file_name):
     #     self.add_from_csv(file_name, 'accounts')
