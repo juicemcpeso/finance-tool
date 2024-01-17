@@ -105,7 +105,7 @@ def test_add_price(empty_portfolio):
 
 def test_add_from_csv_account(empty_portfolio):
     file_name = './test_data/test_accounts.csv'
-    empty_portfolio.add_from_csv_account(file_name)
+    empty_portfolio.add_from_csv(file_name, 'accounts')
     entry = csv_to_numeric_dict_list(file_name)
 
     sql = """SELECT * FROM account"""
