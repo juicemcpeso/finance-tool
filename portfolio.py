@@ -274,6 +274,7 @@ class Portfolio(sql_database.Database):
     def account_value(self, account_id):
         pass
 
+    # Asset class
     def asset_class_percentage(self):
         sql = """
         SELECT
@@ -318,7 +319,7 @@ class Portfolio(sql_database.Database):
         """
         return self.sql_fetch_all(sql, self.net_worth_dict())
 
-    def asset_class_location_percentage(self):
+    def asset_class_percentage_by_location(self):
         sql = """
         SELECT
             asset_class_id, 
@@ -409,7 +410,7 @@ class Portfolio(sql_database.Database):
 
         return self.sql_fetch_all(sql)
 
-    def asset_class_location_value(self):
+    def asset_class_value_by_location(self):
         sql = """
         SELECT
             asset_class_id, 
