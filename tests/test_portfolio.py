@@ -228,17 +228,17 @@ def test_asset_class_location_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_class_location_percentage, 'percentage', 100.0)
 
 
-def test_value_of_asset_classes(test_portfolio):
+def test_asset_class_value(test_portfolio):
     expected = [{'asset_class_id': 1, 'current_value': 5593650},
                 {'asset_class_id': 2, 'current_value': 100718350},
                 {'asset_class_id': 3, 'current_value': 60000000},
                 {'asset_class_id': 4, 'current_value': 239450}]
 
-    assert expected == test_portfolio.value_of_asset_classes()
+    assert expected == test_portfolio.asset_class_value()
 
 
 def test_value_of_asset_classes_sum(test_portfolio):
-    assert sum_to_amount(test_portfolio.value_of_asset_classes, 'current_value', 166551450)
+    assert sum_to_amount(test_portfolio.asset_class_value, 'current_value', 166551450)
 
 
 def test_value_of_asset_classes_with_locations(test_portfolio):

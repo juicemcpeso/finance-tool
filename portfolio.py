@@ -364,7 +364,7 @@ class Portfolio(sql_database.Database):
         """
         return self.sql_fetch_all(sql, self.net_worth_dict())
 
-    def value_of_asset_classes(self):
+    def asset_class_value(self):
         sql = """
         SELECT
             asset_class_id, 
