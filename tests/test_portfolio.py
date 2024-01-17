@@ -124,111 +124,38 @@ def test_add_price(empty_portfolio):
 
 def test_add_from_csv_account(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'accounts')
-    # add_test_data_from_csv(empty_portfolio, 'accounts')
-    #
-    # assert numeric_test_data('accounts') == empty_portfolio['accounts']
-#
-#
-# def test_add_from_csv_account(empty_portfolio):
-#     file_name = 'test_data/accounts.csv'
-#     empty_portfolio.add_from_csv(file_name, 'accounts')
-#     entry = csv_to_numeric_dict_list(file_name)
-#
-#     sql = """SELECT * FROM account"""
-#
-#     assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
 def test_add_from_csv_account_type(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'account_types')
-    # add_test_data_from_csv(empty_portfolio, 'account_types')
-    #
-    # assert numeric_test_data('account_types') == empty_portfolio['account_types']
-    #
-    # file_name = 'test_data/account_types.csv'
-    # empty_portfolio.add_from_csv(file_name, 'account_types')
-    # entry = csv_to_numeric_dict_list(file_name)
-    #
-    # # sql = """SELECT * FROM account_type"""
-    # # assert entry == empty_portfolio.sql_fetch_all_dict(sql)
-    # assert entry == empty_portfolio['account_types']
 
 
 def test_add_from_csv_allocation_plan(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'allocation_plan')
-    # file_name = 'test_data/allocation_plan.csv'
-    # empty_portfolio.add_from_csv(file_name, 'allocation_plan')
-    # entry = csv_to_numeric_dict_list(file_name)
-    # #
-    # # sql = """SELECT * FROM allocation_plan"""
-    #
-    # assert entry == empty_portfolio['allocation_plan']
 
 
 def test_add_from_csv_asset(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'assets')
-    # file_name = 'test_data/assets.csv'
-    # empty_portfolio.add_from_csv(file_name)
-    # entry = csv_to_numeric_dict_list(file_name)
-    #
-    # sql = """SELECT * FROM asset"""
-    #
-    # assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
 def test_add_from_csv_balance(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'balances')
-    # file_name = 'test_data/balances.csv'
-    # empty_portfolio.add_from_csv_balance(file_name)
-    # entry = csv_to_numeric_dict_list(file_name)
-    #
-    # sql = """SELECT * FROM balance"""
-    #
-    # assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
 def test_add_from_csv_institution(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'institutions')
-    # file_name = 'test_data/institutions.csv'
-    # empty_portfolio.add_from_csv(file_name)
-    # entry = csv_to_numeric_dict_list(file_name)
-    #
-    # sql = """SELECT * FROM institution"""
-    #
-    # assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
 def test_add_from_csv_location(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'locations')
-    # file_name = 'test_data/locations.csv'
-    # empty_portfolio.add_from_csv(file_name)
-    # entry = csv_to_numeric_dict_list(file_name)
-    #
-    # sql = """SELECT * FROM location"""
-    #
-    # assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
 def test_add_from_csv_owner(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'owners')
-    # file_name = 'test_data/owners.csv'
-    # empty_portfolio.add_from_csv(file_name)
-    # entry = csv_to_numeric_dict_list(file_name)
-    #
-    # sql = """SELECT * FROM owner"""
-    #
-    # assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
 def test_add_from_csv_price(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'prices')
-    # file_name = 'test_data/prices.csv'
-    # empty_portfolio.add_from_csv(file_name)
-    # entry = csv_to_numeric_dict_list(file_name)
-    #
-    # sql = """SELECT * FROM price"""
-    #
-    # assert entry == empty_portfolio.sql_fetch_all_dict(sql)
 
 
 def test_portfolio_owners(test_portfolio):
