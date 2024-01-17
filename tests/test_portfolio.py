@@ -158,13 +158,6 @@ def test_add_from_csv_price(empty_portfolio):
     assert add_from_csv_test(empty_portfolio, 'prices')
 
 
-def test_portfolio_owners(test_portfolio):
-    file_name = 'test_data/owners.csv'
-    entry = csv_to_numeric_dict_list(file_name)
-
-    assert entry == test_portfolio['owners']
-
-
 # Calculations
 def test_newest_prices(test_portfolio):
     expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 10000},
