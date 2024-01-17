@@ -28,8 +28,8 @@ tax_growth INTEGER,
 tax_out INTEGER
 );"""
 
-create_allocation_plan_table = """
-CREATE TABLE IF NOT EXISTS allocation_plan (
+create_allocation_table = """
+CREATE TABLE IF NOT EXISTS allocation (
 id INTEGER PRIMARY KEY,
 asset_class_id INTEGER,
 location_id INTEGER,
@@ -110,7 +110,7 @@ FOREIGN KEY(asset_id) REFERENCES asset(id)
 
 create_commands = [create_account_table,
                    create_account_type_table,
-                   create_allocation_plan_table,
+                   create_allocation_table,
                    create_asset_table,
                    create_asset_class_table,
                    create_balance_table,
@@ -122,7 +122,7 @@ create_commands = [create_account_table,
 
 drop_commands = ['DROP TABLE IF EXISTS account',
                  'DROP TABLE IF EXISTS account_type',
-                 'DROP TABLE IF EXISTS allocation_plan',
+                 'DROP TABLE IF EXISTS allocation',
                  'DROP TABLE IF EXISTS asset',
                  'DROP TABLE IF EXISTS asset_class',
                  'DROP TABLE IF EXISTS balance',
@@ -142,7 +142,7 @@ class Portfolio(sql_database.Database):
 
         self.add_to_table = {'accounts': self.add_account,
                              'account_types': self.add_account_type,
-                             'allocation_plan': self.add_allocation_plan,
+                             'allocations': self.add_allocation,
                              'assets': self.add_asset,
                              'asset_classes': self.add_asset_class,
                              'balances': self.add_balance,
@@ -156,7 +156,7 @@ class Portfolio(sql_database.Database):
         return iter(self._lookup.keys())
 
     def __getitem__(self, key):
-        return self.sql_fetch_all_dict(self._lookup[key])
+        return self.sql_fetch_all(self._lookup[key])
 
     def __setitem__(self, key, value):
         self._lookup[key] = value
@@ -164,7 +164,7 @@ class Portfolio(sql_database.Database):
     def _construct_lookup(self):
         get_commands = {'accounts': "SELECT * FROM account",
                         'account_types': "SELECT * FROM account_type",
-                        'allocation_plan': "SELECT * FROM allocation_plan",
+                        'allocations': "SELECT * FROM allocation",
                         'assets': "SELECT * FROM asset",
                         'asset_classes': "SELECT * FROM asset_class",
                         'balances': "SELECT * FROM balance",
@@ -195,9 +195,9 @@ class Portfolio(sql_database.Database):
 
         self.execute_many(sql, kwargs.values())
 
-    def add_allocation_plan(self, **kwargs):
+    def add_allocation(self, **kwargs):
         sql = """
-        INSERT INTO allocation_plan(asset_class_id, location_id, percentage) 
+        INSERT INTO allocation(asset_class_id, location_id, percentage) 
         VALUES(:asset_class_id, :location_id, :percentage)
         """
 
@@ -271,249 +271,16 @@ class Portfolio(sql_database.Database):
 
     # Calculations
     # Accounts
-    def account_value(self, account_id):
-        pass
-
-    def asset_allocation(self):
-        sql = """
-        SELECT
-            asset_class_id, 
-            100.0 * SUM(current_value) / :net_worth AS allocation
-        FROM (
-            SELECT
-                c.asset_id,
-                c.asset_class_id,
-                c.percentage * v.current_value / (10000 * 100) as current_value
-            FROM
-                component AS c
-            JOIN (
-                SELECT
-                    asset_id,
-                    SUM(current_value) current_value
-                FROM (
-                    SELECT
-                        b.account_id,
-                        b.asset_id,
-                        MAX(b.balance_date) balance_date,
-                        b.quantity * p.amount / 10000 AS current_value
-                    FROM
-                        balance AS b
-                    JOIN (
-                        SELECT
-                            asset_id, MAX(price_date) price_date, amount
-                        FROM
-                            price
-                        GROUP BY
-                            asset_id
-                        ) AS p ON b.asset_id = p.asset_id
-                    GROUP BY
-                        b.account_id, b.asset_id
-                )
-                GROUP BY asset_id
-                ORDER BY asset_id
-            ) AS v ON c.asset_id = v.asset_id
-        )
-        GROUP BY
-            asset_class_id
-        """
-        return self.sql_fetch_all_dict_params(sql, (self.net_worth(),))
-
-    def asset_allocation_with_locations(self):
-        sql = """
-        SELECT
-            asset_class_id, 
-            location_id,
-            100.0 * SUM(current_value) / :net_worth AS allocation
-        FROM (
-            SELECT
-                c.asset_id,
-                c.asset_class_id,
-                c.location_id,
-                c.percentage * v.current_value / (10000 * 100) as current_value
-            FROM
-                component AS c
-            JOIN (
-                SELECT
-                    asset_id,
-                    SUM(current_value) current_value
-                FROM (
-                    SELECT
-                        b.account_id,
-                        b.asset_id,
-                        MAX(b.balance_date) balance_date,
-                        b.quantity * p.amount / 10000 AS current_value
-                    FROM
-                        balance AS b
-                    JOIN (
-                        SELECT
-                            asset_id, MAX(price_date) price_date, amount
-                        FROM
-                            price
-                        GROUP BY
-                            asset_id
-                        ) AS p ON b.asset_id = p.asset_id
-                    GROUP BY
-                        b.account_id, b.asset_id
-                )
-                GROUP BY asset_id
-                ORDER BY asset_id
-            ) AS v ON c.asset_id = v.asset_id
-        )
-        GROUP BY
-            asset_class_id, location_id
-        """
-        return self.sql_fetch_all_dict_params(sql, (self.net_worth(),))
-
-    def value_of_asset_classes(self):
-        sql = """
-        SELECT
-            asset_class_id, 
-            SUM(current_value) current_value
-        FROM (
-            SELECT
-                c.asset_id,
-                c.asset_class_id,
-                c.percentage * v.current_value / (10000 * 100) as current_value
-            FROM
-                component AS c
-            JOIN (
-                SELECT
-                    asset_id,
-                    SUM(current_value) current_value
-                FROM (
-                    SELECT
-                        b.account_id,
-                        b.asset_id,
-                        MAX(b.balance_date) balance_date,
-                        b.quantity * p.amount / 10000 AS current_value
-                    FROM
-                        balance AS b
-                    JOIN (
-                        SELECT
-                            asset_id, MAX(price_date) price_date, amount
-                        FROM
-                            price
-                        GROUP BY
-                            asset_id
-                        ) AS p ON b.asset_id = p.asset_id
-                    GROUP BY
-                        b.account_id, b.asset_id
-                )
-                GROUP BY asset_id
-                ORDER BY asset_id
-            ) AS v ON c.asset_id = v.asset_id
-        )
-        GROUP BY
-            asset_class_id
-        """
-
-        return self.sql_fetch_all_dict(sql)
-
-    def value_of_asset_classes_with_locations(self):
-        sql = """
-        SELECT
-            asset_class_id, 
-            location_id,
-            SUM(current_value) current_value
-        FROM (
-            SELECT
-                c.asset_id,
-                c.asset_class_id,
-                c.location_id,
-                c.percentage * v.current_value / (10000 * 100) as current_value
-            FROM
-                component AS c
-            JOIN (
-                SELECT
-                    asset_id,
-                    SUM(current_value) current_value
-                FROM (
-                    SELECT
-                        b.account_id,
-                        b.asset_id,
-                        MAX(b.balance_date) balance_date,
-                        b.quantity * p.amount / 10000 AS current_value
-                    FROM
-                        balance AS b
-                    JOIN (
-                        SELECT
-                            asset_id, MAX(price_date) price_date, amount
-                        FROM
-                            price
-                        GROUP BY
-                            asset_id
-                        ) AS p ON b.asset_id = p.asset_id
-                    GROUP BY
-                        b.account_id, b.asset_id
-                )
-                GROUP BY asset_id
-                ORDER BY asset_id
-            ) AS v ON c.asset_id = v.asset_id
-        )
-        GROUP BY
-            asset_class_id, location_id
-        """
-
-        return self.sql_fetch_all_dict(sql)
-
-    # Assets
-    def newest_prices(self):
-        sql = """
-        SELECT asset_id, MAX(price_date) price_date, amount
-        FROM price
-        GROUP BY asset_id
-        """
-
-        return self.sql_fetch_all_dict(sql)
-
-    def current_balances(self):
+    # TODO - rename balance
+    def account_asset_quantity_current(self):
         sql = """
         SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
         FROM balance
         GROUP BY account_id, asset_id
         """
-        return self.sql_fetch_all_dict(sql)
+        return self.sql_fetch_all(sql)
 
-    def balance_by_asset_type(self):
-        sql = """
-        SELECT asset_id, SUM(quantity) quantity
-        FROM (
-            SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
-            FROM balance
-            GROUP BY account_id, asset_id)
-        GROUP BY asset_id
-        ORDER BY asset_id
-        """
-        return self.sql_fetch_all_dict(sql)
-
-    def value_by_asset_type(self):
-        sql = """
-        SELECT asset_id, SUM(current_value) current_value
-        FROM (
-            SELECT 
-                b.account_id, 
-                b.asset_id, 
-                MAX(b.balance_date) balance_date, 
-                b.quantity * p.amount / 10000 AS current_value
-            FROM 
-                balance AS b
-            JOIN (
-                SELECT 
-                    asset_id, MAX(price_date) price_date, amount
-                FROM 
-                    price
-                GROUP BY 
-                    asset_id
-                ) AS p ON b.asset_id = p.asset_id
-            GROUP BY 
-                b.account_id, b.asset_id
-            )
-        GROUP BY asset_id
-        ORDER BY asset_id
-        """
-        return self.sql_fetch_all_dict(sql)
-
-    def value_of_balances(self):
+    def account_value_current_by_asset(self):
         sql = """
         SELECT 
             b.account_id, 
@@ -534,158 +301,10 @@ class Portfolio(sql_database.Database):
             b.account_id, b.asset_id
         """
 
-        return self.sql_fetch_all_dict(sql)
+        return self.sql_fetch_all(sql)
 
-    # Net worth
-    def net_worth(self):
-        sql = """
-        SELECT 
-            SUM(current_values.current_value) AS net_worth
-        FROM (
-            SELECT 
-                b.account_id, 
-                b.asset_id, 
-                MAX(b.balance_date) balance_date, 
-                b.quantity * p.amount / 10000 AS current_value
-            FROM 
-                balance AS b
-            JOIN (
-                SELECT 
-                    asset_id, MAX(price_date) price_date, amount
-                FROM 
-                    price
-                GROUP BY 
-                    asset_id
-                ) AS p ON b.asset_id = p.asset_id
-            GROUP BY 
-                b.account_id, b.asset_id
-            ) AS current_values
-        """
-
-        return self.sql_fetch_all_dict(sql)[0]['net_worth']
-
-    # Tools
-    def value_by_asset_type_in_plan(self):
-        sql = """
-        SELECT
-            plan.asset_class_id,
-            plan.location_id,
-            current_values.current_value
-        FROM 
-            allocation_plan AS plan
-        JOIN (
-            SELECT
-                asset_class_id, 
-                location_id,
-                SUM(current_value) current_value
-            FROM (
-                SELECT
-                    c.asset_id,
-                    c.asset_class_id,
-                    c.location_id,
-                    c.percentage * v.current_value / (10000 * 100) as current_value
-                FROM
-                    component AS c
-                JOIN (
-                    SELECT
-                        asset_id,
-                        SUM(current_value) current_value
-                    FROM (
-                        SELECT
-                            b.account_id,
-                            b.asset_id,
-                            MAX(b.balance_date) balance_date,
-                            b.quantity * p.amount / 10000 AS current_value
-                        FROM
-                            balance AS b
-                        JOIN (
-                            SELECT
-                                asset_id, MAX(price_date) price_date, amount
-                            FROM
-                                price
-                            GROUP BY
-                                asset_id
-                            ) AS p ON b.asset_id = p.asset_id
-                        GROUP BY
-                            b.account_id, b.asset_id
-                    )
-                    GROUP BY asset_id
-                    ORDER BY asset_id
-                ) AS v ON c.asset_id = v.asset_id
-            )
-            GROUP BY
-                asset_class_id, location_id
-        ) AS current_values ON 
-            current_values.asset_class_id == plan.asset_class_id AND 
-            current_values.location_id == plan.location_id 
-        """
-
-        return self.sql_fetch_all_dict(sql)
-
-    def value_by_asset_type_in_plan_future_value(self, amount_to_buy):
-        sql_params = {'amount_to_buy': amount_to_buy,
-                      'future_value': self.net_worth() + amount_to_buy}
-        sql = """
-        SELECT
-            plan.asset_class_id,
-            plan.location_id,
-            plan.percentage AS desired,
-            10000 * current_values.current_value / :future_value AS no_buy,
-            10000 * (current_values.current_value + :amount_to_buy) / :future_value AS yes_buy
-        FROM 
-            allocation_plan AS plan
-        JOIN (
-            SELECT
-                asset_class_id, 
-                location_id,
-                SUM(current_value) current_value
-            FROM (
-                SELECT
-                    c.asset_id,
-                    c.asset_class_id,
-                    c.location_id,
-                    c.percentage * v.current_value / (10000 * 100) as current_value
-                FROM
-                    component AS c
-                JOIN (
-                    SELECT
-                        asset_id,
-                        SUM(current_value) current_value
-                    FROM (
-                        SELECT
-                            b.account_id,
-                            b.asset_id,
-                            MAX(b.balance_date) balance_date,
-                            b.quantity * p.amount / 10000 AS current_value
-                        FROM
-                            balance AS b
-                        JOIN (
-                            SELECT
-                                asset_id, MAX(price_date) price_date, amount
-                            FROM
-                                price
-                            GROUP BY
-                                asset_id
-                            ) AS p ON b.asset_id = p.asset_id
-                        GROUP BY
-                            b.account_id, b.asset_id
-                    )
-                    GROUP BY asset_id
-                    ORDER BY asset_id
-                ) AS v ON c.asset_id = v.asset_id
-            )
-            GROUP BY
-                asset_class_id, location_id
-        ) AS current_values ON 
-            current_values.asset_class_id == plan.asset_class_id AND 
-            current_values.location_id == plan.location_id 
-        """
-
-        return self.sql_fetch_all_dict_params(sql, sql_params)
-
+    # Allocation
     def allocation_difference(self):
-        sql_params = {'net_worth': self.net_worth()}
-
         sql = """
         SELECT
             plan.asset_class_id,
@@ -697,7 +316,7 @@ class Portfolio(sql_database.Database):
             plan.percentage - (10000 * current_values.current_value / :net_worth) AS percent_difference,
             (plan.percentage * :net_worth / 10000) - current_values.current_value AS value_difference
         FROM 
-            allocation_plan AS plan
+            allocation AS plan
         JOIN (
             SELECT
                 asset_class_id, 
@@ -747,9 +366,9 @@ class Portfolio(sql_database.Database):
             value_difference DESC
         """
 
-        return self.sql_fetch_all_dict_params(sql, sql_params)
+        return self.sql_fetch_all(sql, self.net_worth_dict())
 
-    def allocation_difference_future_value(self, amount_to_add):
+    def allocation_difference_after_addition(self, amount_to_add):
         sql_params = {'net_worth': self.net_worth() + amount_to_add}
 
         sql = """
@@ -763,7 +382,7 @@ class Portfolio(sql_database.Database):
             plan.percentage - (10000 * current_values.current_value / :net_worth) AS percent_difference,
             (plan.percentage * :net_worth / 10000) - current_values.current_value AS value_difference
         FROM 
-            allocation_plan AS plan
+            allocation AS plan
         JOIN (
             SELECT
                 asset_class_id, 
@@ -813,7 +432,390 @@ class Portfolio(sql_database.Database):
             value_difference DESC
         """
 
-        return self.sql_fetch_all_dict_params(sql, sql_params)
+        return self.sql_fetch_all(sql, sql_params)
+
+    # Assets
+    def asset_price_newest(self):
+        sql = """
+        SELECT asset_id, MAX(price_date) price_date, amount
+        FROM price
+        GROUP BY asset_id
+        """
+
+        return self.sql_fetch_all(sql)
+
+    def asset_quantity(self):
+        sql = """
+        SELECT asset_id, SUM(quantity) quantity
+        FROM (
+            SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
+            FROM balance
+            GROUP BY account_id, asset_id)
+        GROUP BY asset_id
+        ORDER BY asset_id
+        """
+        return self.sql_fetch_all(sql)
+
+    def asset_value_current(self):
+        sql = """
+        SELECT asset_id, SUM(current_value) current_value
+        FROM (
+            SELECT 
+                b.account_id, 
+                b.asset_id, 
+                MAX(b.balance_date) balance_date, 
+                b.quantity * p.amount / 10000 AS current_value
+            FROM 
+                balance AS b
+            JOIN (
+                SELECT 
+                    asset_id, MAX(price_date) price_date, amount
+                FROM 
+                    price
+                GROUP BY 
+                    asset_id
+                ) AS p ON b.asset_id = p.asset_id
+            GROUP BY 
+                b.account_id, b.asset_id
+            )
+        GROUP BY asset_id
+        ORDER BY asset_id
+        """
+        return self.sql_fetch_all(sql)
+
+    # Asset class
+    def asset_class_percentage(self):
+        sql = """
+        SELECT
+            asset_class_id, 
+            100.0 * SUM(current_value) / :net_worth AS percentage
+        FROM (
+            SELECT
+                c.asset_id,
+                c.asset_class_id,
+                c.percentage * v.current_value / (10000 * 100) as current_value
+            FROM
+                component AS c
+            JOIN (
+                SELECT
+                    asset_id,
+                    SUM(current_value) current_value
+                FROM (
+                    SELECT
+                        b.account_id,
+                        b.asset_id,
+                        MAX(b.balance_date) balance_date,
+                        b.quantity * p.amount / 10000 AS current_value
+                    FROM
+                        balance AS b
+                    JOIN (
+                        SELECT
+                            asset_id, MAX(price_date) price_date, amount
+                        FROM
+                            price
+                        GROUP BY
+                            asset_id
+                        ) AS p ON b.asset_id = p.asset_id
+                    GROUP BY
+                        b.account_id, b.asset_id
+                )
+                GROUP BY asset_id
+                ORDER BY asset_id
+            ) AS v ON c.asset_id = v.asset_id
+        )
+        GROUP BY
+            asset_class_id
+        """
+        return self.sql_fetch_all(sql, self.net_worth_dict())
+
+    def asset_class_percentage_by_location(self):
+        sql = """
+        SELECT
+            asset_class_id, 
+            location_id,
+            100.0 * SUM(current_value) / :net_worth AS percentage
+        FROM (
+            SELECT
+                c.asset_id,
+                c.asset_class_id,
+                c.location_id,
+                c.percentage * v.current_value / (10000 * 100) as current_value
+            FROM
+                component AS c
+            JOIN (
+                SELECT
+                    asset_id,
+                    SUM(current_value) current_value
+                FROM (
+                    SELECT
+                        b.account_id,
+                        b.asset_id,
+                        MAX(b.balance_date) balance_date,
+                        b.quantity * p.amount / 10000 AS current_value
+                    FROM
+                        balance AS b
+                    JOIN (
+                        SELECT
+                            asset_id, MAX(price_date) price_date, amount
+                        FROM
+                            price
+                        GROUP BY
+                            asset_id
+                        ) AS p ON b.asset_id = p.asset_id
+                    GROUP BY
+                        b.account_id, b.asset_id
+                )
+                GROUP BY asset_id
+                ORDER BY asset_id
+            ) AS v ON c.asset_id = v.asset_id
+        )
+        GROUP BY
+            asset_class_id, location_id
+        """
+        return self.sql_fetch_all(sql, self.net_worth_dict())
+
+    def asset_class_value(self):
+        sql = """
+        SELECT
+            asset_class_id, 
+            SUM(current_value) current_value
+        FROM (
+            SELECT
+                c.asset_id,
+                c.asset_class_id,
+                c.percentage * v.current_value / (10000 * 100) as current_value
+            FROM
+                component AS c
+            JOIN (
+                SELECT
+                    asset_id,
+                    SUM(current_value) current_value
+                FROM (
+                    SELECT
+                        b.account_id,
+                        b.asset_id,
+                        MAX(b.balance_date) balance_date,
+                        b.quantity * p.amount / 10000 AS current_value
+                    FROM
+                        balance AS b
+                    JOIN (
+                        SELECT
+                            asset_id, MAX(price_date) price_date, amount
+                        FROM
+                            price
+                        GROUP BY
+                            asset_id
+                        ) AS p ON b.asset_id = p.asset_id
+                    GROUP BY
+                        b.account_id, b.asset_id
+                )
+                GROUP BY asset_id
+                ORDER BY asset_id
+            ) AS v ON c.asset_id = v.asset_id
+        )
+        GROUP BY
+            asset_class_id
+        """
+
+        return self.sql_fetch_all(sql)
+
+    def asset_class_value_by_location(self):
+        sql = """
+        SELECT
+            asset_class_id, 
+            location_id,
+            SUM(current_value) current_value
+        FROM (
+            SELECT
+                c.asset_id,
+                c.asset_class_id,
+                c.location_id,
+                c.percentage * v.current_value / (10000 * 100) as current_value
+            FROM
+                component AS c
+            JOIN (
+                SELECT
+                    asset_id,
+                    SUM(current_value) current_value
+                FROM (
+                    SELECT
+                        b.account_id,
+                        b.asset_id,
+                        MAX(b.balance_date) balance_date,
+                        b.quantity * p.amount / 10000 AS current_value
+                    FROM
+                        balance AS b
+                    JOIN (
+                        SELECT
+                            asset_id, MAX(price_date) price_date, amount
+                        FROM
+                            price
+                        GROUP BY
+                            asset_id
+                        ) AS p ON b.asset_id = p.asset_id
+                    GROUP BY
+                        b.account_id, b.asset_id
+                )
+                GROUP BY asset_id
+                ORDER BY asset_id
+            ) AS v ON c.asset_id = v.asset_id
+        )
+        GROUP BY
+            asset_class_id, location_id
+        """
+
+        return self.sql_fetch_all(sql)
+
+    # Net worth
+    def net_worth_dict(self):
+        sql = """
+        SELECT 
+            SUM(current_values.current_value) AS net_worth
+        FROM (
+            SELECT 
+                b.account_id, 
+                b.asset_id, 
+                MAX(b.balance_date) balance_date, 
+                b.quantity * p.amount / 10000 AS current_value
+            FROM 
+                balance AS b
+            JOIN (
+                SELECT 
+                    asset_id, MAX(price_date) price_date, amount
+                FROM 
+                    price
+                GROUP BY 
+                    asset_id
+                ) AS p ON b.asset_id = p.asset_id
+            GROUP BY 
+                b.account_id, b.asset_id
+            ) AS current_values
+        """
+
+        return self.sql_fetch_one(sql)
+
+    def net_worth(self):
+        return self.net_worth_dict()['net_worth']
+
+    # Tools
+    # TODO - remove value_by_asset_type_in_plan and value_by_asset_type_in_plan_future value once confirmed redundant
+    # def value_by_asset_type_in_plan(self):
+    #     sql = """
+    #     SELECT
+    #         plan.asset_class_id,
+    #         plan.location_id,
+    #         current_values.current_value
+    #     FROM
+    #         allocation AS plan
+    #     JOIN (
+    #         SELECT
+    #             asset_class_id,
+    #             location_id,
+    #             SUM(current_value) current_value
+    #         FROM (
+    #             SELECT
+    #                 c.asset_id,
+    #                 c.asset_class_id,
+    #                 c.location_id,
+    #                 c.percentage * v.current_value / (10000 * 100) as current_value
+    #             FROM
+    #                 component AS c
+    #             JOIN (
+    #                 SELECT
+    #                     asset_id,
+    #                     SUM(current_value) current_value
+    #                 FROM (
+    #                     SELECT
+    #                         b.account_id,
+    #                         b.asset_id,
+    #                         MAX(b.balance_date) balance_date,
+    #                         b.quantity * p.amount / 10000 AS current_value
+    #                     FROM
+    #                         balance AS b
+    #                     JOIN (
+    #                         SELECT
+    #                             asset_id, MAX(price_date) price_date, amount
+    #                         FROM
+    #                             price
+    #                         GROUP BY
+    #                             asset_id
+    #                         ) AS p ON b.asset_id = p.asset_id
+    #                     GROUP BY
+    #                         b.account_id, b.asset_id
+    #                 )
+    #                 GROUP BY asset_id
+    #                 ORDER BY asset_id
+    #             ) AS v ON c.asset_id = v.asset_id
+    #         )
+    #         GROUP BY
+    #             asset_class_id, location_id
+    #     ) AS current_values ON
+    #         current_values.asset_class_id == plan.asset_class_id AND
+    #         current_values.location_id == plan.location_id
+    #     """
+    #
+    #     return self.sql_fetch_all(sql)
+    #
+    # def value_by_asset_type_in_plan_future_value(self, amount_to_buy):
+    #     sql_params = {'amount_to_buy': amount_to_buy,
+    #                   'future_value': self.net_worth() + amount_to_buy}
+    #     sql = """
+    #     SELECT
+    #         plan.asset_class_id,
+    #         plan.location_id,
+    #         plan.percentage AS desired,
+    #         10000 * current_values.current_value / :future_value AS no_buy,
+    #         10000 * (current_values.current_value + :amount_to_buy) / :future_value AS yes_buy
+    #     FROM
+    #         allocation AS plan
+    #     JOIN (
+    #         SELECT
+    #             asset_class_id,
+    #             location_id,
+    #             SUM(current_value) current_value
+    #         FROM (
+    #             SELECT
+    #                 c.asset_id,
+    #                 c.asset_class_id,
+    #                 c.location_id,
+    #                 c.percentage * v.current_value / (10000 * 100) as current_value
+    #             FROM
+    #                 component AS c
+    #             JOIN (
+    #                 SELECT
+    #                     asset_id,
+    #                     SUM(current_value) current_value
+    #                 FROM (
+    #                     SELECT
+    #                         b.account_id,
+    #                         b.asset_id,
+    #                         MAX(b.balance_date) balance_date,
+    #                         b.quantity * p.amount / 10000 AS current_value
+    #                     FROM
+    #                         balance AS b
+    #                     JOIN (
+    #                         SELECT
+    #                             asset_id, MAX(price_date) price_date, amount
+    #                         FROM
+    #                             price
+    #                         GROUP BY
+    #                             asset_id
+    #                         ) AS p ON b.asset_id = p.asset_id
+    #                     GROUP BY
+    #                         b.account_id, b.asset_id
+    #                 )
+    #                 GROUP BY asset_id
+    #                 ORDER BY asset_id
+    #             ) AS v ON c.asset_id = v.asset_id
+    #         )
+    #         GROUP BY
+    #             asset_class_id, location_id
+    #     ) AS current_values ON
+    #         current_values.asset_class_id == plan.asset_class_id AND
+    #         current_values.location_id == plan.location_id
+    #     """
+    #
+    #     return self.sql_fetch_all(sql, sql_params)
 
     def which_asset_to_buy(self, purchase_amount):
         dict_of_tables = {}
