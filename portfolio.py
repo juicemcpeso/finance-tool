@@ -562,7 +562,7 @@ class Portfolio(sql_database.Database):
             ) AS current_values
         """
 
-        return self.sql_fetch_all_dict(sql)[0]['net_worth']
+        return self.sql_fetch_one(sql)['net_worth']
 
     # Tools
     def value_by_asset_type_in_plan(self):
