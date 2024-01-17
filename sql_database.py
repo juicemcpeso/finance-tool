@@ -26,33 +26,21 @@ class Database:
         self.execute_list_commands(self.drop_table_commands)
 
     # TODO - clean up which of these are actually used
-    def execute(self, command):
+    # def execute(self, command):
+    #     """Execute a single command"""
+    #     con = sqlite3.connect(self.database)
+    #     cur = con.cursor()
+    #     cur.execute(command)
+    #     con.commit()
+    #     con.close()
+
+    def execute(self, command, params=None):
         """Execute a single command"""
         con = sqlite3.connect(self.database)
         cur = con.cursor()
-        cur.execute(command)
+        cur.execute(command, params) if params is not None else cur.execute(command)
         con.commit()
         con.close()
-
-    def execute_parameters(self, command, parameters):
-        """Execute a single command with parameters"""
-        con = sqlite3.connect(self.database)
-        cur = con.cursor()
-        cur.execute(command, parameters)
-        con.commit()
-        con.close()
-
-    def execute_kwargs(self, command, kwargs):
-        con = sqlite3.connect(self.database)
-        cur = con.cursor()
-        cur.execute(command, kwargs)
-        con.commit()
-        con.close()
-
-    def execute_list_commands(self, command_list):
-        """Execute a list of commands"""
-        for command in command_list:
-            self.execute(command)
 
     def execute_many(self, command, data_sequence):
         """Execute a single command multiple times with different data"""
@@ -61,6 +49,26 @@ class Database:
         cur.executemany(command, data_sequence)
         con.commit()
         con.close()
+
+    def execute_list_commands(self, command_list):
+        """Execute a list of commands"""
+        for command in command_list:
+            self.execute(command)
+
+    # def execute_parameters(self, command, parameters):
+    #     """Execute a single command with parameters"""
+    #     con = sqlite3.connect(self.database)
+    #     cur = con.cursor()
+    #     cur.execute(command, parameters)
+    #     con.commit()
+    #     con.close()
+    #
+    # def execute_kwargs(self, command, kwargs):
+    #     con = sqlite3.connect(self.database)
+    #     cur = con.cursor()
+    #     cur.execute(command, kwargs)
+    #     con.commit()
+    #     con.close()
 
     # def sql_fetch_all_dict(self, command_text):
     #     con = sqlite3.connect(self.database)
