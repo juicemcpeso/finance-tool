@@ -241,7 +241,7 @@ def test_asset_class_value_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_class_value, 'current_value', 166551450)
 
 
-def test_value_of_asset_classes_with_locations(test_portfolio):
+def test_asset_class_location_value(test_portfolio):
     expected = [{'asset_class_id': 1, 'location_id': 1, 'current_value': 4171600},
                 {'asset_class_id': 1, 'location_id': 2, 'current_value': 1422050},
                 {'asset_class_id': 2, 'location_id': 1, 'current_value': 100478900},
@@ -249,11 +249,11 @@ def test_value_of_asset_classes_with_locations(test_portfolio):
                 {'asset_class_id': 3, 'location_id': 1, 'current_value': 60000000},
                 {'asset_class_id': 4, 'location_id': 'NULL', 'current_value': 239450}]
 
-    assert expected == test_portfolio.value_of_asset_classes_with_locations()
+    assert expected == test_portfolio.asset_class_location_value()
 
 
-def test_value_of_asset_classes_with_locations_sum(test_portfolio):
-    assert sum_to_amount(test_portfolio.value_of_asset_classes_with_locations, 'current_value', 166551450)
+def test_asset_class_location_value_sum(test_portfolio):
+    assert sum_to_amount(test_portfolio.asset_class_location_value, 'current_value', 166551450)
 
 
 def test_balance_by_asset_type(test_portfolio):

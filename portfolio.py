@@ -409,7 +409,7 @@ class Portfolio(sql_database.Database):
 
         return self.sql_fetch_all(sql)
 
-    def value_of_asset_classes_with_locations(self):
+    def asset_class_location_value(self):
         sql = """
         SELECT
             asset_class_id, 
