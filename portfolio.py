@@ -274,11 +274,11 @@ class Portfolio(sql_database.Database):
     def account_value(self, account_id):
         pass
 
-    def asset_allocation(self):
+    def asset_class_percentage(self):
         sql = """
         SELECT
             asset_class_id, 
-            100.0 * SUM(current_value) / :net_worth AS allocation
+            100.0 * SUM(current_value) / :net_worth AS percentage
         FROM (
             SELECT
                 c.asset_id,
@@ -318,12 +318,12 @@ class Portfolio(sql_database.Database):
         """
         return self.sql_fetch_all(sql, self.net_worth_dict())
 
-    def asset_allocation_with_locations(self):
+    def asset_class_location_percentage(self):
         sql = """
         SELECT
             asset_class_id, 
             location_id,
-            100.0 * SUM(current_value) / :net_worth AS allocation
+            100.0 * SUM(current_value) / :net_worth AS percentage
         FROM (
             SELECT
                 c.asset_id,
