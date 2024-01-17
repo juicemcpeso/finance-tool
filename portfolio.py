@@ -537,7 +537,7 @@ class Portfolio(sql_database.Database):
         return self.sql_fetch_all(sql)
 
     # Net worth
-    def net_worth(self):
+    def net_worth_dict(self):
         sql = """
         SELECT 
             SUM(current_values.current_value) AS net_worth
@@ -562,7 +562,10 @@ class Portfolio(sql_database.Database):
             ) AS current_values
         """
 
-        return self.sql_fetch_one(sql)['net_worth']
+        return self.sql_fetch_one(sql)
+
+    def net_worth(self):
+        return self.net_worth_dict()['net_worth']
 
     # Tools
     def value_by_asset_type_in_plan(self):
