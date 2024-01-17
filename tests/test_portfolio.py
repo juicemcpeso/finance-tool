@@ -200,7 +200,7 @@ def test_net_worth(test_portfolio):
     assert expected == test_portfolio.net_worth()
 
 
-def test_asset_allocation(test_portfolio):
+def test_asset_class_percentage(test_portfolio):
     expected = [{'asset_class_id': 1, 'percentage': 100.0 * 5593650 / 166551450},
                 {'asset_class_id': 2, 'percentage': 100.0 * 100718350 / 166551450},
                 {'asset_class_id': 3, 'percentage': 100.0 * 60000000 / 166551450},
@@ -209,11 +209,11 @@ def test_asset_allocation(test_portfolio):
     assert expected == test_portfolio.asset_class_percentage()
 
 
-def test_asset_allocation_sum(test_portfolio):
+def test_asset_class_percentage_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_class_percentage, 'percentage', 100.0)
 
 
-def test_asset_allocation_with_locations(test_portfolio):
+def test_asset_class_location_percentage(test_portfolio):
     expected = [{'asset_class_id': 1, 'location_id': 1, 'percentage': 100.0 * 4171600 / 166551450},
                 {'asset_class_id': 1, 'location_id': 2, 'percentage': 100.0 * 1422050 / 166551450},
                 {'asset_class_id': 2, 'location_id': 1, 'percentage': 100.0 * 100478900 / 166551450},
@@ -224,7 +224,7 @@ def test_asset_allocation_with_locations(test_portfolio):
     assert expected == test_portfolio.asset_class_location_percentage()
 
 
-def test_asset_allocation_with_locations_sum(test_portfolio):
+def test_asset_class_location_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_class_location_percentage, 'percentage', 100.0)
 
 
