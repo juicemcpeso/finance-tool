@@ -172,7 +172,7 @@ def test_asset_price_newest(test_portfolio):
     assert expected == test_portfolio.asset_price_newest()
 
 
-def test_account_balance_current(test_portfolio):
+def test_account_asset_quantity_current(test_portfolio):
     expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'quantity': 100000},
                 {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'quantity': 75000},
                 {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'quantity': 100000000},
@@ -180,7 +180,7 @@ def test_account_balance_current(test_portfolio):
                 {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 60000},
                 {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 60000000}]
 
-    assert expected == test_portfolio.account_balance_current()
+    assert expected == test_portfolio.account_asset_quantity_current()
 
 
 def test_account_value_current_by_asset(test_portfolio):
@@ -259,14 +259,14 @@ def test_asset_class_value_by_location_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_class_value_by_location, 'current_value', 166551450)
 
 
-def test_balance_by_asset_type(test_portfolio):
+def test_asset_quantity(test_portfolio):
     expected = [{'asset_id': 1, 'quantity': 60000000},
                 {'asset_id': 2, 'quantity': 80000},
                 {'asset_id': 3, 'quantity': 135000},
                 {'asset_id': 4, 'quantity': 100000},
                 {'asset_id': 5, 'quantity': 100000000}]
 
-    assert expected == test_portfolio.balance_by_asset_type()
+    assert expected == test_portfolio.asset_quantity()
 
 
 def test_asset_value_current(test_portfolio):
