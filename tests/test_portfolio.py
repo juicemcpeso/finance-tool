@@ -349,6 +349,13 @@ def test_allocation_difference(test_portfolio):
     assert expected == test_portfolio.allocation_difference()
 
 
+def test_allocation_difference_future_value(test_portfolio):
+    file_name = 'expected/expected_allocation_future_value_difference.csv'
+    expected = csv_to_numeric_dict_list(file_name)
+
+    assert expected == test_portfolio.allocation_difference_future_value(10000000)
+
+
 def test_which_asset_to_buy(test_portfolio):
     expected = [{'asset_class_id': 1, 'location_id': 1}]
 
