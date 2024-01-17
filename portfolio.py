@@ -28,8 +28,8 @@ tax_growth INTEGER,
 tax_out INTEGER
 );"""
 
-create_allocation_plan_table = """
-CREATE TABLE IF NOT EXISTS allocation_plan (
+create_allocation_table = """
+CREATE TABLE IF NOT EXISTS allocation (
 id INTEGER PRIMARY KEY,
 asset_class_id INTEGER,
 location_id INTEGER,
@@ -110,7 +110,7 @@ FOREIGN KEY(asset_id) REFERENCES asset(id)
 
 create_commands = [create_account_table,
                    create_account_type_table,
-                   create_allocation_plan_table,
+                   create_allocation_table,
                    create_asset_table,
                    create_asset_class_table,
                    create_balance_table,
@@ -122,7 +122,7 @@ create_commands = [create_account_table,
 
 drop_commands = ['DROP TABLE IF EXISTS account',
                  'DROP TABLE IF EXISTS account_type',
-                 'DROP TABLE IF EXISTS allocation_plan',
+                 'DROP TABLE IF EXISTS allocation',
                  'DROP TABLE IF EXISTS asset',
                  'DROP TABLE IF EXISTS asset_class',
                  'DROP TABLE IF EXISTS balance',
@@ -142,7 +142,7 @@ class Portfolio(sql_database.Database):
 
         self.add_to_table = {'accounts': self.add_account,
                              'account_types': self.add_account_type,
-                             'allocation_plan': self.add_allocation_plan,
+                             'allocations': self.add_allocation,
                              'assets': self.add_asset,
                              'asset_classes': self.add_asset_class,
                              'balances': self.add_balance,
@@ -164,7 +164,7 @@ class Portfolio(sql_database.Database):
     def _construct_lookup(self):
         get_commands = {'accounts': "SELECT * FROM account",
                         'account_types': "SELECT * FROM account_type",
-                        'allocation_plan': "SELECT * FROM allocation_plan",
+                        'allocations': "SELECT * FROM allocation",
                         'assets': "SELECT * FROM asset",
                         'asset_classes': "SELECT * FROM asset_class",
                         'balances': "SELECT * FROM balance",
@@ -195,9 +195,9 @@ class Portfolio(sql_database.Database):
 
         self.execute_many(sql, kwargs.values())
 
-    def add_allocation_plan(self, **kwargs):
+    def add_allocation(self, **kwargs):
         sql = """
-        INSERT INTO allocation_plan(asset_class_id, location_id, percentage) 
+        INSERT INTO allocation(asset_class_id, location_id, percentage) 
         VALUES(:asset_class_id, :location_id, :percentage)
         """
 
@@ -572,7 +572,7 @@ class Portfolio(sql_database.Database):
             plan.location_id,
             current_values.current_value
         FROM 
-            allocation_plan AS plan
+            allocation AS plan
         JOIN (
             SELECT
                 asset_class_id, 
@@ -633,7 +633,7 @@ class Portfolio(sql_database.Database):
             10000 * current_values.current_value / :future_value AS no_buy,
             10000 * (current_values.current_value + :amount_to_buy) / :future_value AS yes_buy
         FROM 
-            allocation_plan AS plan
+            allocation AS plan
         JOIN (
             SELECT
                 asset_class_id, 
@@ -697,7 +697,7 @@ class Portfolio(sql_database.Database):
             plan.percentage - (10000 * current_values.current_value / :net_worth) AS percent_difference,
             (plan.percentage * :net_worth / 10000) - current_values.current_value AS value_difference
         FROM 
-            allocation_plan AS plan
+            allocation AS plan
         JOIN (
             SELECT
                 asset_class_id, 
@@ -763,7 +763,7 @@ class Portfolio(sql_database.Database):
             plan.percentage - (10000 * current_values.current_value / :net_worth) AS percent_difference,
             (plan.percentage * :net_worth / 10000) - current_values.current_value AS value_difference
         FROM 
-            allocation_plan AS plan
+            allocation AS plan
         JOIN (
             SELECT
                 asset_class_id, 

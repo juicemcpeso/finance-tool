@@ -131,7 +131,7 @@ def test_add_from_csv_account_type(empty_portfolio):
 
 
 def test_add_from_csv_allocation_plan(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'allocation_plan')
+    assert add_from_csv_test(empty_portfolio, 'allocations')
 
 
 def test_add_from_csv_asset(empty_portfolio):
