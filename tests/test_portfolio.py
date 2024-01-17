@@ -237,7 +237,7 @@ def test_asset_class_value(test_portfolio):
     assert expected == test_portfolio.asset_class_value()
 
 
-def test_value_of_asset_classes_sum(test_portfolio):
+def test_asset_class_value_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_class_value, 'current_value', 166551450)
 
 
