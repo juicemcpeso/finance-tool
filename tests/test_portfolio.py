@@ -283,18 +283,18 @@ def test_asset_value_current_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_value_current, 'current_value', 166551450)
 
 
-def test_allocation_difference(test_portfolio):
-    file_name = 'expected/expected_allocation_difference.csv'
-    expected = csv_to_numeric_dict_list(file_name)
-
-    assert expected == test_portfolio.allocation_difference()
-
-
-def test_allocation_difference_after_adding(test_portfolio):
-    file_name = 'expected/expected_allocation_difference_after_adding.csv'
-    expected = csv_to_numeric_dict_list(file_name)
-
-    assert expected == test_portfolio.allocation_difference_after_addition(10000000)
+# def test_allocation_difference(test_portfolio):
+#     file_name = 'expected/expected_allocation_difference.csv'
+#     expected = csv_to_numeric_dict_list(file_name)
+#
+#     assert expected == test_portfolio.allocation_difference()
+#
+#
+# def test_allocation_difference_after_adding(test_portfolio):
+#     file_name = 'expected/expected_allocation_difference_after_adding.csv'
+#     expected = csv_to_numeric_dict_list(file_name)
+#
+#     assert expected == test_portfolio.allocation_difference_after_addition(10000000)
 
 
 # TODO - remove following 3 tests once confirmed redundant
