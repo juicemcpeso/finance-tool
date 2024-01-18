@@ -323,3 +323,9 @@ def test_allocation_difference_after_adding(test_portfolio):
 #
 #     assert expected == test_portfolio.which_asset_to_buy(10000000)
 # TODO - end remove
+
+def test_allocation_deviation(test_portfolio):
+    file_name = 'expected/expected_allocation_deviation.csv'
+    expected = csv_to_numeric_dict_list(file_name)
+
+    assert expected == test_portfolio.allocation_deviation()
