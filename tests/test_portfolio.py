@@ -329,3 +329,10 @@ def test_allocation_deviation(test_portfolio):
     expected = csv_to_numeric_dict_list(file_name)
 
     assert expected == test_portfolio.allocation_deviation()
+
+
+def test_allocation_deviation_10000000(test_portfolio):
+    file_name = 'expected/expected_allocation_deviation_10000000.csv'
+    expected = csv_to_numeric_dict_list(file_name)
+
+    assert expected == test_portfolio.allocation_deviation(10000000)

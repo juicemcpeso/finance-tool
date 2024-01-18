@@ -304,67 +304,132 @@ class Portfolio(sql_database.Database):
         return self.sql_fetch_all(sql)
 
     # Allocation
-    def allocation_deviation(self):
-        sql = """
-               SELECT
-                   plan.asset_class_id,
-                   plan.location_id,
-                   current_values.current_value,
-                   plan.percentage AS plan_percent,
-                   plan.percentage * :net_worth / 10000 AS plan_value,
-                   (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation
-               FROM 
-                   allocation AS plan
-               JOIN (
-                   SELECT
-                       asset_class_id, 
-                       location_id,
-                       SUM(current_value) current_value
-                   FROM (
-                       SELECT
-                           c.asset_id,
-                           c.asset_class_id,
-                           c.location_id,
-                           c.percentage * v.current_value / (10000 * 100) as current_value
-                       FROM
-                           component AS c
-                       JOIN (
-                           SELECT
-                               asset_id,
-                               SUM(current_value) current_value
-                           FROM (
-                               SELECT
-                                   b.account_id,
-                                   b.asset_id,
-                                   MAX(b.balance_date) balance_date,
-                                   b.quantity * p.amount / 10000 AS current_value
-                               FROM
-                                   balance AS b
-                               JOIN (
-                                   SELECT
-                                       asset_id, MAX(price_date) price_date, amount
-                                   FROM
-                                       price
-                                   GROUP BY
-                                       asset_id
-                                   ) AS p ON b.asset_id = p.asset_id
-                               GROUP BY
-                                   b.account_id, b.asset_id
-                           )
-                           GROUP BY asset_id
-                           ORDER BY asset_id
-                       ) AS v ON c.asset_id = v.asset_id
-                   )
-                   GROUP BY
-                       asset_class_id, location_id
-               ) AS current_values ON 
-                   current_values.asset_class_id == plan.asset_class_id AND 
-                   current_values.location_id == plan.location_id 
-               ORDER BY
-                   deviation ASC
-               """
+    # def allocation_deviation(self):
+    #     sql = """
+    #            SELECT
+    #                plan.asset_class_id,
+    #                plan.location_id,
+    #                current_values.current_value,
+    #                plan.percentage AS plan_percent,
+    #                plan.percentage * :net_worth / 10000 AS plan_value,
+    #                (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation
+    #            FROM
+    #                allocation AS plan
+    #            JOIN (
+    #                SELECT
+    #                    asset_class_id,
+    #                    location_id,
+    #                    SUM(current_value) current_value
+    #                FROM (
+    #                    SELECT
+    #                        c.asset_id,
+    #                        c.asset_class_id,
+    #                        c.location_id,
+    #                        c.percentage * v.current_value / (10000 * 100) as current_value
+    #                    FROM
+    #                        component AS c
+    #                    JOIN (
+    #                        SELECT
+    #                            asset_id,
+    #                            SUM(current_value) current_value
+    #                        FROM (
+    #                            SELECT
+    #                                b.account_id,
+    #                                b.asset_id,
+    #                                MAX(b.balance_date) balance_date,
+    #                                b.quantity * p.amount / 10000 AS current_value
+    #                            FROM
+    #                                balance AS b
+    #                            JOIN (
+    #                                SELECT
+    #                                    asset_id, MAX(price_date) price_date, amount
+    #                                FROM
+    #                                    price
+    #                                GROUP BY
+    #                                    asset_id
+    #                                ) AS p ON b.asset_id = p.asset_id
+    #                            GROUP BY
+    #                                b.account_id, b.asset_id
+    #                        )
+    #                        GROUP BY asset_id
+    #                        ORDER BY asset_id
+    #                    ) AS v ON c.asset_id = v.asset_id
+    #                )
+    #                GROUP BY
+    #                    asset_class_id, location_id
+    #            ) AS current_values ON
+    #                current_values.asset_class_id == plan.asset_class_id AND
+    #                current_values.location_id == plan.location_id
+    #            ORDER BY
+    #                deviation ASC
+    #            """
+    #
+    #     return self.sql_fetch_all(sql, self.net_worth_dict())
 
-        return self.sql_fetch_all(sql, self.net_worth_dict())
+    def allocation_deviation(self, amount_to_add=0):
+        sql = """
+        SELECT
+            plan.asset_class_id,
+            plan.location_id,
+            current_values.current_value,
+            plan.percentage AS plan_percent,
+            plan.percentage * :net_worth / 10000 AS plan_value,
+            (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation
+        FROM 
+            allocation AS plan
+        JOIN (
+            SELECT
+                asset_class_id, 
+                location_id,
+                SUM(current_value) current_value
+            FROM (
+                SELECT
+                    c.asset_id,
+                    c.asset_class_id,
+                    c.location_id,
+                    c.percentage * v.current_value / (10000 * 100) as current_value
+                FROM
+                    component AS c
+                JOIN (
+                    SELECT
+                        asset_id,
+                        SUM(current_value) current_value
+                    FROM (
+                        SELECT
+                            b.account_id,
+                            b.asset_id,
+                            MAX(b.balance_date) balance_date,
+                            b.quantity * p.amount / 10000 AS current_value
+                        FROM
+                            balance AS b
+                        JOIN (
+                            SELECT
+                                asset_id, MAX(price_date) price_date, amount
+                            FROM
+                                price
+                            GROUP BY
+                                asset_id
+                            ) AS p ON b.asset_id = p.asset_id
+                        GROUP BY
+                            b.account_id, b.asset_id
+                        )
+                    GROUP BY
+                        asset_id
+                    ORDER BY
+                        asset_id
+                    ) AS v ON c.asset_id = v.asset_id
+                )
+            GROUP BY
+                asset_class_id,
+                location_id
+            ) AS current_values ON 
+                current_values.asset_class_id == plan.asset_class_id AND 
+                current_values.location_id == plan.location_id 
+        ORDER BY
+            deviation ASC
+        """
+
+        return self.sql_fetch_all(sql, {'net_worth': self.net_worth() + amount_to_add})
 
     def allocation_difference(self):
         sql = """
