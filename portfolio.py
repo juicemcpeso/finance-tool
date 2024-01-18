@@ -139,6 +139,7 @@ class Portfolio(sql_database.Database):
 
         self._lookup = {}
         self._construct_lookup()
+        self.decimal = 10000
 
         self.add_to_table = {'accounts': self.add_account,
                              'account_types': self.add_account_type,
@@ -312,7 +313,8 @@ class Portfolio(sql_database.Database):
             current_values.current_value,
             plan.percentage AS plan_percent,
             plan.percentage * :net_worth / 10000 AS plan_value,
-            (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation
+            (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation,
+            0 AS contribution_amount
         FROM 
             allocation AS plan
         JOIN (
@@ -919,6 +921,45 @@ class Portfolio(sql_database.Database):
             if line['option'] == lowest_option:
                 return [{'asset_class_id': line['asset_class_id'],
                          'location_id': line['location_id']}]
+
+    def where_to_contribute(self, contribution_amount):
+        deviation_table = self.allocation_deviation(contribution_amount)
+        contribution_table = []
+        amount_remaining = contribution_amount
+
+        while True:
+            largest_deviation = self.largest_deviation(deviation_table)
+
+            for line in deviation_table:
+                if line['deviation'] <= largest_deviation:
+                    line['contribution_amount'] += 1
+                    line['deviation'] = self.deviation(line)
+                    amount_remaining -= 1
+
+            if amount_remaining == 0:
+                break
+
+        for line in deviation_table:
+            if line['contribution_amount'] > 0:
+                contribution_table.append(line)
+
+        for line in contribution_table:
+            del line['current_value']
+            del line['deviation']
+            del line['plan_percent']
+            del line['plan_value']
+
+        return contribution_table
+
+    def deviation(self, line_dict):
+        return self.decimal * (line_dict['current_value'] + line_dict['contribution_amount'] - line_dict['plan_value']) - self.decimal
+
+    def largest_deviation(self, table):
+        largest_deviation = 0
+        for line in table:
+            if line['deviation'] < largest_deviation:
+                largest_deviation = line['deviation']
+        return largest_deviation
 
     # CSV loader
     def add_from_csv(self, file_name, table_name):
