@@ -371,6 +371,7 @@ class Portfolio(sql_database.Database):
 
         return self.sql_fetch_all(sql, {'net_worth': self.net_worth() + amount_to_add})
 
+    # TODO - remove once confirmed redundant with allocation deviation
     # def allocation_difference(self):
     #     sql = """
     #     SELECT
@@ -924,7 +925,6 @@ class Portfolio(sql_database.Database):
 
     def where_to_contribute(self, contribution_amount):
         deviation_table = self.allocation_deviation(contribution_amount)
-        contribution_table = []
         amount_remaining = contribution_amount
 
         for line in deviation_table:
@@ -942,15 +942,8 @@ class Portfolio(sql_database.Database):
             if amount_remaining == 0:
                 break
 
-        # for line in deviation_table:
-        #     if line['contribution'] > 0:
-        #         contribution_table.append(line)
-        #
         for line in deviation_table:
             del line['new_deviation']
-        #     del line['deviation']
-        #     del line['plan_percent']
-        #     del line['plan_value']
 
         return deviation_table
 

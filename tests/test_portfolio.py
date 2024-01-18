@@ -283,64 +283,6 @@ def test_asset_value_current_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_value_current, 'current_value', 166551450)
 
 
-# def test_allocation_difference(test_portfolio):
-#     file_name = 'expected/expected_allocation_difference.csv'
-#     expected = csv_to_numeric_dict_list(file_name)
-#
-#     assert expected == test_portfolio.allocation_difference()
-#
-#
-# def test_allocation_difference_after_adding(test_portfolio):
-#     file_name = 'expected/expected_allocation_difference_after_adding.csv'
-#     expected = csv_to_numeric_dict_list(file_name)
-#
-#     assert expected == test_portfolio.allocation_difference_after_addition(10000000)
-
-
-# TODO - remove following 3 tests once confirmed redundant
-# def test_value_by_asset_type_in_plan(test_portfolio):
-#     expected = [{'asset_class_id': 1, 'location_id': 1, 'current_value': 4171600},
-#                 {'asset_class_id': 1, 'location_id': 2, 'current_value': 1422050},
-#                 {'asset_class_id': 2, 'location_id': 1, 'current_value': 100478900},
-#                 {'asset_class_id': 2, 'location_id': 2, 'current_value': 239450},
-#                 {'asset_class_id': 3, 'location_id': 1, 'current_value': 60000000}]
-#
-#     assert expected == test_portfolio.value_by_asset_type_in_plan()
-#
-#
-# def test_value_by_asset_type_in_plan_future_value(test_portfolio):
-#     expected = [{'asset_class_id': 1, 'location_id': 1, 'desired': 4000, 'no_buy': 236, 'yes_buy': 802},
-#                 {'asset_class_id': 1, 'location_id': 2, 'desired': 2000, 'no_buy': 80, 'yes_buy': 646},
-#                 {'asset_class_id': 2, 'location_id': 1, 'desired': 2500, 'no_buy': 5691, 'yes_buy': 6257},
-#                 {'asset_class_id': 2, 'location_id': 2, 'desired': 500, 'no_buy': 13, 'yes_buy': 579},
-#                 {'asset_class_id': 3, 'location_id': 1, 'desired': 1000, 'no_buy': 3398, 'yes_buy': 3964}]
-#
-#     assert expected == test_portfolio.value_by_asset_type_in_plan_future_value(10000000)
-#
-#
-# def test_which_asset_to_buy(test_portfolio):
-#     expected = [{'asset_class_id': 1, 'location_id': 1}]
-#
-#     assert expected == test_portfolio.which_asset_to_buy(10000000)
-# TODO - end remove
-
-# def test_allocation_deviation(test_portfolio):
-#     file_name = 'expected/expected_allocation_deviation.csv'
-#     expected = csv_to_numeric_dict_list(file_name)
-#
-#     assert expected == test_portfolio.allocation_deviation()
-#
-#
-# def test_allocation_deviation_10000000(test_portfolio):
-#     file_name = 'expected/expected_allocation_deviation_10000000.csv'
-#     expected = csv_to_numeric_dict_list(file_name)
-#
-#     assert expected == test_portfolio.allocation_deviation(10000000)
-
-# def test_where_to_contribute_0(test_portfolio_allocation):
-#     expected = []
-#
-#     assert expected == test_portfolio_allocation.where_to_contribute(0)
 def test_allocation_deviation(test_portfolio_allocation):
     file_name = 'expected_deviations/add_0.csv'
     expected = csv_to_numeric_dict_list(file_name)
@@ -360,42 +302,3 @@ def test_where_to_contribute_1000(test_portfolio_allocation):
     expected = csv_to_numeric_dict_list(file_name)
 
     assert expected == test_portfolio_allocation.where_to_contribute(10000000)
-
-
-# def test_where_to_contribute_10000000(test_portfolio):
-#     expected = [
-#
-#     assert expected == test_portfolio.where_to_contribute(10000000)
-
-
-
-
-
-# TODO - delete following tests as redundant
-#
-#
-# def test_allocation_deviation_add_1000(test_portfolio_allocation):
-#     file_name = 'expected_deviations/add_1000.csv'
-#     expected = csv_to_numeric_dict_list(file_name)
-#
-#     assert expected == test_portfolio_allocation.allocation_deviation(10000000)
-
-# def test_allocation_deviation_add_10000(test_portfolio_allocation):
-#     file_name = 'expected_deviations/add_10000.csv'
-#     expected = csv_to_numeric_dict_list(file_name)
-#
-#     assert expected == test_portfolio_allocation.allocation_deviation(100000000)
-#
-#
-# def test_allocation_deviation_add_20000(test_portfolio_allocation):
-#     file_name = 'expected_deviations/add_20000.csv'
-#     expected = csv_to_numeric_dict_list(file_name)
-#
-#     assert expected == test_portfolio_allocation.allocation_deviation(200000000)
-#
-#
-# def test_allocation_deviation_add_100000(test_portfolio_allocation):
-#     file_name = 'expected_deviations/add_100000.csv'
-#     expected = csv_to_numeric_dict_list(file_name)
-#
-#     assert expected == test_portfolio_allocation.allocation_deviation(1000000000)
