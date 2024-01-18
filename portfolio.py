@@ -927,29 +927,32 @@ class Portfolio(sql_database.Database):
         contribution_table = []
         amount_remaining = contribution_amount
 
+        for line in deviation_table:
+            line.update({'new_deviation': line['deviation']})
+
         while contribution_amount > 0:
             largest_deviation = self.largest_deviation(deviation_table)
 
             for line in deviation_table:
-                if line['deviation'] <= largest_deviation:
+                if line['new_deviation'] <= largest_deviation:
                     line['contribution'] += 1
-                    line['deviation'] = self.deviation(line)
+                    line['new_deviation'] = self.deviation(line)
                     amount_remaining -= 1
 
             if amount_remaining == 0:
                 break
 
+        # for line in deviation_table:
+        #     if line['contribution'] > 0:
+        #         contribution_table.append(line)
+        #
         for line in deviation_table:
-            if line['contribution'] > 0:
-                contribution_table.append(line)
+            del line['new_deviation']
+        #     del line['deviation']
+        #     del line['plan_percent']
+        #     del line['plan_value']
 
-        for line in contribution_table:
-            del line['current_value']
-            del line['deviation']
-            del line['plan_percent']
-            del line['plan_value']
-
-        return contribution_table
+        return deviation_table
 
     def deviation(self, line_dict):
         return self.decimal * (line_dict['current_value'] + line_dict['contribution'] - line_dict['plan_value']) - self.decimal

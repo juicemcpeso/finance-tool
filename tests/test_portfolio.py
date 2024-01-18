@@ -337,14 +337,27 @@ def test_asset_value_current_sum(test_portfolio):
 #
 #     assert expected == test_portfolio.allocation_deviation(10000000)
 
+# def test_where_to_contribute_0(test_portfolio_allocation):
+#     expected = []
+#
+#     assert expected == test_portfolio_allocation.where_to_contribute(0)
+def test_allocation_deviation(test_portfolio_allocation):
+    file_name = 'expected_deviations/add_0.csv'
+    expected = csv_to_numeric_dict_list(file_name)
+
+    assert expected == test_portfolio_allocation.allocation_deviation()
+
+
 def test_where_to_contribute_0(test_portfolio_allocation):
-    expected = []
+    file_name = 'expected_deviations/add_0.csv'
+    expected = csv_to_numeric_dict_list(file_name)
 
     assert expected == test_portfolio_allocation.where_to_contribute(0)
 
 
 def test_where_to_contribute_1000(test_portfolio_allocation):
-    expected = [{'asset_class_id': 1, 'location_id': 2, 'contribution': 10000000}]
+    file_name = 'expected_deviations/add_1000.csv'
+    expected = csv_to_numeric_dict_list(file_name)
 
     assert expected == test_portfolio_allocation.where_to_contribute(10000000)
 
@@ -355,11 +368,7 @@ def test_where_to_contribute_1000(test_portfolio_allocation):
 #     assert expected == test_portfolio.where_to_contribute(10000000)
 
 
-def test_allocation_deviation(test_portfolio_allocation):
-    file_name = 'expected_deviations/add_0.csv'
-    expected = csv_to_numeric_dict_list(file_name)
 
-    assert expected == test_portfolio_allocation.allocation_deviation()
 
 
 # TODO - delete following tests as redundant
