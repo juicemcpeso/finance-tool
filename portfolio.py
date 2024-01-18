@@ -313,7 +313,8 @@ class Portfolio(sql_database.Database):
             current_values.current_value,
             plan.percentage AS plan_percent,
             plan.percentage * :net_worth / 10000 AS plan_value,
-            (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation
+            (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation,
+            0 AS contribution
         FROM 
             allocation AS plan
         JOIN (
@@ -926,12 +927,12 @@ class Portfolio(sql_database.Database):
         contribution_table = []
         amount_remaining = contribution_amount
 
-        while True:
+        while contribution_amount > 0:
             largest_deviation = self.largest_deviation(deviation_table)
 
             for line in deviation_table:
                 if line['deviation'] <= largest_deviation:
-                    line['contribution_amount'] += 1
+                    line['contribution'] += 1
                     line['deviation'] = self.deviation(line)
                     amount_remaining -= 1
 
@@ -939,7 +940,7 @@ class Portfolio(sql_database.Database):
                 break
 
         for line in deviation_table:
-            if line['contribution_amount'] > 0:
+            if line['contribution'] > 0:
                 contribution_table.append(line)
 
         for line in contribution_table:
@@ -951,7 +952,7 @@ class Portfolio(sql_database.Database):
         return contribution_table
 
     def deviation(self, line_dict):
-        return self.decimal * (line_dict['current_value'] + line_dict['contribution_amount'] - line_dict['plan_value']) - self.decimal
+        return self.decimal * (line_dict['current_value'] + line_dict['contribution'] - line_dict['plan_value']) - self.decimal
 
     def largest_deviation(self, table):
         largest_deviation = 0
