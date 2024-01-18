@@ -313,8 +313,7 @@ class Portfolio(sql_database.Database):
             current_values.current_value,
             plan.percentage AS plan_percent,
             plan.percentage * :net_worth / 10000 AS plan_value,
-            (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation,
-            0 AS contribution_amount
+            (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation
         FROM 
             allocation AS plan
         JOIN (
