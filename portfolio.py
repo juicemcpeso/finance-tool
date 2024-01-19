@@ -641,12 +641,12 @@ class Portfolio(sql_database.Database):
     def where_to_contribute(self, contribution_amount):
         deviation_table = self.allocation_deviation(contribution_amount)
         asset_deviation_level_cost = {0: 0}
-        total_deviation_level_cost = {}
+        total_deviation_level_cost = {key: 0 for key in range(len(deviation_table))}
         accessible_level = 0
 
         # Create dictionary for how much money each asset needs to get to each deviation level
-        for line_number in range(0, len(deviation_table)):
-            total_deviation_level_cost.update({line_number: 0})
+        # for line_number in range(0, len(deviation_table)):
+        #     total_deviation_level_cost.update({line_number: 0})
 
         for line_number, line in enumerate(deviation_table):
             asset_deviation_level_cost.update({line_number: {}})
