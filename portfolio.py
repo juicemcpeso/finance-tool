@@ -366,6 +366,8 @@ class Portfolio(sql_database.Database):
             ) AS current_values ON 
                 current_values.asset_class_id == plan.asset_class_id AND 
                 current_values.location_id == plan.location_id 
+        WHERE
+            deviation < 0        
         ORDER BY
             deviation ASC
         """
@@ -817,7 +819,12 @@ class Portfolio(sql_database.Database):
                 if leftover == 0:
                     break
 
-        return deviation_table
+        result_table = []
+        for line in deviation_table:
+            if line['contribution'] > 0:
+                result_table.append(line)
+
+        return result_table
 
     def money_to_get_to_target_deviation(self, deviation_dict, target):
         return ((target + self.decimal) * deviation_dict['plan_value'] / self.decimal) - deviation_dict['current_value']

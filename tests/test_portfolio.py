@@ -291,10 +291,7 @@ def test_allocation_deviation(test_portfolio_allocation):
 
 
 def test_where_to_contribute_0(test_portfolio_allocation):
-    file_name = 'expected_deviations/add_0.csv'
-    expected = csv_to_numeric_dict_list(file_name)
-
-    assert expected == test_portfolio_allocation.where_to_contribute(0)
+    assert test_portfolio_allocation.where_to_contribute(0) == []
 
 
 def test_where_to_contribute_1000(test_portfolio_allocation):
