@@ -640,20 +640,9 @@ class Portfolio(sql_database.Database):
     # Tools
     def where_to_contribute(self, contribution_amount):
         deviation_table = self.allocation_deviation(contribution_amount)
-        asset_deviation_level_cost = {0: 0}
+        asset_deviation_level_cost = self.create_asset_deviation_level_cost_dict(deviation_table)
         total_deviation_level_cost = {key: 0 for key in range(len(deviation_table))}
         accessible_level = 0
-
-        # Create dictionary for how much money each asset needs to get to each deviation level
-        # for line_number in range(0, len(deviation_table)):
-        #     total_deviation_level_cost.update({line_number: 0})
-
-        for line_number, line in enumerate(deviation_table):
-            asset_deviation_level_cost.update({line_number: {}})
-
-            for next_number in range(line_number + 1, len(deviation_table)):
-                dev_next_level = deviation_table[next_number]['deviation']
-                asset_deviation_level_cost[line_number].update({next_number: self.money_to_get_to_target_deviation(line, dev_next_level)})
 
         for line_number in asset_deviation_level_cost:
             for key in asset_deviation_level_cost[line_number]:
@@ -677,23 +666,25 @@ class Portfolio(sql_database.Database):
         for line_number in range(accessible_level + 1):
             contribution_table[line_number]['contribution'] += amount_remaining * contribution_table[line_number]['plan_percent'] // total_percentage
 
-        amount_contributed = 0
-        for line in contribution_table:
-            amount_contributed += line['contribution']
-
-        leftover = contribution_amount - amount_contributed
-
-        while leftover > 0:
-            for line_number in range(accessible_level + 1):
-                contribution_table[line_number]['contribution'] += 1
-                leftover -= 1
-                if leftover == 0:
-                    break
+        assign_leftovers(contribution_table, contribution_amount)
 
         return contribution_table
 
     def money_to_get_to_target_deviation(self, deviation_dict, target):
         return ((target + self.decimal) * deviation_dict['plan_value'] / self.decimal) - deviation_dict['current_value']
+
+    def create_asset_deviation_level_cost_dict(self, deviation_table):
+        asset_deviation_level_cost = {0: 0}
+
+        for line_number, line in enumerate(deviation_table):
+            asset_deviation_level_cost.update({line_number: {}})
+
+            for next_number in range(line_number + 1, len(deviation_table)):
+                dev_next_level = deviation_table[next_number]['deviation']
+                asset_deviation_level_cost[line_number].update(
+                    {next_number: self.money_to_get_to_target_deviation(line, dev_next_level)})
+
+        return asset_deviation_level_cost
 
     # CSV loader
     def add_from_csv(self, file_name, table_name):
@@ -702,12 +693,15 @@ class Portfolio(sql_database.Database):
 
 
 def assign_leftovers(contribution_table, contribution_amount):
-    pass
+    amount_contributed = 0
+    for line in contribution_table:
+        amount_contributed += line['contribution']
 
+    leftover = contribution_amount - amount_contributed
 
-# def remove_lines_with_0_contribution(contribution_table):
-#     result_table = []
-#     for line in contribution_table:
-#         if line['contribution'] > 0:
-#             result_table.append(line)
-#     return result_table
+    while leftover > 0:
+        for line in contribution_table:
+            line['contribution'] += 1
+            leftover -= 1
+            if leftover == 0:
+                break
