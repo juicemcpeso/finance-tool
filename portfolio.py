@@ -640,34 +640,35 @@ class Portfolio(sql_database.Database):
     # Tools
     def where_to_contribute(self, contribution_amount):
         deviation_table = self.allocation_deviation(contribution_amount)
-        required_amount = {0: 0}
-        money_to_get_to_each_deviation = {0: 0}
+        asset_deviation_level_cost = {0: 0}
+        total_deviation_level_cost = {}
         accessible_level = 0
 
-        for line_number in range(1, len(deviation_table)):
-            money_to_get_to_each_deviation.update({line_number: 0})
+        # Create dictionary for how much money each asset needs to get to each deviation level
+        for line_number in range(0, len(deviation_table)):
+            total_deviation_level_cost.update({line_number: 0})
 
         for line_number, line in enumerate(deviation_table):
-            required_amount.update({line_number: {}})
+            asset_deviation_level_cost.update({line_number: {}})
 
             for next_number in range(line_number + 1, len(deviation_table)):
                 dev_next_level = deviation_table[next_number]['deviation']
-                required_amount[line_number].update({next_number: self.money_to_get_to_target_deviation(line, dev_next_level)})
+                asset_deviation_level_cost[line_number].update({next_number: self.money_to_get_to_target_deviation(line, dev_next_level)})
 
-        for line_number in required_amount:
-            for key in required_amount[line_number]:
-                money_to_get_to_each_deviation[key] += required_amount[line_number][key]
+        for line_number in asset_deviation_level_cost:
+            for key in asset_deviation_level_cost[line_number]:
+                total_deviation_level_cost[key] += asset_deviation_level_cost[line_number][key]
 
-        for key in money_to_get_to_each_deviation:
-            if money_to_get_to_each_deviation[key] < contribution_amount:
+        for key in total_deviation_level_cost:
+            if total_deviation_level_cost[key] < contribution_amount:
                 accessible_level = key
 
         contribution_table = deviation_table[:(accessible_level + 1)]
 
         for line_number in range(accessible_level):
-            contribution_table[line_number]['contribution'] += required_amount[line_number][accessible_level]
+            contribution_table[line_number]['contribution'] += asset_deviation_level_cost[line_number][accessible_level]
 
-        amount_remaining = contribution_amount - money_to_get_to_each_deviation[accessible_level]
+        amount_remaining = contribution_amount - total_deviation_level_cost[accessible_level]
 
         total_percentage = 0
         for line_number in range(accessible_level + 1):
