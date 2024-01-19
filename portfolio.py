@@ -767,163 +767,6 @@ class Portfolio(sql_database.Database):
         return self.net_worth_dict()['net_worth']
 
     # Tools
-    # TODO - remove value_by_asset_type_in_plan and value_by_asset_type_in_plan_future value once confirmed redundant
-    # def value_by_asset_type_in_plan(self):
-    #     sql = """
-    #     SELECT
-    #         plan.asset_class_id,
-    #         plan.location_id,
-    #         current_values.current_value
-    #     FROM
-    #         allocation AS plan
-    #     JOIN (
-    #         SELECT
-    #             asset_class_id,
-    #             location_id,
-    #             SUM(current_value) current_value
-    #         FROM (
-    #             SELECT
-    #                 c.asset_id,
-    #                 c.asset_class_id,
-    #                 c.location_id,
-    #                 c.percentage * v.current_value / (10000 * 100) as current_value
-    #             FROM
-    #                 component AS c
-    #             JOIN (
-    #                 SELECT
-    #                     asset_id,
-    #                     SUM(current_value) current_value
-    #                 FROM (
-    #                     SELECT
-    #                         b.account_id,
-    #                         b.asset_id,
-    #                         MAX(b.balance_date) balance_date,
-    #                         b.quantity * p.amount / 10000 AS current_value
-    #                     FROM
-    #                         balance AS b
-    #                     JOIN (
-    #                         SELECT
-    #                             asset_id, MAX(price_date) price_date, amount
-    #                         FROM
-    #                             price
-    #                         GROUP BY
-    #                             asset_id
-    #                         ) AS p ON b.asset_id = p.asset_id
-    #                     GROUP BY
-    #                         b.account_id, b.asset_id
-    #                 )
-    #                 GROUP BY asset_id
-    #                 ORDER BY asset_id
-    #             ) AS v ON c.asset_id = v.asset_id
-    #         )
-    #         GROUP BY
-    #             asset_class_id, location_id
-    #     ) AS current_values ON
-    #         current_values.asset_class_id == plan.asset_class_id AND
-    #         current_values.location_id == plan.location_id
-    #     """
-    #
-    #     return self.sql_fetch_all(sql)
-    #
-    # def value_by_asset_type_in_plan_future_value(self, amount_to_buy):
-    #     sql_params = {'amount_to_buy': amount_to_buy,
-    #                   'future_value': self.net_worth() + amount_to_buy}
-    #     sql = """
-    #     SELECT
-    #         plan.asset_class_id,
-    #         plan.location_id,
-    #         plan.percentage AS desired,
-    #         10000 * current_values.current_value / :future_value AS no_buy,
-    #         10000 * (current_values.current_value + :amount_to_buy) / :future_value AS yes_buy
-    #     FROM
-    #         allocation AS plan
-    #     JOIN (
-    #         SELECT
-    #             asset_class_id,
-    #             location_id,
-    #             SUM(current_value) current_value
-    #         FROM (
-    #             SELECT
-    #                 c.asset_id,
-    #                 c.asset_class_id,
-    #                 c.location_id,
-    #                 c.percentage * v.current_value / (10000 * 100) as current_value
-    #             FROM
-    #                 component AS c
-    #             JOIN (
-    #                 SELECT
-    #                     asset_id,
-    #                     SUM(current_value) current_value
-    #                 FROM (
-    #                     SELECT
-    #                         b.account_id,
-    #                         b.asset_id,
-    #                         MAX(b.balance_date) balance_date,
-    #                         b.quantity * p.amount / 10000 AS current_value
-    #                     FROM
-    #                         balance AS b
-    #                     JOIN (
-    #                         SELECT
-    #                             asset_id, MAX(price_date) price_date, amount
-    #                         FROM
-    #                             price
-    #                         GROUP BY
-    #                             asset_id
-    #                         ) AS p ON b.asset_id = p.asset_id
-    #                     GROUP BY
-    #                         b.account_id, b.asset_id
-    #                 )
-    #                 GROUP BY asset_id
-    #                 ORDER BY asset_id
-    #             ) AS v ON c.asset_id = v.asset_id
-    #         )
-    #         GROUP BY
-    #             asset_class_id, location_id
-    #     ) AS current_values ON
-    #         current_values.asset_class_id == plan.asset_class_id AND
-    #         current_values.location_id == plan.location_id
-    #     """
-    #
-    #     return self.sql_fetch_all(sql, sql_params)
-
-    # def which_asset_to_buy(self, purchase_amount):
-    #     dict_of_tables = {}
-    #     results_dict = {}
-    #     base_table_list = self.value_by_asset_type_in_plan_future_value(purchase_amount)
-    #     for line_number, line in enumerate(base_table_list):
-    #         line.update({'option': line_number})
-    #
-    #     for option_number in range(len(base_table_list)):
-    #         copy_of_base_table = copy.deepcopy(base_table_list)
-    #
-    #         for line in copy_of_base_table:
-    #             if line['option'] == option_number:
-    #                 line.update({'amount': line['yes_buy']})
-    #             else:
-    #                 line.update({'amount': line['no_buy']})
-    #
-    #             del line['no_buy']
-    #             del line['yes_buy']
-    #
-    #         dict_of_tables.update({option_number: copy_of_base_table})
-    #
-    #     for option in dict_of_tables:
-    #         score = 0.0
-    #         for line in dict_of_tables[option]:
-    #             score += abs(line['amount'] - line['desired'])
-    #         results_dict.update({option: score})
-    #
-    #     lowest_option = 0
-    #
-    #     for option in results_dict:
-    #         if results_dict[option] < results_dict[lowest_option]:
-    #             lowest_option = option
-    #
-    #     for line in base_table_list:
-    #         if line['option'] == lowest_option:
-    #             return [{'asset_class_id': line['asset_class_id'],
-    #                      'location_id': line['location_id']}]
-    #
     def where_to_contribute(self, contribution_amount):
         deviation_table = self.allocation_deviation(contribution_amount)
         required_amount = {0: 0}
@@ -979,15 +822,15 @@ class Portfolio(sql_database.Database):
     def money_to_get_to_target_deviation(self, deviation_dict, target):
         return ((target + self.decimal) * deviation_dict['plan_value'] / self.decimal) - deviation_dict['current_value']
 
-    def deviation(self, line_dict):
-        return self.decimal * (line_dict['current_value'] + line_dict['contribution'] - line_dict['plan_value']) - self.decimal
-
-    def largest_deviation(self, table):
-        largest_deviation = 0
-        for line in table:
-            if line['deviation'] < largest_deviation:
-                largest_deviation = line['deviation']
-        return largest_deviation
+    # def deviation(self, line_dict):
+    #     return self.decimal * (line_dict['current_value'] + line_dict['contribution'] - line_dict['plan_value']) - self.decimal
+    #
+    # def largest_deviation(self, table):
+    #     largest_deviation = 0
+    #     for line in table:
+    #         if line['deviation'] < largest_deviation:
+    #             largest_deviation = line['deviation']
+    #     return largest_deviation
 
     # CSV loader
     def add_from_csv(self, file_name, table_name):
