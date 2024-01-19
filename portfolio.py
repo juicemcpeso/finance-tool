@@ -662,38 +662,34 @@ class Portfolio(sql_database.Database):
             if money_to_get_to_each_deviation[key] < contribution_amount:
                 accessible_level = key
 
-        for line_number in range(len(deviation_table)):
-            if line_number < accessible_level:
-                deviation_table[line_number]['contribution'] += required_amount[line_number][accessible_level]
+        contribution_table = deviation_table[:(accessible_level + 1)]
+
+        for line_number in range(accessible_level):
+            contribution_table[line_number]['contribution'] += required_amount[line_number][accessible_level]
 
         amount_remaining = contribution_amount - money_to_get_to_each_deviation[accessible_level]
 
         total_percentage = 0
         for line_number in range(accessible_level + 1):
-            total_percentage += deviation_table[line_number]['plan_percent']
+            total_percentage += contribution_table[line_number]['plan_percent']
 
         for line_number in range(accessible_level + 1):
-            deviation_table[line_number]['contribution'] += amount_remaining * deviation_table[line_number]['plan_percent'] // total_percentage
+            contribution_table[line_number]['contribution'] += amount_remaining * contribution_table[line_number]['plan_percent'] // total_percentage
 
         amount_contributed = 0
-        for line_number in range(0, len(deviation_table)):
-            amount_contributed += deviation_table[line_number]['contribution']
+        for line in contribution_table:
+            amount_contributed += line['contribution']
 
         leftover = contribution_amount - amount_contributed
 
         while leftover > 0:
             for line_number in range(accessible_level + 1):
-                deviation_table[line_number]['contribution'] += 1
+                contribution_table[line_number]['contribution'] += 1
                 leftover -= 1
                 if leftover == 0:
                     break
 
-        result_table = []
-        for line in deviation_table:
-            if line['contribution'] > 0:
-                result_table.append(line)
-
-        return result_table
+        return contribution_table
 
     def money_to_get_to_target_deviation(self, deviation_dict, target):
         return ((target + self.decimal) * deviation_dict['plan_value'] / self.decimal) - deviation_dict['current_value']
@@ -702,3 +698,15 @@ class Portfolio(sql_database.Database):
     def add_from_csv(self, file_name, table_name):
         for line in csv.DictReader(open(file_name)):
             self.add_to_table[table_name](kwargs=line)
+
+
+def assign_leftovers(contribution_table, contribution_amount):
+    pass
+
+
+# def remove_lines_with_0_contribution(contribution_table):
+#     result_table = []
+#     for line in contribution_table:
+#         if line['contribution'] > 0:
+#             result_table.append(line)
+#     return result_table

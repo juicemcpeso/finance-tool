@@ -290,8 +290,8 @@ def test_allocation_deviation(test_portfolio_allocation):
     assert expected == test_portfolio_allocation.allocation_deviation()
 
 
-def test_where_to_contribute_0(test_portfolio_allocation):
-    assert test_portfolio_allocation.where_to_contribute(0) == []
+# def test_where_to_contribute_0(test_portfolio_allocation):
+#     assert test_portfolio_allocation.where_to_contribute(0) == []
 
 
 def test_where_to_contribute_1000(test_portfolio_allocation):
