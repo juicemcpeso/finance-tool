@@ -302,3 +302,10 @@ def test_where_to_contribute_1000(test_portfolio_allocation):
     expected = csv_to_numeric_dict_list(file_name)
 
     assert expected == test_portfolio_allocation.where_to_contribute(10000000)
+
+
+def test_where_to_contribute_10000(test_portfolio_allocation):
+    file_name = 'expected_deviations/add_10000.csv'
+    expected = csv_to_numeric_dict_list(file_name)
+
+    assert expected == test_portfolio_allocation.where_to_contribute(100000000)

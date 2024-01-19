@@ -5,6 +5,7 @@
 
 import copy
 import csv
+import time
 import sql_database
 
 create_account_table = """
@@ -924,6 +925,7 @@ class Portfolio(sql_database.Database):
                          'location_id': line['location_id']}]
 
     def where_to_contribute(self, contribution_amount):
+        start_time = time.perf_counter()
         deviation_table = self.allocation_deviation(contribution_amount)
         amount_remaining = contribution_amount
 
@@ -945,6 +947,7 @@ class Portfolio(sql_database.Database):
         for line in deviation_table:
             del line['new_deviation']
 
+        print(f"Run time: {time.perf_counter() - start_time} seconds")
         return deviation_table
 
     def deviation(self, line_dict):
