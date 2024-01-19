@@ -770,11 +770,11 @@ class Portfolio(sql_database.Database):
     def where_to_contribute(self, contribution_amount):
         deviation_table = self.allocation_deviation(contribution_amount)
         required_amount = {0: 0}
-        money_to_get_to_each_level = {0: 0}
+        money_to_get_to_each_deviation = {0: 0}
         accessible_level = 0
 
         for line_number in range(1, len(deviation_table)):
-            money_to_get_to_each_level.update({line_number: 0})
+            money_to_get_to_each_deviation.update({line_number: 0})
 
         for line_number, line in enumerate(deviation_table):
             required_amount.update({line_number: {}})
@@ -785,17 +785,17 @@ class Portfolio(sql_database.Database):
 
         for line_number in required_amount:
             for key in required_amount[line_number]:
-                money_to_get_to_each_level[key] += required_amount[line_number][key]
+                money_to_get_to_each_deviation[key] += required_amount[line_number][key]
 
-        for key in money_to_get_to_each_level:
-            if money_to_get_to_each_level[key] < contribution_amount:
+        for key in money_to_get_to_each_deviation:
+            if money_to_get_to_each_deviation[key] < contribution_amount:
                 accessible_level = key
 
         for line_number in range(len(deviation_table)):
             if line_number < accessible_level:
                 deviation_table[line_number]['contribution'] += required_amount[line_number][accessible_level]
 
-        amount_remaining = contribution_amount - money_to_get_to_each_level[accessible_level]
+        amount_remaining = contribution_amount - money_to_get_to_each_deviation[accessible_level]
 
         total_percentage = 0
         for line_number in range(accessible_level + 1):
