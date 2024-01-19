@@ -886,70 +886,44 @@ class Portfolio(sql_database.Database):
     #
     #     return self.sql_fetch_all(sql, sql_params)
 
-    def which_asset_to_buy(self, purchase_amount):
-        dict_of_tables = {}
-        results_dict = {}
-        base_table_list = self.value_by_asset_type_in_plan_future_value(purchase_amount)
-        for line_number, line in enumerate(base_table_list):
-            line.update({'option': line_number})
-
-        for option_number in range(len(base_table_list)):
-            copy_of_base_table = copy.deepcopy(base_table_list)
-
-            for line in copy_of_base_table:
-                if line['option'] == option_number:
-                    line.update({'amount': line['yes_buy']})
-                else:
-                    line.update({'amount': line['no_buy']})
-
-                del line['no_buy']
-                del line['yes_buy']
-
-            dict_of_tables.update({option_number: copy_of_base_table})
-
-        for option in dict_of_tables:
-            score = 0.0
-            for line in dict_of_tables[option]:
-                score += abs(line['amount'] - line['desired'])
-            results_dict.update({option: score})
-
-        lowest_option = 0
-
-        for option in results_dict:
-            if results_dict[option] < results_dict[lowest_option]:
-                lowest_option = option
-
-        for line in base_table_list:
-            if line['option'] == lowest_option:
-                return [{'asset_class_id': line['asset_class_id'],
-                         'location_id': line['location_id']}]
-
-    # def where_to_contribute(self, contribution_amount):
-    #     start_time = time.perf_counter()
-    #     deviation_table = self.allocation_deviation(contribution_amount)
-    #     amount_remaining = contribution_amount
+    # def which_asset_to_buy(self, purchase_amount):
+    #     dict_of_tables = {}
+    #     results_dict = {}
+    #     base_table_list = self.value_by_asset_type_in_plan_future_value(purchase_amount)
+    #     for line_number, line in enumerate(base_table_list):
+    #         line.update({'option': line_number})
     #
-    #     for line in deviation_table:
-    #         line.update({'new_deviation': line['deviation']})
+    #     for option_number in range(len(base_table_list)):
+    #         copy_of_base_table = copy.deepcopy(base_table_list)
     #
-    #     while contribution_amount > 0:
-    #         largest_deviation = self.largest_deviation(deviation_table)
+    #         for line in copy_of_base_table:
+    #             if line['option'] == option_number:
+    #                 line.update({'amount': line['yes_buy']})
+    #             else:
+    #                 line.update({'amount': line['no_buy']})
     #
-    #         for line in deviation_table:
-    #             if line['new_deviation'] <= largest_deviation:
-    #                 line['contribution'] += 1
-    #                 line['new_deviation'] = self.deviation(line)
-    #                 amount_remaining -= 1
+    #             del line['no_buy']
+    #             del line['yes_buy']
     #
-    #         if amount_remaining == 0:
-    #             break
+    #         dict_of_tables.update({option_number: copy_of_base_table})
     #
-    #     for line in deviation_table:
-    #         del line['new_deviation']
+    #     for option in dict_of_tables:
+    #         score = 0.0
+    #         for line in dict_of_tables[option]:
+    #             score += abs(line['amount'] - line['desired'])
+    #         results_dict.update({option: score})
     #
-    #     print(f"Run time: {time.perf_counter() - start_time} seconds")
-    #     return deviation_table
-
+    #     lowest_option = 0
+    #
+    #     for option in results_dict:
+    #         if results_dict[option] < results_dict[lowest_option]:
+    #             lowest_option = option
+    #
+    #     for line in base_table_list:
+    #         if line['option'] == lowest_option:
+    #             return [{'asset_class_id': line['asset_class_id'],
+    #                      'location_id': line['location_id']}]
+    #
     def where_to_contribute(self, contribution_amount):
         deviation_table = self.allocation_deviation(contribution_amount)
         required_amount = {0: 0}
@@ -958,8 +932,6 @@ class Portfolio(sql_database.Database):
 
         for line_number in range(1, len(deviation_table)):
             money_to_get_to_each_level.update({line_number: 0})
-
-        print(money_to_get_to_each_level)
 
         for line_number, line in enumerate(deviation_table):
             required_amount.update({line_number: {}})
@@ -976,25 +948,10 @@ class Portfolio(sql_database.Database):
             if money_to_get_to_each_level[key] < contribution_amount:
                 accessible_level = key
 
-        # for line_number in accessible_levels:
-        #     if line_number + 1 > len(accessible_levels):
-        #         # Proportional
-        #         pass
-        #     else:
-        #         relevant_lines = range(line_number + 1)
-
         for line_number in range(len(deviation_table)):
-            print('a')
             if line_number < accessible_level:
-                print('b')
                 deviation_table[line_number]['contribution'] += required_amount[line_number][accessible_level]
-                # for level in range(line_number + 1, accessible_levels + 1):
-                #     print('c')
-                #     print(level)
-                #     deviation_table[line_number]['contribution'] += required_amount[line_number][level]
 
-        print(deviation_table)
-        print('---')
         amount_remaining = contribution_amount - money_to_get_to_each_level[accessible_level]
 
         total_percentage = 0
@@ -1016,20 +973,11 @@ class Portfolio(sql_database.Database):
                 leftover -= 1
                 if leftover == 0:
                     break
-            #
-            # for level in required_amount:
-            #     if level <= accessible_levels:
-            #         deviation_table[level]['contribution'] += required_amount[level]
 
-        print(money_to_get_to_each_level)
-        print(amount_remaining)
-        print(accessible_level)
-        print(deviation_table)
         return deviation_table
 
     def money_to_get_to_target_deviation(self, deviation_dict, target):
         return ((target + self.decimal) * deviation_dict['plan_value'] / self.decimal) - deviation_dict['current_value']
-
 
     def deviation(self, line_dict):
         return self.decimal * (line_dict['current_value'] + line_dict['contribution'] - line_dict['plan_value']) - self.decimal
