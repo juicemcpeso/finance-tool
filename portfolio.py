@@ -408,14 +408,23 @@ class Portfolio(sql_database.Database):
     def asset_quantity(self):
         sql = """
         SELECT asset_id, SUM(quantity) quantity
-        FROM (
-            SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
-            FROM balance
-            GROUP BY account_id, asset_id)
+        FROM asset_quantity_by_account_current
         GROUP BY asset_id
         ORDER BY asset_id
         """
         return self.sql_fetch_all(sql)
+
+    # def asset_quantity(self):
+    #     sql = """
+    #     SELECT asset_id, SUM(quantity) quantity
+    #     FROM (
+    #         SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
+    #         FROM balance
+    #         GROUP BY account_id, asset_id)
+    #     GROUP BY asset_id
+    #     ORDER BY asset_id
+    #     """
+    #     return self.sql_fetch_all(sql)
 
     def asset_value_current(self):
         sql = """
