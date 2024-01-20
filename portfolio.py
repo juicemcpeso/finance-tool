@@ -110,6 +110,13 @@ FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
 
 # Views
+create_asset_price_newest_view = """
+CREATE VIEW IF NOT EXISTS asset_price_newest AS
+SELECT asset_id, MAX(price_date) price_date, amount
+FROM price
+GROUP BY asset_id
+"""
+
 create_asset_quantity_by_account_view = """
 CREATE VIEW IF NOT EXISTS asset_quantity_by_account_current AS
 SELECT
@@ -134,6 +141,7 @@ create_tables_and_views_commands = [create_account_table,
                                     create_location_table,
                                     create_owner_table,
                                     create_price_table,
+                                    create_asset_price_newest_view,
                                     create_asset_quantity_by_account_view]
 
 drop_tables_and_views_commands = ['DROP TABLE IF EXISTS account',
@@ -147,6 +155,7 @@ drop_tables_and_views_commands = ['DROP TABLE IF EXISTS account',
                                   'DROP TABLE IF EXISTS location',
                                   'DROP TABLE IF EXISTS owner',
                                   'DROP TABLE IF EXISTS price',
+                                  'DROP VIEW IF EXISTS asset_price_newest',
                                   'DROP VIEW IF EXISTS asset_quantity_by_account_current']
 
 
@@ -398,12 +407,19 @@ class Portfolio(sql_database.Database):
     # Assets
     def asset_price_newest(self):
         sql = """
-        SELECT asset_id, MAX(price_date) price_date, amount
-        FROM price
-        GROUP BY asset_id
+        SELECT * FROM asset_price_newest
         """
 
         return self.sql_fetch_all(sql)
+
+    # def asset_price_newest(self):
+    #     sql = """
+    #     SELECT asset_id, MAX(price_date) price_date, amount
+    #     FROM price
+    #     GROUP BY asset_id
+    #     """
+    #
+    #     return self.sql_fetch_all(sql)
 
     def asset_quantity(self):
         sql = """
@@ -437,14 +453,8 @@ class Portfolio(sql_database.Database):
                 b.quantity * p.amount / 10000 AS current_value
             FROM 
                 balance AS b
-            JOIN (
-                SELECT 
-                    asset_id, MAX(price_date) price_date, amount
-                FROM 
-                    price
-                GROUP BY 
-                    asset_id
-                ) AS p ON b.asset_id = p.asset_id
+            JOIN 
+                asset_price_newest AS p ON b.asset_id = p.asset_id
             GROUP BY 
                 b.account_id, b.asset_id
             )
@@ -478,14 +488,8 @@ class Portfolio(sql_database.Database):
                         b.quantity * p.amount / 10000 AS current_value
                     FROM
                         balance AS b
-                    JOIN (
-                        SELECT
-                            asset_id, MAX(price_date) price_date, amount
-                        FROM
-                            price
-                        GROUP BY
-                            asset_id
-                        ) AS p ON b.asset_id = p.asset_id
+                    JOIN
+                        asset_price_newest AS p ON b.asset_id = p.asset_id
                     GROUP BY
                         b.account_id, b.asset_id
                 )
@@ -524,14 +528,8 @@ class Portfolio(sql_database.Database):
                         b.quantity * p.amount / 10000 AS current_value
                     FROM
                         balance AS b
-                    JOIN (
-                        SELECT
-                            asset_id, MAX(price_date) price_date, amount
-                        FROM
-                            price
-                        GROUP BY
-                            asset_id
-                        ) AS p ON b.asset_id = p.asset_id
+                    JOIN
+                        asset_price_newest AS p ON b.asset_id = p.asset_id
                     GROUP BY
                         b.account_id, b.asset_id
                 )
@@ -568,14 +566,8 @@ class Portfolio(sql_database.Database):
                         b.quantity * p.amount / 10000 AS current_value
                     FROM
                         balance AS b
-                    JOIN (
-                        SELECT
-                            asset_id, MAX(price_date) price_date, amount
-                        FROM
-                            price
-                        GROUP BY
-                            asset_id
-                        ) AS p ON b.asset_id = p.asset_id
+                    JOIN
+                        asset_price_newest AS p ON b.asset_id = p.asset_id
                     GROUP BY
                         b.account_id, b.asset_id
                 )
@@ -615,14 +607,8 @@ class Portfolio(sql_database.Database):
                         b.quantity * p.amount / 10000 AS current_value
                     FROM
                         balance AS b
-                    JOIN (
-                        SELECT
-                            asset_id, MAX(price_date) price_date, amount
-                        FROM
-                            price
-                        GROUP BY
-                            asset_id
-                        ) AS p ON b.asset_id = p.asset_id
+                    JOIN
+                        asset_price_newest AS p ON b.asset_id = p.asset_id
                     GROUP BY
                         b.account_id, b.asset_id
                 )
@@ -649,14 +635,8 @@ class Portfolio(sql_database.Database):
                 b.quantity * p.amount / 10000 AS current_value
             FROM 
                 balance AS b
-            JOIN (
-                SELECT 
-                    asset_id, MAX(price_date) price_date, amount
-                FROM 
-                    price
-                GROUP BY 
-                    asset_id
-                ) AS p ON b.asset_id = p.asset_id
+            JOIN
+                asset_price_newest AS p ON b.asset_id = p.asset_id
             GROUP BY 
                 b.account_id, b.asset_id
             ) AS current_values
