@@ -109,34 +109,50 @@ amount INT,
 FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
 
-create_commands = [create_account_table,
-                   create_account_type_table,
-                   create_allocation_table,
-                   create_asset_table,
-                   create_asset_class_table,
-                   create_balance_table,
-                   create_component_table,
-                   create_institution_table,
-                   create_location_table,
-                   create_owner_table,
-                   create_price_table]
+# Views
+create_asset_quantity_by_account_view = """
+CREATE VIEW IF NOT EXISTS asset_quantity_by_account_current AS
+SELECT
+    account_id,
+    asset_id,
+    MAX(balance_date) balance_date,
+    quantity
+FROM
+    balance
+GROUP BY
+    account_id, asset_id
+"""
 
-drop_commands = ['DROP TABLE IF EXISTS account',
-                 'DROP TABLE IF EXISTS account_type',
-                 'DROP TABLE IF EXISTS allocation',
-                 'DROP TABLE IF EXISTS asset',
-                 'DROP TABLE IF EXISTS asset_class',
-                 'DROP TABLE IF EXISTS balance',
-                 'DROP TABLE IF EXISTS component',
-                 'DROP TABLE IF EXISTS institution',
-                 'DROP TABLE IF EXISTS location',
-                 'DROP TABLE IF EXISTS owner',
-                 'DROP TABLE IF EXISTS price']
+create_tables_and_views_commands = [create_account_table,
+                                    create_account_type_table,
+                                    create_allocation_table,
+                                    create_asset_table,
+                                    create_asset_class_table,
+                                    create_balance_table,
+                                    create_component_table,
+                                    create_institution_table,
+                                    create_location_table,
+                                    create_owner_table,
+                                    create_price_table,
+                                    create_asset_quantity_by_account_view]
+
+drop_tables_and_views_commands = ['DROP TABLE IF EXISTS account',
+                                  'DROP TABLE IF EXISTS account_type',
+                                  'DROP TABLE IF EXISTS allocation',
+                                  'DROP TABLE IF EXISTS asset',
+                                  'DROP TABLE IF EXISTS asset_class',
+                                  'DROP TABLE IF EXISTS balance',
+                                  'DROP TABLE IF EXISTS component',
+                                  'DROP TABLE IF EXISTS institution',
+                                  'DROP TABLE IF EXISTS location',
+                                  'DROP TABLE IF EXISTS owner',
+                                  'DROP TABLE IF EXISTS price',
+                                  'DROP VIEW IF EXISTS asset_quantity_by_account_current']
 
 
 class Portfolio(sql_database.Database):
     def __init__(self, portfolio_path):
-        super().__init__(portfolio_path, create_commands, drop_commands)
+        super().__init__(portfolio_path, create_tables_and_views_commands, drop_tables_and_views_commands)
 
         self._lookup = {}
         self._construct_lookup()
@@ -273,14 +289,19 @@ class Portfolio(sql_database.Database):
 
     # Calculations
     # Accounts
-    # TODO - rename balance
     def account_asset_quantity_current(self):
         sql = """
-        SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
-        FROM balance
-        GROUP BY account_id, asset_id
+        SELECT * FROM asset_quantity_by_account_current
         """
         return self.sql_fetch_all(sql)
+
+    # def account_asset_quantity_current(self):
+    #     sql = """
+    #     SELECT account_id, asset_id, MAX(balance_date) balance_date, quantity
+    #     FROM balance
+    #     GROUP BY account_id, asset_id
+    #     """
+    #     return self.sql_fetch_all(sql)
 
     def account_value_current_by_asset(self):
         sql = """
@@ -664,7 +685,8 @@ class Portfolio(sql_database.Database):
             total_percentage += contribution_table[line_number]['plan_percent']
 
         for line_number in range(accessible_level + 1):
-            contribution_table[line_number]['contribution'] += amount_remaining * contribution_table[line_number]['plan_percent'] // total_percentage
+            contribution_table[line_number]['contribution'] += amount_remaining * contribution_table[line_number][
+                'plan_percent'] // total_percentage
 
         assign_leftovers(contribution_table, contribution_amount)
 
