@@ -158,6 +158,18 @@ ORDER BY
     asset_id
 """
 
+create_asset_class_value_by_location_view = """
+CREATE VIEW IF NOT EXISTS asset_class_value_by_location aS
+SELECT
+    asset_class_id, 
+    location_id,
+    SUM(current_value) current_value
+FROM
+    component_value
+GROUP BY
+    asset_class_id, location_id
+"""
+
 create_component_value = """
 CREATE VIEW IF NOT EXISTS component_value AS
 SELECT
@@ -185,6 +197,7 @@ create_tables_and_views_commands = [create_account_table,
                                     create_account_value_current_by_asset,
                                     create_asset_price_newest_view,
                                     create_asset_quantity_by_account_view,
+                                    create_asset_class_value_by_location_view,
                                     create_asset_value_current_view,
                                     create_component_value]
 
@@ -202,6 +215,7 @@ drop_tables_and_views_commands = ['DROP TABLE IF EXISTS account',
                                   'DROP VIEW IF EXISTS account_value_current_by_asset',
                                   'DROP VIEW IF EXISTS asset_price_newest',
                                   'DROP VIEW IF EXISTS asset_quantity_by_account_current',
+                                  'DROP VIEW IF EXISTS asset_class_value_by_location',
                                   'DROP VIEW IF EXISTS asset_value_current',
                                   'DROP VIEW IF EXISTS component_value']
 
@@ -396,17 +410,8 @@ class Portfolio(sql_database.Database):
             0 AS contribution
         FROM 
             allocation AS plan
-        JOIN (
-            SELECT
-                asset_class_id, 
-                location_id,
-                SUM(current_value) current_value
-            FROM
-                component_value
-            GROUP BY
-                asset_class_id,
-                location_id
-            ) AS current_values ON 
+        JOIN 
+            asset_class_value_by_location AS current_values ON 
                 current_values.asset_class_id == plan.asset_class_id AND 
                 current_values.location_id == plan.location_id 
         WHERE
@@ -523,14 +528,7 @@ class Portfolio(sql_database.Database):
 
     def asset_class_value_by_location(self):
         sql = """
-        SELECT
-            asset_class_id, 
-            location_id,
-            SUM(current_value) current_value
-        FROM
-            component_value
-        GROUP BY
-            asset_class_id, location_id
+        SELECT * FROM asset_class_value_by_location
         """
 
         return self.sql_fetch_all(sql)
