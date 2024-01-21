@@ -90,7 +90,7 @@ class Add(Menu):
 
     def create_options(self):
         self._options = [action.Back(self.app, Main(self.app)),
-                         action.AddAccount(self.app)]
+                         action.AddToTable(self.app, 'account')]
 
     # option_list = [actions.Option('<--Back', self._menus['main']),
     #                actions.Option('Account', self.portfolio.add_account),

@@ -126,39 +126,39 @@ def test_add_price(empty_portfolio):
 
 
 def test_add_from_csv_account(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'accounts')
+    assert add_from_csv_test(empty_portfolio, 'account')
 
 
 def test_add_from_csv_account_type(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'account_types')
+    assert add_from_csv_test(empty_portfolio, 'account_type')
 
 
 def test_add_from_csv_allocation_plan(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'allocations')
+    assert add_from_csv_test(empty_portfolio, 'allocation')
 
 
 def test_add_from_csv_asset(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'assets')
+    assert add_from_csv_test(empty_portfolio, 'asset')
 
 
 def test_add_from_csv_balance(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'balances')
+    assert add_from_csv_test(empty_portfolio, 'balance')
 
 
 def test_add_from_csv_institution(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'institutions')
+    assert add_from_csv_test(empty_portfolio, 'institution')
 
 
 def test_add_from_csv_location(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'locations')
+    assert add_from_csv_test(empty_portfolio, 'location')
 
 
 def test_add_from_csv_owner(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'owners')
+    assert add_from_csv_test(empty_portfolio, 'owner')
 
 
 def test_add_from_csv_price(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'prices')
+    assert add_from_csv_test(empty_portfolio, 'price')
 
 
 # Calculations

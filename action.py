@@ -74,24 +74,33 @@ class NewFile(FileAction):
 
 
 # Add actions
-class AddAccount(AppAction):
-    def __init__(self, app):
-        super().__init__('Add account', app)
+class AddToTable(AppAction):
+    def __init__(self, app, table_name):
+        self.table_name = table_name
+        super().__init__('Add ' + self.table_name, app)
 
     def __call__(self):
-        sql = """
-        "INSERT INTO account 
-        VALUES (:name, :account_type_id, :owner_id, :institution)"
-        """
-        self.app.portfolio.add_account()
+        self.app.portfolio.add_to_table[self.table_name](kwargs={})
 
 
-class AddOwner(AppAction):
-    def __init__(self, app):
-        super().__init__('Add owner', app)
-
-    def __call__(self):
-        self.app.portfolio.add_owner(kwargs=self.data)
+# class AddAccount(AppAction):
+#     def __init__(self, app):
+#         super().__init__('Add account', app)
+#
+#     def __call__(self):
+#         sql = """
+#         "INSERT INTO account
+#         VALUES (:name, :account_type_id, :owner_id, :institution)"
+#         """
+#         self.app.portfolio.add_account()
+#
+#
+# class AddOwner(AppAction):
+#     def __init__(self, app):
+#         super().__init__('Add owner', app)
+#
+#     def __call__(self):
+#         self.app.portfolio.add_owner(kwargs=self.data)
 
 
 # Input actions

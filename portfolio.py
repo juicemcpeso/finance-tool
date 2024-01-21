@@ -226,17 +226,17 @@ class Portfolio(sql_database.Database):
         self._construct_lookup()
         self.decimal = 10000
 
-        self.add_to_table = {'accounts': self.add_account,
-                             'account_types': self.add_account_type,
-                             'allocations': self.add_allocation,
-                             'assets': self.add_asset,
-                             'asset_classes': self.add_asset_class,
-                             'balances': self.add_balance,
-                             'components': self.add_component,
-                             'institutions': self.add_institution,
-                             'locations': self.add_location,
-                             'owners': self.add_owner,
-                             'prices': self.add_price}
+        self.add_to_table = {'account': self.add_account,
+                             'account_type': self.add_account_type,
+                             'allocation': self.add_allocation,
+                             'asset': self.add_asset,
+                             'asset_class': self.add_asset_class,
+                             'balance': self.add_balance,
+                             'component': self.add_component,
+                             'institution': self.add_institution,
+                             'location': self.add_location,
+                             'owner': self.add_owner,
+                             'price': self.add_price}
 
     def __iter__(self):
         return iter(self._lookup.keys())
@@ -248,17 +248,17 @@ class Portfolio(sql_database.Database):
         self._lookup[key] = value
 
     def _construct_lookup(self):
-        get_commands = {'accounts': "SELECT * FROM account",
-                        'account_types': "SELECT * FROM account_type",
-                        'allocations': "SELECT * FROM allocation",
-                        'assets': "SELECT * FROM asset",
-                        'asset_classes': "SELECT * FROM asset_class",
-                        'balances': "SELECT * FROM balance",
-                        'components': "SELECT * FROM component",
-                        'institutions': "SELECT * FROM institution",
-                        'locations': "SELECT * FROM location",
-                        'owners': "SELECT * FROM owner",
-                        'prices': "SELECT * FROM price"}
+        get_commands = {'account': "SELECT * FROM account",
+                        'account_type': "SELECT * FROM account_type",
+                        'allocation': "SELECT * FROM allocation",
+                        'asset': "SELECT * FROM asset",
+                        'asset_class': "SELECT * FROM asset_class",
+                        'balance': "SELECT * FROM balance",
+                        'component': "SELECT * FROM component",
+                        'institution': "SELECT * FROM institution",
+                        'location': "SELECT * FROM location",
+                        'owner': "SELECT * FROM owner",
+                        'price': "SELECT * FROM price"}
 
         for item in get_commands:
             self._lookup[item] = get_commands[item]
