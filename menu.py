@@ -9,7 +9,7 @@ import os
 
 
 class Menu(structures.Selection):
-    def __init__(self, name, app, option_list=[]):
+    def __init__(self, app, name, option_list=[]):
         super().__init__(name, option_list)
         self.app = app
 
@@ -37,7 +37,7 @@ class Menu(structures.Selection):
 # Database menus
 class Database(Menu):
     def __init__(self, app):
-        super().__init__('Database menu', app)
+        super().__init__(app, 'Database menu')
 
     def create_options(self):
         self._options = [action.Exit(self.app),
@@ -49,30 +49,30 @@ class Database(Menu):
 # File menus
 class DeleteFile(Menu):
     def __init__(self, app):
-        super().__init__('Delete', app)
+        super().__init__(app, 'Delete')
 
     def create_options(self):
         self._options = []
         self.append(action.Back(self.app, Database(self.app)))
         for file_name in os.listdir(self.app.portfolio_directory):
-            self.append(action.DeleteFile(file_name, self.app, file_name))
+            self.append(action.DeleteFile(self.app, file_name, file_name))
 
 
 class LoadFile(Menu):
     def __init__(self, app):
-        super().__init__('Load', app)
+        super().__init__(app, 'Load')
 
     def create_options(self):
         self._options = []
         self.append(action.Back(self.app, Database(self.app)))
         for file_name in os.listdir(self.app.portfolio_directory):
-            self.append(action.LoadFile(file_name, self.app, file_name))
+            self.append(action.LoadFile(self.app, file_name, file_name))
 
 
 # Portfolio menus
 class Main(Menu):
     def __init__(self, app):
-        super().__init__('Main menu', app)
+        super().__init__(app, 'Main menu')
 
     def create_options(self):
         self._options = [action.Exit(self.app),
@@ -86,11 +86,15 @@ class Main(Menu):
 
 class Add(Menu):
     def __init__(self, app):
-        super().__init__('Add menu', app)
+        super().__init__(app, 'Add menu')
 
     def create_options(self):
         self._options = [action.Back(self.app, Main(self.app)),
-                         action.AddToTable(self.app, 'account')]
+                         action.AddToTable(self.app, 'account'),
+                         action.AddToTable(self.app, 'asset'),
+                         action.AddToTable(self.app, 'asset_class'),
+                         action.AddToTable(self.app, 'location'),
+                         action.AddToTable(self.app, 'owner')]
 
     # option_list = [actions.Option('<--Back', self._menus['main']),
     #                actions.Option('Account', self.portfolio.add_account),

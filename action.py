@@ -9,7 +9,7 @@ import structures
 
 
 class AppAction(structures.Action):
-    def __init__(self, name, app):
+    def __init__(self, app, name):
         super().__init__(name)
         self.app = app
         self.data = {}
@@ -27,7 +27,7 @@ class AppAction(structures.Action):
 # Generic actions
 class Back(AppAction):
     def __init__(self, app, action):
-        super().__init__('<- Back', app)
+        super().__init__(app, '<- Back')
         self.action = action
 
     def __call__(self):
@@ -36,7 +36,7 @@ class Back(AppAction):
 
 class Exit(AppAction):
     def __init__(self, app):
-        super().__init__('Exit app', app)
+        super().__init__(app, 'Exit app')
 
     def __call__(self):
         self.app.active = False
@@ -46,8 +46,8 @@ class Exit(AppAction):
 
 # File actions
 class FileAction(AppAction):
-    def __init__(self, name, app, file_name=None):
-        super().__init__(name, app)
+    def __init__(self, app, name, file_name=None):
+        super().__init__(app, name)
         self.file_name = file_name
 
     def file_path(self):
@@ -66,7 +66,7 @@ class LoadFile(FileAction):
 
 class NewFile(FileAction):
     def __init__(self, app):
-        super().__init__('New', app)
+        super().__init__(app, 'New')
 
     def __call__(self):
         self.file_name = str(input("Enter new portfolio name: "))
@@ -77,13 +77,12 @@ class NewFile(FileAction):
 class AddToTable(AppAction):
     def __init__(self, app, table_name):
         self.table_name = table_name
-        super().__init__('Add ' + self.table_name, app)
+        super().__init__(app, 'Add ' + self.table_name)
 
     def __call__(self):
         for column_name in self.app.portfolio.column_names(self.app.portfolio.table_commands[self.table_name]):
             print(column_name)
         # self.app.portfolio.add_to_table[self.table_name](kwargs={})
-
 
 # class AddAccount(AppAction):
 #     def __init__(self, app):
@@ -106,8 +105,9 @@ class AddToTable(AppAction):
 
 
 # Input actions
-class UserInput:
-    pass
+class UserInput(AppAction):
+    def __init__(self, app, name):
+        self.name = name
 
 
 class InputDate(UserInput):
@@ -116,6 +116,9 @@ class InputDate(UserInput):
 
 class InputText(UserInput):
     pass
+
+
+input_methods = {'name': InputText}
 
 # Export actions
 # TODO - write export actions. May want this to be in it's own module.
