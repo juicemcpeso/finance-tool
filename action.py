@@ -75,14 +75,6 @@ class NewFile(FileAction):
 
 
 # Add actions
-# class InputAction(AppAction):
-#     def __init__(self, app, name):
-#         super().__init__(app, name)
-#
-#     def __call__(self):
-#         self.input_method[self.name]()
-
-
 class AddToTable(AppAction):
     def __init__(self, app, table_name):
         self.table_name = table_name
@@ -134,25 +126,6 @@ class UserInput(AppAction):
 
     def input_text(self):
         self.response = input(f"{self.display_text}: ")
-
-# class AddAccount(AppAction):
-#     def __init__(self, app):
-#         super().__init__('Add account', app)
-#
-#     def __call__(self):
-#         sql = """
-#         "INSERT INTO account
-#         VALUES (:name, :account_type_id, :owner_id, :institution)"
-#         """
-#         self.app.portfolio.add_account()
-#
-#
-# class AddOwner(AppAction):
-#     def __init__(self, app):
-#         super().__init__('Add owner', app)
-#
-#     def __call__(self):
-#         self.app.portfolio.add_owner(kwargs=self.data)
 
 
 # Export actions

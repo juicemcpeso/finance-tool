@@ -96,13 +96,6 @@ class Add(Menu):
                          action.AddToTable(self.app, 'location'),
                          action.AddToTable(self.app, 'owner')]
 
-    # option_list = [actions.Option('<--Back', self._menus['main']),
-    #                actions.Option('Account', self.portfolio.add_account),
-    #                actions.Option('Asset', self.portfolio.add_asset),
-    #                actions.Option('Balance', self.portfolio.add_balance),
-    #                actions.Option('Owner', self.portfolio.add_owner),
-    #                actions.Option('Price', self.portfolio.add_price)]
-
 
 class Export(Menu):
     pass
