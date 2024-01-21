@@ -90,7 +90,7 @@ class Add(Menu):
 
     def create_options(self):
         self._options = [action.Back(self.app, Main(self.app)),
-                         action.AddToTable(self.app, 'account'),
+                         action.AddToTable(self.app, 'account_type'),
                          action.AddToTable(self.app, 'asset'),
                          action.AddToTable(self.app, 'asset_class'),
                          action.AddToTable(self.app, 'location'),

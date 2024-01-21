@@ -90,8 +90,9 @@ class AddToTable(AppAction):
 
     def __call__(self):
         for column_name in self.app.portfolio.column_names(self.app.portfolio.table_commands[self.table_name])[1:]:
-            UserInput(self.app, self.table_name, column_name)()
-        # self.app.portfolio.add_to_table[self.table_name](kwargs={})
+            self.data.update({column_name: UserInput(self.app, self.table_name, column_name)()})
+
+        self.app.portfolio.add_to_table[self.table_name](kwargs=self.data)
 
 
 class UserInput(AppAction):
@@ -103,27 +104,36 @@ class UserInput(AppAction):
 
         self.input_method = {'birthday': self.input_date,
                              'name': self.input_text,
-                             'symbol': self.input_text}
+                             'symbol': self.input_text,
+                             'tax_growth': self.input_bool,
+                             'tax_in': self.input_bool,
+                             'tax_out': self.input_bool}
 
     def __call__(self):
         while self.response is None:
             self.input_method[self.column_name]()
 
+        return self.response
+
     def input_bool(self):
-        pass
+        user_input = input(f"{self.display_text} (T = True, F = False): ").lower()
+        if user_input in {'t', 'f'}:
+            self.response = True if user_input == 't' else False
 
     def input_date(self):
+        user_input = input(f"{self.display_text} in YYYY-MM-DD format: ")
         try:
-            self.response = datetime.date.fromisoformat(input(f"{self.display_text} in YYYY-MM-DD format: "))
+            datetime.date.fromisoformat(user_input)
         except ValueError:
             print("Date must be in YYYY-MM-DD format")
+        else:
+            self.response = user_input
 
     def input_number(self):
         pass
 
     def input_text(self):
         self.response = input(f"{self.display_text}: ")
-
 
 # class AddAccount(AppAction):
 #     def __init__(self, app):
