@@ -3,6 +3,7 @@
 # 2023-12-19
 # @juicemcpeso
 
+import datetime
 import os
 import portfolio
 import structures
@@ -74,15 +75,55 @@ class NewFile(FileAction):
 
 
 # Add actions
+# class InputAction(AppAction):
+#     def __init__(self, app, name):
+#         super().__init__(app, name)
+#
+#     def __call__(self):
+#         self.input_method[self.name]()
+
+
 class AddToTable(AppAction):
     def __init__(self, app, table_name):
         self.table_name = table_name
         super().__init__(app, 'Add ' + self.table_name)
 
     def __call__(self):
-        for column_name in self.app.portfolio.column_names(self.app.portfolio.table_commands[self.table_name]):
-            print(column_name)
+        for column_name in self.app.portfolio.column_names(self.app.portfolio.table_commands[self.table_name])[1:]:
+            UserInput(self.app, self.table_name, column_name)()
         # self.app.portfolio.add_to_table[self.table_name](kwargs={})
+
+
+class UserInput(AppAction):
+    def __init__(self, app, table_name, column_name):
+        self.column_name = column_name
+        self.display_text = 'Input ' + table_name + ' ' + self.column_name
+        super().__init__(app, column_name)
+        self.response = None
+
+        self.input_method = {'birthday': self.input_date,
+                             'name': self.input_text,
+                             'symbol': self.input_text}
+
+    def __call__(self):
+        while self.response is None:
+            self.input_method[self.column_name]()
+
+    def input_bool(self):
+        pass
+
+    def input_date(self):
+        try:
+            self.response = datetime.date.fromisoformat(input(f"{self.display_text} in YYYY-MM-DD format: "))
+        except ValueError:
+            print("Date must be in YYYY-MM-DD format")
+
+    def input_number(self):
+        pass
+
+    def input_text(self):
+        self.response = input(f"{self.display_text}: ")
+
 
 # class AddAccount(AppAction):
 #     def __init__(self, app):
@@ -103,22 +144,6 @@ class AddToTable(AppAction):
 #     def __call__(self):
 #         self.app.portfolio.add_owner(kwargs=self.data)
 
-
-# Input actions
-class UserInput(AppAction):
-    def __init__(self, app, name):
-        self.name = name
-
-
-class InputDate(UserInput):
-    pass
-
-
-class InputText(UserInput):
-    pass
-
-
-input_methods = {'name': InputText}
 
 # Export actions
 # TODO - write export actions. May want this to be in it's own module.
