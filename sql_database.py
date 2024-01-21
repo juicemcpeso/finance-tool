@@ -65,3 +65,11 @@ class Database:
         con.commit()
         con.close()
         return result
+
+    def column_names(self, command):
+        con = sqlite3.connect(self.database)
+        cur = con.execute(command)
+        column_names = [description[0] for description in cur.description]
+        con.commit()
+        con.close()
+        return column_names

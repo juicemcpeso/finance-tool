@@ -223,7 +223,6 @@ class Portfolio(sql_database.Database):
         super().__init__(portfolio_path, create_tables_and_views_commands, drop_tables_and_views_commands)
 
         self._lookup = {}
-        self._construct_lookup()
         self.decimal = 10000
 
         self.add_to_table = {'account': self.add_account,
@@ -238,6 +237,20 @@ class Portfolio(sql_database.Database):
                              'owner': self.add_owner,
                              'price': self.add_price}
 
+        self.table_commands = {'account': "SELECT * FROM account",
+                               'account_type': "SELECT * FROM account_type",
+                               'allocation': "SELECT * FROM allocation",
+                               'asset': "SELECT * FROM asset",
+                               'asset_class': "SELECT * FROM asset_class",
+                               'balance': "SELECT * FROM balance",
+                               'component': "SELECT * FROM component",
+                               'institution': "SELECT * FROM institution",
+                               'location': "SELECT * FROM location",
+                               'owner': "SELECT * FROM owner",
+                               'price': "SELECT * FROM price"}
+
+        self._construct_lookup()
+
     def __iter__(self):
         return iter(self._lookup.keys())
 
@@ -248,20 +261,8 @@ class Portfolio(sql_database.Database):
         self._lookup[key] = value
 
     def _construct_lookup(self):
-        get_commands = {'account': "SELECT * FROM account",
-                        'account_type': "SELECT * FROM account_type",
-                        'allocation': "SELECT * FROM allocation",
-                        'asset': "SELECT * FROM asset",
-                        'asset_class': "SELECT * FROM asset_class",
-                        'balance': "SELECT * FROM balance",
-                        'component': "SELECT * FROM component",
-                        'institution': "SELECT * FROM institution",
-                        'location': "SELECT * FROM location",
-                        'owner': "SELECT * FROM owner",
-                        'price': "SELECT * FROM price"}
-
-        for item in get_commands:
-            self._lookup[item] = get_commands[item]
+        for item in self.table_commands:
+            self._lookup[item] = self.table_commands[item]
 
     # IO
     # Add

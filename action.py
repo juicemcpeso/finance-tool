@@ -80,7 +80,9 @@ class AddToTable(AppAction):
         super().__init__('Add ' + self.table_name, app)
 
     def __call__(self):
-        self.app.portfolio.add_to_table[self.table_name](kwargs={})
+        for column_name in self.app.portfolio.column_names(self.app.portfolio.table_commands[self.table_name]):
+            print(column_name)
+        # self.app.portfolio.add_to_table[self.table_name](kwargs={})
 
 
 # class AddAccount(AppAction):
