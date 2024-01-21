@@ -158,6 +158,19 @@ ORDER BY
     asset_id
 """
 
+create_component_value = """
+CREATE VIEW IF NOT EXISTS component_value AS
+SELECT
+    c.asset_id,
+    c.asset_class_id,
+    c.location_id,
+    c.percentage * v.current_value / (10000 * 100) as current_value
+FROM
+    component AS c
+JOIN
+    asset_value_current AS v ON c.asset_id = v.asset_id
+"""
+
 create_tables_and_views_commands = [create_account_table,
                                     create_account_type_table,
                                     create_allocation_table,
@@ -172,7 +185,8 @@ create_tables_and_views_commands = [create_account_table,
                                     create_account_value_current_by_asset,
                                     create_asset_price_newest_view,
                                     create_asset_quantity_by_account_view,
-                                    create_asset_value_current_view]
+                                    create_asset_value_current_view,
+                                    create_component_value]
 
 drop_tables_and_views_commands = ['DROP TABLE IF EXISTS account',
                                   'DROP TABLE IF EXISTS account_type',
@@ -188,7 +202,8 @@ drop_tables_and_views_commands = ['DROP TABLE IF EXISTS account',
                                   'DROP VIEW IF EXISTS account_value_current_by_asset',
                                   'DROP VIEW IF EXISTS asset_price_newest',
                                   'DROP VIEW IF EXISTS asset_quantity_by_account_current',
-                                  'DROP VIEW IF EXISTS asset_value_current']
+                                  'DROP VIEW IF EXISTS asset_value_current',
+                                  'DROP VIEW IF EXISTS component_value']
 
 
 class Portfolio(sql_database.Database):
@@ -386,17 +401,8 @@ class Portfolio(sql_database.Database):
                 asset_class_id, 
                 location_id,
                 SUM(current_value) current_value
-            FROM (
-                SELECT
-                    c.asset_id,
-                    c.asset_class_id,
-                    c.location_id,
-                    c.percentage * v.current_value / (10000 * 100) as current_value
-                FROM
-                    component AS c
-                JOIN
-                    asset_value_current AS v ON c.asset_id = v.asset_id
-                )
+            FROM
+                component_value
             GROUP BY
                 asset_class_id,
                 location_id
@@ -482,16 +488,8 @@ class Portfolio(sql_database.Database):
         SELECT
             asset_class_id, 
             100.0 * SUM(current_value) / :net_worth AS percentage
-        FROM (
-            SELECT
-                c.asset_id,
-                c.asset_class_id,
-                c.percentage * v.current_value / (10000 * 100) as current_value
-            FROM
-                component AS c
-            JOIN
-                asset_value_current AS v ON c.asset_id = v.asset_id
-        )
+        FROM
+            component_value
         GROUP BY
             asset_class_id
         """
@@ -503,17 +501,8 @@ class Portfolio(sql_database.Database):
             asset_class_id, 
             location_id,
             100.0 * SUM(current_value) / :net_worth AS percentage
-        FROM (
-            SELECT
-                c.asset_id,
-                c.asset_class_id,
-                c.location_id,
-                c.percentage * v.current_value / (10000 * 100) as current_value
-            FROM
-                component AS c
-            JOIN
-                asset_value_current AS v ON c.asset_id = v.asset_id
-        )
+        FROM
+            component_value
         GROUP BY
             asset_class_id, location_id
         """
@@ -524,16 +513,8 @@ class Portfolio(sql_database.Database):
         SELECT
             asset_class_id, 
             SUM(current_value) current_value
-        FROM (
-            SELECT
-                c.asset_id,
-                c.asset_class_id,
-                c.percentage * v.current_value / (10000 * 100) as current_value
-            FROM
-                component AS c
-            JOIN
-                asset_value_current AS v ON c.asset_id = v.asset_id
-        )
+        FROM
+            component_value
         GROUP BY
             asset_class_id
         """
@@ -546,17 +527,8 @@ class Portfolio(sql_database.Database):
             asset_class_id, 
             location_id,
             SUM(current_value) current_value
-        FROM (
-            SELECT
-                c.asset_id,
-                c.asset_class_id,
-                c.location_id,
-                c.percentage * v.current_value / (10000 * 100) as current_value
-            FROM
-                component AS c
-            JOIN
-                asset_value_current AS v ON c.asset_id = v.asset_id
-        )
+        FROM
+            component_value
         GROUP BY
             asset_class_id, location_id
         """
