@@ -59,70 +59,76 @@ def sum_to_amount(test_function, key_to_sum, expected_amount):
     return total == expected_amount
 
 
-def test_add_account(empty_portfolio):
-    entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 1}
-    empty_portfolio.add_account(args=entry)
-
-    sql = """
-    SELECT name, account_type_id, institution_id, owner_id FROM account WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
+def test_add_to_table(empty_portfolio, table_name):
+    expected = csv_to_numeric_dict_list(data_file_path(table_name))[0]
+    empty_portfolio.add_to_table[table_name](kwargs=expected)
+    assert [expected] == empty_portfolio[table_name]
 
 
-def test_add_account_type(empty_portfolio):
-    entry = {'name': 'Traditional IRA', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}
-    empty_portfolio.add_account_type(args=entry)
-
-    sql = """
-    SELECT name, tax_in, tax_growth, tax_out FROM account_type WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
-
-
-def test_add_asset(empty_portfolio):
-    entry = {'name': 'Test Index Fund', 'symbol': 'TEST'}
-    empty_portfolio.add_asset(args=entry)
-
-    sql = """
-    SELECT name, symbol FROM asset WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
-
-
-def test_add_balance(empty_portfolio):
-    entry = {'account_id': 1, 'asset_id': 4, 'balance_date': '2023-01-01', 'quantity': 12}
-    empty_portfolio.add_balance(args=entry)
-
-    sql = """
-    SELECT account_id, asset_id, balance_date, quantity FROM balance WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
-
-
-def test_add_owner(empty_portfolio):
-    entry = {'name': 'Carlos', 'birthday': '2000-01-01'}
-    empty_portfolio.add_owner(args=entry)
-
-    sql = """
-    SELECT name, birthday FROM owner WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
-
-
-def test_add_price(empty_portfolio):
-    entry = {'asset_id': 2, 'price_date': '2023-01-01', 'amount': 3.61}
-    empty_portfolio.add_price(args=entry)
-
-    sql = """
-    SELECT asset_id, price_date, amount FROM price WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
+# def test_add_account(empty_portfolio):
+#     entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 1}
+#     empty_portfolio.add_account(args=entry)
+#
+#     sql = """
+#     SELECT name, account_type_id, institution_id, owner_id FROM account WHERE id = 1
+#     """
+#
+#     assert entry == empty_portfolio.sql_fetch_one(sql)
+#
+#
+# def test_add_account_type(empty_portfolio):
+#     entry = {'name': 'Traditional IRA', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}
+#     empty_portfolio.add_account_type(args=entry)
+#
+#     sql = """
+#     SELECT name, tax_in, tax_growth, tax_out FROM account_type WHERE id = 1
+#     """
+#
+#     assert entry == empty_portfolio.sql_fetch_one(sql)
+#
+#
+# def test_add_asset(empty_portfolio):
+#     entry = {'name': 'Test Index Fund', 'symbol': 'TEST'}
+#     empty_portfolio.add_asset(args=entry)
+#
+#     sql = """
+#     SELECT name, symbol FROM asset WHERE id = 1
+#     """
+#
+#     assert entry == empty_portfolio.sql_fetch_one(sql)
+#
+#
+# def test_add_balance(empty_portfolio):
+#     entry = {'account_id': 1, 'asset_id': 4, 'balance_date': '2023-01-01', 'quantity': 12}
+#     empty_portfolio.add_balance(args=entry)
+#
+#     sql = """
+#     SELECT account_id, asset_id, balance_date, quantity FROM balance WHERE id = 1
+#     """
+#
+#     assert entry == empty_portfolio.sql_fetch_one(sql)
+#
+#
+# def test_add_owner(empty_portfolio):
+#     entry = {'name': 'Carlos', 'birthday': '2000-01-01'}
+#     empty_portfolio.add_owner(args=entry)
+#
+#     sql = """
+#     SELECT name, birthday FROM owner WHERE id = 1
+#     """
+#
+#     assert entry == empty_portfolio.sql_fetch_one(sql)
+#
+#
+# def test_add_price(empty_portfolio):
+#     entry = {'asset_id': 2, 'price_date': '2023-01-01', 'amount': 3.61}
+#     empty_portfolio.add_price(args=entry)
+#
+#     sql = """
+#     SELECT asset_id, price_date, amount FROM price WHERE id = 1
+#     """
+#
+#     assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
 # Calculations

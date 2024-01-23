@@ -237,6 +237,18 @@ class Portfolio(sql_database.Database):
                                'owner': "SELECT * FROM owner",
                                'price': "SELECT * FROM price"}
 
+        self.add_to_table = {'account': self.add_account,
+                             'account_type': self.add_account_type,
+                             'allocation': self.add_allocation,
+                             'asset': self.add_asset,
+                             'asset_class': self.add_asset_class,
+                             'balance': self.add_balance,
+                             'component': self.add_component,
+                             'institution': self.add_institution,
+                             'location': self.add_location,
+                             'owner': self.add_owner,
+                             'price': self.add_price}
+
         self._construct_lookup()
 
     def __iter__(self):
