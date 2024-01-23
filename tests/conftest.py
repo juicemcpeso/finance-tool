@@ -10,7 +10,7 @@ def create_test_app(test_data_file_path=None):
     test_app.portfolio.create_all_tables()
 
     if test_data_file_path is not None:
-        for table_name in test_app.add_to_table:
+        for table_name in test_app.portfolio:
             test_app.add_from_csv(test_data_file_path + table_name + '.csv', table_name)
 
     return test_app
