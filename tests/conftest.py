@@ -44,3 +44,18 @@ def test_portfolio(test_app_original):
 @pytest.fixture
 def test_portfolio_allocation(test_app_allocation):
     return test_app_allocation.portfolio
+
+
+@pytest.fixture(params=['account',
+                        'account_type',
+                        'allocation',
+                        'asset',
+                        'asset_class',
+                        'balance',
+                        'component',
+                        'institution',
+                        'location',
+                        'owner',
+                        'price'])
+def table_name(request):
+    return request.param

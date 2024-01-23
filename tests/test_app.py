@@ -7,23 +7,6 @@ import csv
 
 import pytest
 
-list_of_tables = ['account',
-                  'account_type',
-                  'allocation',
-                  'asset',
-                  'asset_class',
-                  'balance',
-                  'component',
-                  'institution',
-                  'location',
-                  'owner',
-                  'price']
-
-
-@pytest.fixture(params=list_of_tables)
-def table_name(request):
-    return request.param
-
 
 def data_file_path(table_name):
     return './test_data/' + table_name + '.csv'
