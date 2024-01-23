@@ -478,5 +478,3 @@ class Portfolio(sql_database.Database):
 
     def net_worth(self):
         return self.net_worth_dict()['net_worth']
-
-    # Tools
