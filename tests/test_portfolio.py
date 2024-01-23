@@ -125,40 +125,6 @@ def test_add_price(empty_portfolio):
     assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
-def test_add_from_csv_account(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'account')
-
-
-def test_add_from_csv_account_type(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'account_type')
-
-
-def test_add_from_csv_allocation_plan(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'allocation')
-
-
-def test_add_from_csv_asset(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'asset')
-
-
-def test_add_from_csv_balance(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'balance')
-
-
-def test_add_from_csv_institution(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'institution')
-
-
-def test_add_from_csv_location(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'location')
-
-
-def test_add_from_csv_owner(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'owner')
-
-
-def test_add_from_csv_price(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'price')
 
 
 # Calculations

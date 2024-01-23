@@ -225,18 +225,6 @@ class Portfolio(sql_database.Database):
         self._lookup = {}
         self.decimal = 10000
 
-        self.add_to_table = {'account': self.add_account,
-                             'account_type': self.add_account_type,
-                             'allocation': self.add_allocation,
-                             'asset': self.add_asset,
-                             'asset_class': self.add_asset_class,
-                             'balance': self.add_balance,
-                             'component': self.add_component,
-                             'institution': self.add_institution,
-                             'location': self.add_location,
-                             'owner': self.add_owner,
-                             'price': self.add_price}
-
         self.table_commands = {'account': "SELECT * FROM account",
                                'account_type': "SELECT * FROM account_type",
                                'allocation': "SELECT * FROM allocation",
@@ -528,11 +516,6 @@ class Portfolio(sql_database.Database):
                     {next_number: self.money_to_get_to_target_deviation(line, dev_next_level)})
 
         return asset_deviation_level_cost
-
-    # CSV loader
-    def add_from_csv(self, file_name, table_name):
-        for line in csv.DictReader(open(file_name)):
-            self.add_to_table[table_name](kwargs=line)
 
 
 def assign_leftovers(contribution_table, contribution_amount):

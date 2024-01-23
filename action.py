@@ -19,7 +19,7 @@ class AppAction(structures.Action):
         pass
 
     def __repr__(self):
-        return f"Action({self.name}, {self.app})"
+        return f"AppAction({self.app}, {self.name})"
 
     def __str__(self):
         return self.name
@@ -81,10 +81,17 @@ class AddToTable(AppAction):
         super().__init__(app, 'Add ' + self.table_name)
 
     def __call__(self):
+        self.app.portfolio.add_to_table[self.table_name](kwargs=self.data)
+
+
+class InputRow(AppAction):
+    def __init__(self, app, table_name):
+        self.table_name = table_name
+        super().__init__(app, 'InputRow')
+
+    def __call__(self):
         for column_name in self.app.portfolio.column_names(self.app.portfolio.table_commands[self.table_name])[1:]:
             self.data.update({column_name: UserInput(self.app, self.table_name, column_name)()})
-
-        self.app.portfolio.add_to_table[self.table_name](kwargs=self.data)
 
 
 class UserInput(AppAction):
