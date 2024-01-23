@@ -21,13 +21,7 @@ class TextUI:
 
     def __call__(self):
         while True:
-            self.menu_select_portfolio()
-            if self.app.portfolio is not None:
-                self.menu_main()
-            # self.menu_select_portfolio()
-            #
-            # if self.app.portfolio is not None:
-            #     self.menu_main()
+            self.menu_main()
 
     # Menus
     def menu(self, menu_dict):

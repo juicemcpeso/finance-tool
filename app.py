@@ -13,19 +13,6 @@ class App:
         self.portfolio = _portfolio
         self.portfolio_directory = './portfolios/'
 
-        # self._menus = {'add': None,
-        #                'database menu': None,
-        #                'load': None,
-        #                'main': None}
-
-    #
-    # def __call__(self):
-    #     while True:
-    #         menu.Database(self)()
-    #
-    #         if self.portfolio is not None:
-    #             menu.Main(self)()
-
     # Add
     def add_row_to_table(self, table_name, kwargs):
         add_to_table = {'account': self.portfolio.add_account,
@@ -46,7 +33,6 @@ class App:
     def add_from_csv(self, file_name, table_name):
         for line in csv.DictReader(open(file_name)):
             self.add_row_to_table(table_name, kwargs=line)
-            # self.add_to_table[table_name](kwargs=line)
 
     # Tools
     def where_to_contribute(self, contribution_amount):
@@ -99,11 +85,6 @@ class App:
                     {next_number: self.money_to_get_to_target_deviation(line, dev_next_level)})
 
         return asset_deviation_level_cost
-
-    # Files
-    # TODO - add in with file selection module
-    # def load_file(self, file_name):
-    #     self.portfolio = portfolio.Portfolio(self.portfolio_directory + file_name)
 
 
 # TODO - test if where to contribute is not refactored
