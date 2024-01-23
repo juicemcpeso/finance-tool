@@ -8,5 +8,3 @@ import text_ui
 
 if __name__ == "__main__":
     text_ui.TextUI(app.App())()
-    # program = app.App()
-    # program()

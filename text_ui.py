@@ -32,14 +32,14 @@ class TextUI:
     # Menus
     def menu(self, menu_dict):
         self.menu_print_options(menu_dict)
-        selected_option = self.select_option(menu_dict['options'])
+        selected_option = select_option(menu_dict['options'])
 
         if selected_option is not None:
             selected_option['function']()
 
     def menu_no_execute(self, menu_dict):
         self.menu_print_options(menu_dict)
-        return self.select_option(menu_dict['options'])
+        return select_option(menu_dict['options'])
 
     def menu_print_options(self, menu_dict):
         print('\n' + menu_dict['name'])
@@ -94,18 +94,19 @@ class TextUI:
         response = input(f"{self.display_text}: ")
 
     # User - selection
-    def select_option(self, option_list):
-        while True:
-            try:
-                option_number = int(input('Select option number: '))
-            except ValueError:
-                pass
-            else:
-                if option_number in range(len(option_list)):
-                    return option_list[option_number]
-                    break
 
     def quit(self):
         self.app.active = False
         print('bye')
         exit()
+
+
+def select_option(option_list):
+    while True:
+        try:
+            option_number = int(input('Select option number: '))
+        except ValueError:
+            pass
+        else:
+            if option_number in range(len(option_list)):
+                return option_list[option_number]

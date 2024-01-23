@@ -4,8 +4,6 @@
 # @juicemcpeso
 
 import csv
-import menu
-import portfolio
 
 
 class App:
