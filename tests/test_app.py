@@ -4,7 +4,6 @@
 # @juicemcpeso
 
 import csv
-
 import pytest
 
 

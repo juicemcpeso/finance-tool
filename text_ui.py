@@ -5,6 +5,7 @@
 
 import datetime
 import os
+import sys
 
 
 class TextUI:
@@ -23,17 +24,19 @@ class TextUI:
         self.menu_main()
 
     # Menus
+    # TODO - test
     def menu_main(self):
         menu_dict = {'label': 'Main menu',
-                     'options': [{'label': 'Quit', 'function': self.quit}]}
+                     'options': [{'label': 'Quit', 'function': self.close}]}
         menu(menu_dict)
 
-    def quit(self):
+    def close(self):
         self.app.active = False
         print('bye')
-        exit()
+        sys.exit()
 
 
+# TODO - test
 def menu(menu_dict):
     print_menu(menu_dict)
     while True:
@@ -43,6 +46,7 @@ def menu(menu_dict):
             selected_option['function']()
 
 
+# TODO - test
 def print_menu(menu_dict):
     print('\n' + menu_dict['label'])
     for i, option in enumerate(menu_dict['options']):
@@ -50,6 +54,7 @@ def print_menu(menu_dict):
 
 
 # User - input
+# TODO - test
 def user_input(input_dict):
     response = None
     while response is None:
@@ -58,31 +63,53 @@ def user_input(input_dict):
     return response
 
 
+# TODO - test
 def user_input_bool(label):
-    response = input(f"Input {label} (t = true, f = false): ").lower()
-    if response in {'t', 'f'}:
-        return True if response == 't' else False
+    return verify_bool(input(f"Input {label} (t = true, f = false): "))
 
 
+def verify_bool(response):
+    lowered_response = response.lower()
+    if lowered_response in {'t', 'f'}:
+        return True if lowered_response == 't' else False
+    else:
+        print(f"Input must be T or F")
+        return None
+
+
+# TODO - test
 def user_input_date(label):
-    response = input(f"Input {label} in YYYY-MM-DD format: ")
+    return verify_date(input(f"Input {label} in YYYY-MM-DD format: "))
+
+
+def verify_date(response):
     try:
         datetime.date.fromisoformat(response)
     except ValueError:
-        print(f"{label} must be in YYYY-MM-DD format")
+        print(f"Input must be in YYYY-MM-DD format")
+        return None
     else:
         return response
 
 
+# TODO - test
+# TODO - is this where I want to convert to the decimal form? That should be a function in the app module
 def user_input_number(label):
     pass
 
 
+# TODO - may need to split this into price and shares
+def verify_number(response):
+    pass
+
+
+# TODO - test
 def user_input_text(label):
     return input(f"Input {label}: ")
 
 
 # User - selection
+# TODO - test
 def user_selection(option_list):
     while True:
         try:
