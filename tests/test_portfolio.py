@@ -125,8 +125,6 @@ def test_add_price(empty_portfolio):
     assert entry == empty_portfolio.sql_fetch_one(sql)
 
 
-
-
 # Calculations
 def test_asset_price_newest(test_portfolio):
     expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 10000},
@@ -254,24 +252,3 @@ def test_allocation_deviation(test_portfolio_allocation):
     expected = csv_to_numeric_dict_list(file_name)
 
     assert expected == test_portfolio_allocation.allocation_deviation()
-
-
-def test_where_to_contribute_1000(test_portfolio_allocation):
-    file_name = 'expected_deviations/add_1000.csv'
-    expected = csv_to_numeric_dict_list(file_name)
-
-    assert expected == test_portfolio_allocation.where_to_contribute(10000000)
-
-
-def test_where_to_contribute_10000(test_portfolio_allocation):
-    file_name = 'expected_deviations/add_10000.csv'
-    expected = csv_to_numeric_dict_list(file_name)
-
-    assert expected == test_portfolio_allocation.where_to_contribute(100000000)
-
-
-def test_where_to_contribute_100000(test_portfolio_allocation):
-    file_name = 'expected_deviations/add_100000.csv'
-    expected = csv_to_numeric_dict_list(file_name)
-
-    assert expected == test_portfolio_allocation.where_to_contribute(1000000000)

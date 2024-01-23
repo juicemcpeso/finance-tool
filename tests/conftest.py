@@ -27,7 +27,7 @@ def test_app_original():
 
 
 @pytest.fixture
-def test_app_allocations():
+def test_app_allocation():
     return create_test_app('./test_data_allocations/')
 
 
@@ -42,5 +42,5 @@ def test_portfolio(test_app_original):
 
 
 @pytest.fixture
-def test_portfolio_allocation(test_app_allocations):
-    return test_app_allocations.portfolio
+def test_portfolio_allocation(test_app_allocation):
+    return test_app_allocation.portfolio

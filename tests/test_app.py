@@ -75,3 +75,24 @@ def test_add_from_csv_owner(test_app_empty):
 
 def test_add_from_csv_price(test_app_empty):
     assert add_from_csv_test(test_app_empty, 'price')
+
+
+def test_where_to_contribute_1000(test_app_allocation):
+    file_name = 'expected_deviations/add_1000.csv'
+    expected = csv_to_numeric_dict_list(file_name)
+
+    assert expected == test_app_allocation.where_to_contribute(10000000)
+
+
+def test_where_to_contribute_10000(test_app_allocation):
+    file_name = 'expected_deviations/add_10000.csv'
+    expected = csv_to_numeric_dict_list(file_name)
+
+    assert expected == test_app_allocation.where_to_contribute(100000000)
+
+
+def test_where_to_contribute_100000(test_app_allocation):
+    file_name = 'expected_deviations/add_100000.csv'
+    expected = csv_to_numeric_dict_list(file_name)
+
+    assert expected == test_app_allocation.where_to_contribute(1000000000)
