@@ -35,17 +35,8 @@ class App:
 
             if self.portfolio is not None:
                 menu.Main(self)()
-    #
-    # def add_row_to_table(self, table_name, data):
-    #     self.add_to_table[table_name](kwargs=data)
 
     # CSV loader
     def add_from_csv(self, file_name, table_name):
         for line in csv.DictReader(open(file_name)):
             self.add_to_table[table_name](kwargs=line)
-
-    # def __getitem__(self, key):
-    #     return self._menus[key]
-    #
-    # def __setitem__(self, key, value):
-    #     self._menus[key] = value

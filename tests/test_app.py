@@ -8,21 +8,13 @@ import csv
 
 def data_file_path(table_name):
     return './test_data/' + table_name + '.csv'
-#
-#
-# def numeric_test_data(table_name):
-#     return csv_to_numeric_dict_list(data_file_path(table_name))
 
 
 def csv_to_numeric_dict_list(file_name):
     entry = list(csv.DictReader(open(file_name)))
     convert_dict_list_to_numeric(entry)
     return entry
-#
-#
-# def numeric_test_data(table_name):
-#     return csv_to_numeric_dict_list(data_file_path(table_name))
-#
+
 
 def convert_dict_list_to_numeric(dict_list):
     for row in dict_list:
@@ -41,14 +33,6 @@ def convert_to_numeric(item):
             numeric_output = int(item)
 
     return numeric_output
-
-
-# def sum_to_amount(test_function, key_to_sum, expected_amount):
-#     total = 0
-#     for item in test_function():
-#         total += item[key_to_sum]
-#
-#     return total == expected_amount
 
 
 def add_from_csv_test(app, table_name):
