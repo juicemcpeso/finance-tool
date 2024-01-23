@@ -20,33 +20,13 @@ class TextUI:
         return f"{self.app.name} TextUI"
 
     def __call__(self):
-        while True:
-            self.menu_main()
+        self.menu_main()
 
     # Menus
     def menu_main(self):
-        options = [{'name': 'Quit', 'function': self.quit}]
-        menu({'name': 'Main menu', 'options': options})
-
-    def input_bool(self):
-        user_input = input(f"{self.display_text} (T = True, F = False): ").lower()
-        if user_input in {'t', 'f'}:
-            return True if user_input == 't' else False
-
-    def input_date(self):
-        user_input = input(f"{self.display_text} in YYYY-MM-DD format: ")
-        try:
-            datetime.date.fromisoformat(user_input)
-        except ValueError:
-            print("Date must be in YYYY-MM-DD format")
-        else:
-            response = user_input
-
-    def input_number(self):
-        pass
-
-    def input_text(self):
-        response = input(f"{self.display_text}: ")
+        menu_dict = {'label': 'Main menu',
+                     'options': [{'label': 'Quit', 'function': self.quit}]}
+        menu(menu_dict)
 
     def quit(self):
         self.app.active = False
@@ -56,25 +36,50 @@ class TextUI:
 
 def menu(menu_dict):
     print_menu(menu_dict)
-    selected_option = user_selection(menu_dict['options'])
+    while True:
+        selected_option = user_selection(menu_dict['options'])
 
-    if selected_option is not None:
-        selected_option['function']()
+        if selected_option is not None:
+            selected_option['function']()
 
 
 def print_menu(menu_dict):
-    print('\n' + menu_dict['name'])
+    print('\n' + menu_dict['label'])
     for i, option in enumerate(menu_dict['options']):
-        print(f"{i} | {option['name']}")
+        print(f"{i} | {option['label']}")
 
 
 # User - input
-def user_input(input_function):
+def user_input(input_dict):
     response = None
     while response is None:
-        response = input_function
+        response = input_dict['function'](input_dict['label'])
 
     return response
+
+
+def user_input_bool(label):
+    response = input(f"Input {label} (t = true, f = false): ").lower()
+    if response in {'t', 'f'}:
+        return True if response == 't' else False
+
+
+def user_input_date(label):
+    response = input(f"Input {label} in YYYY-MM-DD format: ")
+    try:
+        datetime.date.fromisoformat(response)
+    except ValueError:
+        print(f"{label} must be in YYYY-MM-DD format")
+    else:
+        return response
+
+
+def user_input_number(label):
+    pass
+
+
+def user_input_text(label):
+    return input(f"Input {label}: ")
 
 
 # User - selection
