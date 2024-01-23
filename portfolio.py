@@ -478,3 +478,8 @@ class Portfolio(sql_database.Database):
 
     def net_worth(self):
         return self.net_worth_dict()['net_worth']
+
+    # I/O
+    def add_from_csv(self, file_name, table_name):
+        for line in csv.DictReader(open(file_name)):
+            self.add_to_table[table_name](kwargs=line)

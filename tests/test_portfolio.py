@@ -59,10 +59,16 @@ def sum_to_amount(test_function, key_to_sum, expected_amount):
     return total == expected_amount
 
 
-def test_add_to_table(empty_portfolio, table_name):
-    expected = csv_to_numeric_dict_list(data_file_path(table_name))[0]
-    empty_portfolio.add_to_table[table_name](kwargs=expected)
-    assert [expected] == empty_portfolio[table_name]
+def test_add_to_table(empty_portfolio, portfolio_table_name):
+    expected = csv_to_numeric_dict_list(data_file_path(portfolio_table_name))[0]
+    empty_portfolio.add_to_table[portfolio_table_name](kwargs=expected)
+    assert [expected] == empty_portfolio[portfolio_table_name]
+
+
+def test_add_from_csv(empty_portfolio, portfolio_table_name):
+    file_name = data_file_path(portfolio_table_name)
+    empty_portfolio.add_from_csv(file_name, portfolio_table_name)
+    assert csv_to_numeric_dict_list(file_name) == empty_portfolio[portfolio_table_name]
 
 
 # Calculations
