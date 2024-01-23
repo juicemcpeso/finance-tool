@@ -41,22 +41,22 @@ class TextUI:
             print(f"{i} | {option['name']}")
 
     def menu_main(self):
-        options = [{'name': '<- Back', 'function': self.menu_select_portfolio},
-                   {'name': 'Quit', 'function': self.quit}]
+        options = [{'name': 'Quit', 'function': self.quit}]
         self.menu({'name': 'Main menu', 'options': options})
 
-    def menu_select_portfolio(self):
-        options = [{'name': 'Load', 'function': self.menu_load_file},
-                   {'name': 'Quit', 'function': self.quit}]
-        self.menu({'name': 'Select portfolio', 'options': options})
-
-    # File
-    def menu_load_file(self):
-        options = []
-        for file_name in os.listdir(self.app.portfolio_directory):
-            options.append({'name': file_name})
-        selected_option = self.menu_no_execute({'name': 'Load file', 'options': options})
-        self.app.load_file(selected_option['name'])
+    # TODO - file selection module
+    # def menu_select_portfolio(self):
+    #     options = [{'name': 'Load', 'function': self.menu_load_file},
+    #                {'name': 'Quit', 'function': self.quit}]
+    #     self.menu({'name': 'Select portfolio', 'options': options})
+    #
+    # # File
+    # def menu_load_file(self):
+    #     options = []
+    #     for file_name in os.listdir(self.app.portfolio_directory):
+    #         options.append({'name': file_name})
+    #     selected_option = self.menu_no_execute({'name': 'Load file', 'options': options})
+    #     self.app.load_file(selected_option['name'])
 
 
     # User - input
