@@ -20,6 +20,11 @@ list_of_tables = ['account',
                   'price']
 
 
+@pytest.fixture(params=list_of_tables)
+def table_name(request):
+    return request.param
+
+
 def data_file_path(table_name):
     return './test_data/' + table_name + '.csv'
 
@@ -49,14 +54,12 @@ def convert_to_numeric(item):
     return numeric_output
 
 
-@pytest.mark.parametrize('table_name', list_of_tables)
 def test_add_from_csv_test(test_app_empty, table_name):
     file_name = data_file_path(table_name)
     test_app_empty.add_from_csv(file_name, table_name)
     assert csv_to_numeric_dict_list(file_name) == test_app_empty.portfolio[table_name]
 
 
-@pytest.mark.parametrize('table_name', list_of_tables)
 def test_add_row_to_table(test_app_empty, table_name):
     expected = csv_to_numeric_dict_list(data_file_path(table_name))[0]
     test_app_empty.add_row_to_table(table_name, kwargs=expected)
