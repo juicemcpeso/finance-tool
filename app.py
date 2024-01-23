@@ -84,9 +84,11 @@ class App:
 
         return contribution_table
 
+    # TODO - test if where to contribute is not refactored
     def money_to_get_to_target_deviation(self, deviation_dict, target):
         return ((target + self.decimal) * deviation_dict['plan_value'] / self.decimal) - deviation_dict['current_value']
 
+    # TODO - test if where to contribute is not refactored
     def create_asset_deviation_level_cost_dict(self, deviation_table):
         asset_deviation_level_cost = {0: 0}
 
@@ -101,11 +103,12 @@ class App:
         return asset_deviation_level_cost
 
     # Files
-    # TODO - test
-    def load_file(self, file_name):
-        self.portfolio = portfolio.Portfolio(self.portfolio_directory + file_name)
+    # TODO - add in with file selection module
+    # def load_file(self, file_name):
+    #     self.portfolio = portfolio.Portfolio(self.portfolio_directory + file_name)
 
 
+# TODO - test if where to contribute is not refactored
 def assign_leftovers(contribution_table, contribution_amount):
     amount_contributed = 0
     for line in contribution_table:
@@ -119,4 +122,3 @@ def assign_leftovers(contribution_table, contribution_amount):
             leftover -= 1
             if leftover == 0:
                 break
-
