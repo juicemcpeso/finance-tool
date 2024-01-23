@@ -24,48 +24,9 @@ class TextUI:
             self.menu_main()
 
     # Menus
-    def menu(self, menu_dict):
-        self.menu_print_options(menu_dict)
-        selected_option = select_option(menu_dict['options'])
-
-        if selected_option is not None:
-            selected_option['function']()
-
-    def menu_no_execute(self, menu_dict):
-        self.menu_print_options(menu_dict)
-        return select_option(menu_dict['options'])
-
-    def menu_print_options(self, menu_dict):
-        print('\n' + menu_dict['name'])
-        for i, option in enumerate(menu_dict['options']):
-            print(f"{i} | {option['name']}")
-
     def menu_main(self):
         options = [{'name': 'Quit', 'function': self.quit}]
-        self.menu({'name': 'Main menu', 'options': options})
-
-    # TODO - file selection module
-    # def menu_select_portfolio(self):
-    #     options = [{'name': 'Load', 'function': self.menu_load_file},
-    #                {'name': 'Quit', 'function': self.quit}]
-    #     self.menu({'name': 'Select portfolio', 'options': options})
-    #
-    # # File
-    # def menu_load_file(self):
-    #     options = []
-    #     for file_name in os.listdir(self.app.portfolio_directory):
-    #         options.append({'name': file_name})
-    #     selected_option = self.menu_no_execute({'name': 'Load file', 'options': options})
-    #     self.app.load_file(selected_option['name'])
-
-
-    # User - input
-    def user_input(self, input_function):
-        response = None
-        while response is None:
-            response = input_function
-
-        return response
+        menu({'name': 'Main menu', 'options': options})
 
     def input_bool(self):
         user_input = input(f"{self.display_text} (T = True, F = False): ").lower()
@@ -87,15 +48,37 @@ class TextUI:
     def input_text(self):
         response = input(f"{self.display_text}: ")
 
-    # User - selection
-
     def quit(self):
         self.app.active = False
         print('bye')
         exit()
 
 
-def select_option(option_list):
+def menu(menu_dict):
+    print_menu(menu_dict)
+    selected_option = user_selection(menu_dict['options'])
+
+    if selected_option is not None:
+        selected_option['function']()
+
+
+def print_menu(menu_dict):
+    print('\n' + menu_dict['name'])
+    for i, option in enumerate(menu_dict['options']):
+        print(f"{i} | {option['name']}")
+
+
+# User - input
+def user_input(input_function):
+    response = None
+    while response is None:
+        response = input_function
+
+    return response
+
+
+# User - selection
+def user_selection(option_list):
     while True:
         try:
             option_number = int(input('Select option number: '))
