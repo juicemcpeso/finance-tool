@@ -54,8 +54,9 @@ def print_menu(menu_dict):
 
 
 # User - input
+
 # TODO - test
-def user_input(input_dict):
+def user_input_loop(input_type):
     response = None
     while response is None:
         response = input_dict['function'](input_dict['label'])
@@ -63,26 +64,31 @@ def user_input(input_dict):
     return response
 
 
-def user_input_bool(label):
-    response = format_bool(input(f"Input {label} (t = true, f = false): "))
-    return response if verify_bool(response) else None
+# TODO - refactor this
+def user_input(input_type, label):
+    lookup = {'bool': {'input': input_bool,
+                       'format': format_bool,
+                       'verify': verify_bool}}
+
+    input_dict = lookup[input_type]
+
+    if input_dict['format'] is not None:
+        response = input_dict['format'](input_dict['input'](label))
+    else:
+        response = input_dict['input'](label)
+
+    return response if input_dict['verify'](response) else None
+
+
+def input_bool(label):
+    return input(f"Input {label} (t = true, f = false): ")
 
 
 def format_bool(response):
     lowered_response = response.lower()
     format_dict = {'t': True,
                    'f': False}
-    # if lowered_response == 't':
-    #     pass
     return format_dict[lowered_response] if lowered_response in format_dict else response
-
-# def verify_bool(response):
-#     lowered_response = response.lower()
-#     if lowered_response in {'t', 'f'}:
-#         return True if lowered_response == 't' else False
-#     else:
-#         print(f"Input must be T or F")
-#         return None
 
 
 def verify_bool(response):
@@ -91,17 +97,13 @@ def verify_bool(response):
 
 # TODO - test
 def user_input_date(label):
-    return verify_date(input(f"Input {label} in YYYY-MM-DD format: "))
+    response = format_date(input(f"Input {label} in YYYY-MM-DD format: "))
+    return response if verify_date(response) else None
 
 
-# def verify_date(response):
-#     try:
-#         datetime.date.fromisoformat(response)
-#     except ValueError:
-#         print(f"Input must be in YYYY-MM-DD format")
-#         return None
-#     else:
-#         return response
+def format_date(response):
+    return response
+
 
 def verify_date(response):
     try:
