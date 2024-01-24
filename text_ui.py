@@ -64,16 +64,29 @@ def user_input(input_dict):
 
 
 def user_input_bool(label):
-    return verify_bool(input(f"Input {label} (t = true, f = false): "))
+    response = format_bool(input(f"Input {label} (t = true, f = false): "))
+    return response if verify_bool(response) else None
+
+
+def format_bool(response):
+    lowered_response = response.lower()
+    format_dict = {'t': True,
+                   'f': False}
+    # if lowered_response == 't':
+    #     pass
+    return format_dict[lowered_response] if lowered_response in format_dict else response
+
+# def verify_bool(response):
+#     lowered_response = response.lower()
+#     if lowered_response in {'t', 'f'}:
+#         return True if lowered_response == 't' else False
+#     else:
+#         print(f"Input must be T or F")
+#         return None
 
 
 def verify_bool(response):
-    lowered_response = response.lower()
-    if lowered_response in {'t', 'f'}:
-        return True if lowered_response == 't' else False
-    else:
-        print(f"Input must be T or F")
-        return None
+    return True if response in {True, False} else False
 
 
 # TODO - test
@@ -81,14 +94,23 @@ def user_input_date(label):
     return verify_date(input(f"Input {label} in YYYY-MM-DD format: "))
 
 
+# def verify_date(response):
+#     try:
+#         datetime.date.fromisoformat(response)
+#     except ValueError:
+#         print(f"Input must be in YYYY-MM-DD format")
+#         return None
+#     else:
+#         return response
+
 def verify_date(response):
     try:
         datetime.date.fromisoformat(response)
     except ValueError:
-        print(f"Input must be in YYYY-MM-DD format")
-        return None
+        # print(f"Input must be in YYYY-MM-DD format")
+        return False
     else:
-        return response
+        return True
 
 
 # TODO - test

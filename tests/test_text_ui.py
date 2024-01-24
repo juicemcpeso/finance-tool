@@ -6,16 +6,36 @@
 import text_ui
 import pytest
 
-test_bool_results = [('T', True),
-                     ('t', True),
-                     ('F', False),
-                     ('f', False),
-                     ('a', None),
-                     ('G', None),
-                     ('0', None),
-                     ('test', None),
-                     ('$', None),
-                     ('', None)]
+test_verify_bool_results = [(True, True),
+                            (False, True),
+                            ('a', False),
+                            ('G', False),
+                            ('0', False),
+                            ('test', False),
+                            ('$', False),
+                            ('', False)]
+
+test_input_bool_results = [('T', True),
+                           ('t', True),
+                           ('F', False),
+                           ('f', False),
+                           ('a', None),
+                           ('G', None),
+                           ('0', None),
+                           ('test', None),
+                           ('$', None),
+                           ('', None)]
+
+test_format_bool_results = [('T', True),
+                            ('t', True),
+                            ('F', False),
+                            ('f', False),
+                            ('a', 'a'),
+                            ('G', 'G'),
+                            ('0', '0'),
+                            ('test', 'test'),
+                            ('$', '$'),
+                            ('', '')]
 
 
 def test_close(test_ui_empty):
@@ -25,14 +45,19 @@ def test_close(test_ui_empty):
     assert expected.type == SystemExit
 
 
-@pytest.mark.parametrize('response, expected', test_bool_results)
+@pytest.mark.parametrize('response, expected', test_input_bool_results)
 def test_user_input_bool(monkeypatch, response, expected):
     monkeypatch.setattr('builtins.input', lambda _: response)
     assert text_ui.user_input_bool('bool') == expected
 
 
-@pytest.mark.parametrize('response, expected', test_bool_results)
-def test_verify_input_bool(response, expected):
+@pytest.mark.parametrize('response, expected', test_format_bool_results)
+def test_format_bool(response, expected):
+    assert text_ui.format_bool(response) == expected
+
+
+@pytest.mark.parametrize('response, expected', test_verify_bool_results)
+def test_verify_bool(response, expected):
     assert text_ui.verify_bool(response) == expected
 
 
@@ -43,4 +68,3 @@ def test_verify_input_bool(response, expected):
                                                 ('', None)])
 def test_verify_date_true(response, expected):
     assert text_ui.verify_date(response) == expected
-
