@@ -54,7 +54,6 @@ def print_menu(menu_dict):
 
 
 # User - input
-
 # TODO - test
 def user_input_loop(input_type):
     response = None
@@ -64,11 +63,8 @@ def user_input_loop(input_type):
     return response
 
 
-# TODO - refactor this
 def user_input(input_type, label):
     input_dict = input_lookup[input_type]
-
-    # response = input_dict['format'](input_dict['input'](label)) if 'format' in input_dict.keys() else input_dict['input'](label)
 
     if 'format' in input_dict.keys():
         response = input_dict['format'](input_dict['input'](label))
@@ -95,8 +91,6 @@ def verify_bool(response):
 
 def input_date(label):
     return input(f"Input {label} in YYYY-MM-DD format: ")
-    # response = format_date(input(f"Input {label} in YYYY-MM-DD format: "))
-    # return response if verify_date(response) else None
 
 
 def verify_date(response):
