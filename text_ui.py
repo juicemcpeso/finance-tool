@@ -66,13 +66,7 @@ def user_input_loop(input_type):
 
 # TODO - refactor this
 def user_input(input_type, label):
-    lookup = {'bool': {'input': input_bool,
-                       'format': format_bool,
-                       'verify': verify_bool},
-              'date': {'input': input_date,
-                       'verify': verify_date}}
-
-    input_dict = lookup[input_type]
+    input_dict = input_lookup[input_type]
 
     # response = input_dict['format'](input_dict['input'](label)) if 'format' in input_dict.keys() else input_dict['input'](label)
 
@@ -99,7 +93,6 @@ def verify_bool(response):
     return True if response in {True, False} else False
 
 
-# TODO - test
 def input_date(label):
     return input(f"Input {label} in YYYY-MM-DD format: ")
     # response = format_date(input(f"Input {label} in YYYY-MM-DD format: "))
@@ -127,8 +120,12 @@ def verify_number(response):
 
 
 # TODO - test
-def user_input_text(label):
+def input_text(label):
     return input(f"Input {label}: ")
+
+
+def verify_text(response):
+    return isinstance(response, str)
 
 
 # User - selection
@@ -142,3 +139,10 @@ def user_selection(option_list):
         else:
             if option_number in range(len(option_list)):
                 return option_list[option_number]
+
+
+input_lookup = {'bool': {'input': input_bool,
+                         'format': format_bool,
+                         'verify': verify_bool},
+                'date': {'input': input_date,
+                         'verify': verify_date}}
