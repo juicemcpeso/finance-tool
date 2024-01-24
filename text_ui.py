@@ -68,11 +68,15 @@ def user_input_loop(input_type):
 def user_input(input_type, label):
     lookup = {'bool': {'input': input_bool,
                        'format': format_bool,
-                       'verify': verify_bool}}
+                       'verify': verify_bool},
+              'date': {'input': input_date,
+                       'verify': verify_date}}
 
     input_dict = lookup[input_type]
 
-    if input_dict['format'] is not None:
+    # response = input_dict['format'](input_dict['input'](label)) if 'format' in input_dict.keys() else input_dict['input'](label)
+
+    if 'format' in input_dict.keys():
         response = input_dict['format'](input_dict['input'](label))
     else:
         response = input_dict['input'](label)
@@ -96,20 +100,16 @@ def verify_bool(response):
 
 
 # TODO - test
-def user_input_date(label):
-    response = format_date(input(f"Input {label} in YYYY-MM-DD format: "))
-    return response if verify_date(response) else None
-
-
-def format_date(response):
-    return response
+def input_date(label):
+    return input(f"Input {label} in YYYY-MM-DD format: ")
+    # response = format_date(input(f"Input {label} in YYYY-MM-DD format: "))
+    # return response if verify_date(response) else None
 
 
 def verify_date(response):
     try:
         datetime.date.fromisoformat(response)
     except ValueError:
-        # print(f"Input must be in YYYY-MM-DD format")
         return False
     else:
         return True

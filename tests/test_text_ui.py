@@ -7,6 +7,7 @@ import subprocess
 import text_ui
 import pytest
 
+# TODO - make this into a single dictionary
 test_verify_bool_results = [(True, True),
                             (False, True),
                             ('a', False),
@@ -38,6 +39,19 @@ test_format_bool_results = [('T', True),
                             ('$', '$'),
                             ('', '')]
 
+date_data = [{'input': '2021-01-23', 'verify': True, 'response': '2021-01-23'},
+             {'input': 'test', 'verify': False, 'response': None},
+             {'input': '12-23-2023', 'verify': False, 'response': None},
+             {'input': '2023-02-29', 'verify': False, 'response': None},
+             {'input': '', 'verify': False, 'response': None}]
+
+#
+# print(date_verify)
+# date_verify = []
+#
+# for row in date_data:
+#     date_verify.append((row['input'], row['verify']))
+
 
 def test_close(test_ui_empty):
     with pytest.raises(SystemExit) as expected:
@@ -46,6 +60,7 @@ def test_close(test_ui_empty):
     assert expected.type == SystemExit
 
 
+# Bool
 @pytest.mark.parametrize('response, expected', test_user_input_bool_results)
 def test_user_input_bool(monkeypatch, response, expected):
     monkeypatch.setattr('builtins.input', lambda _: response)
@@ -78,10 +93,18 @@ def test_verify_bool(response, expected):
     assert text_ui.verify_bool(response) == expected
 
 
-@pytest.mark.parametrize('response, expected', [('2021-01-23', '2021-01-23'),
-                                                ('test', None),
-                                                ('12-23-2023', None),
-                                                ('2023-02-29', None),
-                                                ('', None)])
+# Date
+@pytest.mark.parametrize('response, expected', [(row['input'], row['response']) for row in date_data])
+def test_user_input_date(monkeypatch, response, expected):
+    monkeypatch.setattr('builtins.input', lambda _: response)
+    assert text_ui.user_input('date', 'test label') == expected
+
+
+def test_input_date(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda _: 'input')
+    assert text_ui.input_date('test label') == 'input'
+
+
+@pytest.mark.parametrize('response, expected', [(row['input'], row['verify']) for row in date_data])
 def test_verify_date_true(response, expected):
     assert text_ui.verify_date(response) == expected
