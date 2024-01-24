@@ -63,7 +63,6 @@ def user_input(input_dict):
     return response
 
 
-# TODO - test
 def user_input_bool(label):
     return verify_bool(input(f"Input {label} (t = true, f = false): "))
 
