@@ -2,6 +2,7 @@ import pytest
 
 import app
 import portfolio
+import sql_database
 import text_ui
 
 
@@ -26,6 +27,11 @@ def test_portfolio_allocation(empty_portfolio):
     for table_name in empty_portfolio:
         empty_portfolio.add_from_csv('./test_data_allocations/' + table_name + '.csv', table_name)
     return empty_portfolio
+
+
+@pytest.fixture
+def test_database():
+    return sql_database.Database('test.db')
 
 
 # Test apps

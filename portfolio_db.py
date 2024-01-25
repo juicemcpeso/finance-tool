@@ -3,6 +3,7 @@
 # 2024-01-25
 # @juicemcpeso
 
+# CREATE - tables
 create_table_account = """
 CREATE TABLE IF NOT EXISTS account (
     id INTEGER PRIMARY KEY,
@@ -47,6 +48,12 @@ CREATE TABLE IF NOT EXISTS asset_class (
     name TEXT
 );"""
 
+create_table_asset_class = """
+CREATE TABLE IF NOT EXISTS asset_class (
+    id INTEGER PRIMARY KEY,
+    name TEXT
+);"""
+
 create_table_balance = """
 CREATE TABLE IF NOT EXISTS balance (
     id INTEGER PRIMARY KEY,
@@ -56,12 +63,6 @@ CREATE TABLE IF NOT EXISTS balance (
     quantity INT,
     FOREIGN KEY(account_id) REFERENCES account(id),
     FOREIGN KEY(asset_id) REFERENCES asset(id)
-);"""
-
-create_table_asset = """
-CREATE TABLE IF NOT EXISTS asset_class (
-    id INTEGER PRIMARY KEY,
-    name TEXT
 );"""
 
 create_table_component = """
@@ -104,7 +105,19 @@ CREATE TABLE IF NOT EXISTS price (
     FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
 
-# Views
+create_tables = {create_table_account,
+                 create_table_account_type,
+                 create_table_allocation,
+                 create_table_asset,
+                 create_table_asset_class,
+                 create_table_balance,
+                 create_table_component,
+                 create_table_institution,
+                 create_table_location,
+                 create_table_owner,
+                 create_table_price}
+
+# CREATE - views
 create_view_account_value_current_by_asset = """
 CREATE VIEW IF NOT EXISTS account_value_current_by_asset AS
 SELECT 
@@ -183,7 +196,14 @@ JOIN
     asset_value_current AS v ON c.asset_id = v.asset_id
 """
 
-# Drop
+create_views = {create_view_account_value_current_by_asset,
+                create_view_asset_price_newest,
+                create_view_asset_quantity_by_account,
+                create_view_asset_value_current,
+                create_view_asset_class_value_by_location,
+                create_view_component_value}
+
+# DROP - tables
 drop_table_account = """
 DROP TABLE IF EXISTS account
 """
@@ -228,6 +248,19 @@ drop_table_price = """
 DROP TABLE IF EXISTS price
 """
 
+drop_tables = {drop_table_account,
+               drop_table_account_type,
+               drop_table_allocation,
+               drop_table_asset,
+               drop_table_asset_class,
+               drop_table_balance,
+               drop_table_component,
+               drop_table_institution,
+               drop_table_location,
+               drop_table_owner,
+               drop_table_price}
+
+# DROP - views
 drop_view_account_value_current_by_asset = """
 DROP VIEW IF EXISTS account_value_current_by_asset
 """
@@ -251,6 +284,13 @@ DROP VIEW IF EXISTS asset_value_current
 drop_view_component_value = """
 DROP VIEW IF EXISTS component_value
 """
+
+drop_views = {drop_view_account_value_current_by_asset,
+              drop_view_asset_price_newest,
+              drop_view_asset_quantity_by_account_current,
+              drop_view_asset_class_value_by_location,
+              drop_view_asset_value_current,
+              drop_view_component_value}
 
 # INSERT
 insert_account = """

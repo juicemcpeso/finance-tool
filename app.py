@@ -4,6 +4,7 @@
 # @juicemcpeso
 
 import csv
+import portfolio_db
 
 
 class App:
@@ -12,6 +13,18 @@ class App:
         self.decimal = 10000
         self.portfolio = _portfolio
         self.portfolio_directory = './portfolios/'
+
+        self.insert = {'account': portfolio_db.insert_account,
+                       'account type': portfolio_db.insert_account_type,
+                       'allocation': portfolio_db.insert_allocation,
+                       'asset': portfolio_db.insert_asset,
+                       'asset class': portfolio_db.insert_asset_class,
+                       'balance': portfolio_db.insert_balance,
+                       'component': portfolio_db.insert_component,
+                       'institution': portfolio_db.insert_institution,
+                       'location': portfolio_db.insert_location,
+                       'owner': portfolio_db.insert_owner,
+                       'price': portfolio_db.insert_price}
 
     # Add
     def add_row_to_table(self, table_name, kwargs):

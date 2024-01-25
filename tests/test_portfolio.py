@@ -4,6 +4,7 @@
 # @juicemcpeso
 
 import csv
+import portfolio_db
 
 
 # Get csv files
@@ -108,14 +109,18 @@ def test_account_value_current_by_asset_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.account_value_current_by_asset, 'current_value', 166551450)
 
 
-def test_net_worth_dict(test_portfolio):
+# def test_net_worth(test_portfolio):
+#     expected = {'net_worth': 166551450}
+#     assert expected == test_portfolio.net_worth_dict()
+
+def test_net_worth(test_database):
     expected = {'net_worth': 166551450}
-    assert expected == test_portfolio.net_worth_dict()
+    assert expected == test_database.execute(portfolio_db.net_worth)
 
 
-def test_net_worth(test_portfolio):
-    expected = 166551450
-    assert expected == test_portfolio.net_worth()
+# def test_net_worth(test_portfolio):
+#     expected = 166551450
+#     assert expected == test_portfolio.net_worth()
 
 
 def test_asset_class_percentage(test_portfolio):
