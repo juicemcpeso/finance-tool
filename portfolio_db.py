@@ -253,7 +253,7 @@ DROP VIEW IF EXISTS component_value
 """
 
 # INSERT
-sql = """
+insert_account = """
 INSERT INTO account(name, account_type_id, institution_id, owner_id) 
 VALUES(:name, :account_type_id, :institution_id, :owner_id)
 """
@@ -263,88 +263,50 @@ INSERT INTO account_type(name, tax_in, tax_growth, tax_out)
 VALUES(:name, :tax_in, :tax_growth, :tax_out)
 """
 
-self.execute_many(sql, kwargs.values())
-
-
-def add_allocation(self, **kwargs):
-sql = """
+insert_allocation = """
 INSERT INTO allocation(asset_class_id, location_id, percentage) 
 VALUES(:asset_class_id, :location_id, :percentage)
 """
 
-self.execute_many(sql, kwargs.values())
-
-
-def add_asset(self, **kwargs):
-sql = """
+insert_asset = """
 INSERT INTO asset(name, symbol) 
 VALUES(:name, :symbol)
 """
 
-self.execute_many(sql, kwargs.values())
-
-
-def add_asset_class(self, **kwargs):
-sql = """
+insert_asset_class = """
 INSERT INTO asset_class(name) 
 VALUES(:name)
 """
 
-self.execute_many(sql, kwargs.values())
-
-
-def add_balance(self, **kwargs):
-sql = """
+insert_balance = """
 INSERT INTO balance(account_id, asset_id, balance_date, quantity) 
 VALUES(:account_id, :asset_id, :balance_date, :quantity)
 """
 
-self.execute_many(sql, kwargs.values())
-
-
-def add_component(self, **kwargs):
-sql = """
+insert_component = """
 INSERT INTO component(asset_id, asset_class_id, location_id, percentage) 
 VALUES(:asset_id, :asset_class_id, :location_id, :percentage)
 """
 
-self.execute_many(sql, kwargs.values())
-
-
-def add_institution(self, **kwargs):
-sql = """
+insert_institution = """
 INSERT INTO institution(name) 
 VALUES(:name)
 """
 
-self.execute_many(sql, kwargs.values())
-
-
-def add_location(self, **kwargs):
-sql = """
+insert_location = """
 INSERT INTO location(name) 
 VALUES(:name)
 """
 
-self.execute_many(sql, kwargs.values())
-
-
-def add_owner(self, **kwargs):
-sql = """
+insert_owner = """
 INSERT INTO owner(name, birthday) 
 VALUES(:name, :birthday)
 """
 
-self.execute_many(sql, kwargs.values())
-
-
-def add_price(self, **kwargs):
-sql = """
+insert_price = """
 INSERT INTO price(asset_id, price_date, amount) 
 VALUES(:asset_id, :price_date, :amount)
 """
-
-self.execute_many(sql, kwargs.values())
 
 # SELECT
 select_account = """
