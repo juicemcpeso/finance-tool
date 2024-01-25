@@ -183,4 +183,71 @@ JOIN
     asset_value_current AS v ON c.asset_id = v.asset_id
 """
 
-# DROP
+# Drop
+drop_table_account = """
+DROP TABLE IF EXISTS account
+"""
+
+drop_table_account_type = """
+DROP TABLE IF EXISTS account_type
+"""
+
+drop_table_allocation = """
+DROP TABLE IF EXISTS allocation
+"""
+
+drop_table_asset = """
+DROP TABLE IF EXISTS asset
+"""
+
+drop_table_asset_class = """
+DROP TABLE IF EXISTS asset_class
+"""
+
+drop_table_balance = """
+DROP TABLE IF EXISTS balance
+"""
+
+drop_table_component = """
+DROP TABLE IF EXISTS component
+"""
+
+drop_table_institution = """
+DROP TABLE IF EXISTS institution
+"""
+
+drop_table_location = """
+DROP TABLE IF EXISTS location
+"""
+
+drop_table_owner = """
+DROP TABLE IF EXISTS owner
+"""
+
+drop_table_price = """
+DROP TABLE IF EXISTS price
+"""
+
+drop_view_account_value_current_by_asset = """
+DROP VIEW IF EXISTS account_value_current_by_asset
+"""
+
+drop_view_asset_price_newest = """
+DROP VIEW IF EXISTS asset_price_newest
+"""
+
+drop_view_asset_quantity_by_account_current = """
+DROP VIEW IF EXISTS asset_quantity_by_account_current
+"""
+
+drop_view_asset_class_value_by_location = """
+DROP VIEW IF EXISTS asset_class_value_by_location
+"""
+
+drop_view_asset_value_current = """
+DROP VIEW IF EXISTS asset_value_current
+"""
+
+drop_view_component_value = """
+DROP VIEW IF EXISTS component_value
+"""

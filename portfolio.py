@@ -483,3 +483,16 @@ class Portfolio(sql_database.Database):
     def add_from_csv(self, file_name, table_name):
         for line in csv.DictReader(open(file_name)):
             self.add_to_table[table_name](kwargs=line)
+
+
+def print_code(command_list):
+    for command in command_list:
+        command_string = command.lower().replace(' ', '_')
+        new = command_string.replace('if_exists_', '')
+
+        print(new + ' = \"\"\"')
+        print(command)
+        print('\"\"\"')
+        print()
+
+print_code(drop_tables_and_views_commands)
