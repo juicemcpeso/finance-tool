@@ -495,4 +495,26 @@ def print_code(command_list):
         print('\"\"\"')
         print()
 
-print_code(drop_tables_and_views_commands)
+
+def print_select(command_dict):
+    for command in command_dict:
+        variable_name = "select_" + command
+
+        print(variable_name + ' = \"\"\"')
+        print(command_dict[command])
+        print('\"\"\"')
+        print()
+
+table_commands = {'account': "SELECT * FROM account",
+                               'account_type': "SELECT * FROM account_type",
+                               'allocation': "SELECT * FROM allocation",
+                               'asset': "SELECT * FROM asset",
+                               'asset_class': "SELECT * FROM asset_class",
+                               'balance': "SELECT * FROM balance",
+                               'component': "SELECT * FROM component",
+                               'institution': "SELECT * FROM institution",
+                               'location': "SELECT * FROM location",
+                               'owner': "SELECT * FROM owner",
+                               'price': "SELECT * FROM price"}
+
+print_select(table_commands)

@@ -251,3 +251,142 @@ DROP VIEW IF EXISTS asset_value_current
 drop_view_component_value = """
 DROP VIEW IF EXISTS component_value
 """
+
+# INSERT
+sql = """
+INSERT INTO account(name, account_type_id, institution_id, owner_id) 
+VALUES(:name, :account_type_id, :institution_id, :owner_id)
+"""
+
+insert_account_type = """
+INSERT INTO account_type(name, tax_in, tax_growth, tax_out) 
+VALUES(:name, :tax_in, :tax_growth, :tax_out)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+
+def add_allocation(self, **kwargs):
+sql = """
+INSERT INTO allocation(asset_class_id, location_id, percentage) 
+VALUES(:asset_class_id, :location_id, :percentage)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+
+def add_asset(self, **kwargs):
+sql = """
+INSERT INTO asset(name, symbol) 
+VALUES(:name, :symbol)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+
+def add_asset_class(self, **kwargs):
+sql = """
+INSERT INTO asset_class(name) 
+VALUES(:name)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+
+def add_balance(self, **kwargs):
+sql = """
+INSERT INTO balance(account_id, asset_id, balance_date, quantity) 
+VALUES(:account_id, :asset_id, :balance_date, :quantity)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+
+def add_component(self, **kwargs):
+sql = """
+INSERT INTO component(asset_id, asset_class_id, location_id, percentage) 
+VALUES(:asset_id, :asset_class_id, :location_id, :percentage)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+
+def add_institution(self, **kwargs):
+sql = """
+INSERT INTO institution(name) 
+VALUES(:name)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+
+def add_location(self, **kwargs):
+sql = """
+INSERT INTO location(name) 
+VALUES(:name)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+
+def add_owner(self, **kwargs):
+sql = """
+INSERT INTO owner(name, birthday) 
+VALUES(:name, :birthday)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+
+def add_price(self, **kwargs):
+sql = """
+INSERT INTO price(asset_id, price_date, amount) 
+VALUES(:asset_id, :price_date, :amount)
+"""
+
+self.execute_many(sql, kwargs.values())
+
+# SELECT
+select_account = """
+SELECT * FROM account
+"""
+
+select_account_type = """
+SELECT * FROM account_type
+"""
+
+select_allocation = """
+SELECT * FROM allocation
+"""
+
+select_asset = """
+SELECT * FROM asset
+"""
+
+select_asset_class = """
+SELECT * FROM asset_class
+"""
+
+select_balance = """
+SELECT * FROM balance
+"""
+
+select_component = """
+SELECT * FROM component
+"""
+
+select_institution = """
+SELECT * FROM institution
+"""
+
+select_location = """
+SELECT * FROM location
+"""
+
+select_owner = """
+SELECT * FROM owner
+"""
+
+select_price = """
+SELECT * FROM price
+"""
