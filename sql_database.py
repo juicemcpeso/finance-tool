@@ -73,3 +73,13 @@ class Database:
         con.commit()
         con.close()
         return column_names
+
+    def execute_from_file(self, file_name):
+        with open(file_name, 'r') as sql_file:
+            sql_script = sql_file.read()
+
+        con = sqlite3.connect(self.database)
+        cur = con.cursor()
+        cur.executescript(sql_script)
+        con.commit()
+        con.close()
