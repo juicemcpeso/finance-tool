@@ -4,7 +4,7 @@
 # @juicemcpeso
 
 import app
+import text_ui
 
 if __name__ == "__main__":
-    program = app.App()
-    program()
+    text_ui.TextUI(app.App())()

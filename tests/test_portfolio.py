@@ -59,106 +59,16 @@ def sum_to_amount(test_function, key_to_sum, expected_amount):
     return total == expected_amount
 
 
-def test_add_account(empty_portfolio):
-    entry = {'name': 'Carlos IRA', 'account_type_id': 2, 'institution_id': 1, 'owner_id': 1}
-    empty_portfolio.add_account(args=entry)
-
-    sql = """
-    SELECT name, account_type_id, institution_id, owner_id FROM account WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
+def test_add_to_table(empty_portfolio, portfolio_table_name):
+    expected = csv_to_numeric_dict_list(data_file_path(portfolio_table_name))[0]
+    empty_portfolio.add_to_table[portfolio_table_name](kwargs=expected)
+    assert [expected] == empty_portfolio[portfolio_table_name]
 
 
-def test_add_account_type(empty_portfolio):
-    entry = {'name': 'Traditional IRA', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}
-    empty_portfolio.add_account_type(args=entry)
-
-    sql = """
-    SELECT name, tax_in, tax_growth, tax_out FROM account_type WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
-
-
-def test_add_asset(empty_portfolio):
-    entry = {'name': 'Test Index Fund', 'symbol': 'TEST'}
-    empty_portfolio.add_asset(args=entry)
-
-    sql = """
-    SELECT name, symbol FROM asset WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
-
-
-def test_add_balance(empty_portfolio):
-    entry = {'account_id': 1, 'asset_id': 4, 'balance_date': '2023-01-01', 'quantity': 12}
-    empty_portfolio.add_balance(args=entry)
-
-    sql = """
-    SELECT account_id, asset_id, balance_date, quantity FROM balance WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
-
-
-def test_add_owner(empty_portfolio):
-    entry = {'name': 'Carlos', 'birthday': '2000-01-01'}
-    empty_portfolio.add_owner(args=entry)
-
-    sql = """
-    SELECT name, birthday FROM owner WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
-
-
-def test_add_price(empty_portfolio):
-    entry = {'asset_id': 2, 'price_date': '2023-01-01', 'amount': 3.61}
-    empty_portfolio.add_price(args=entry)
-
-    sql = """
-    SELECT asset_id, price_date, amount FROM price WHERE id = 1
-    """
-
-    assert entry == empty_portfolio.sql_fetch_one(sql)
-
-
-def test_add_from_csv_account(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'accounts')
-
-
-def test_add_from_csv_account_type(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'account_types')
-
-
-def test_add_from_csv_allocation_plan(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'allocations')
-
-
-def test_add_from_csv_asset(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'assets')
-
-
-def test_add_from_csv_balance(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'balances')
-
-
-def test_add_from_csv_institution(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'institutions')
-
-
-def test_add_from_csv_location(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'locations')
-
-
-def test_add_from_csv_owner(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'owners')
-
-
-def test_add_from_csv_price(empty_portfolio):
-    assert add_from_csv_test(empty_portfolio, 'prices')
+def test_add_from_csv(empty_portfolio, portfolio_table_name):
+    file_name = data_file_path(portfolio_table_name)
+    empty_portfolio.add_from_csv(file_name, portfolio_table_name)
+    assert csv_to_numeric_dict_list(file_name) == empty_portfolio[portfolio_table_name]
 
 
 # Calculations
@@ -196,6 +106,11 @@ def test_account_value_current_by_asset(test_portfolio):
 
 def test_account_value_current_by_asset_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.account_value_current_by_asset, 'current_value', 166551450)
+
+
+def test_net_worth_dict(test_portfolio):
+    expected = {'net_worth': 166551450}
+    assert expected == test_portfolio.net_worth_dict()
 
 
 def test_net_worth(test_portfolio):
@@ -288,24 +203,3 @@ def test_allocation_deviation(test_portfolio_allocation):
     expected = csv_to_numeric_dict_list(file_name)
 
     assert expected == test_portfolio_allocation.allocation_deviation()
-
-
-def test_where_to_contribute_1000(test_portfolio_allocation):
-    file_name = 'expected_deviations/add_1000.csv'
-    expected = csv_to_numeric_dict_list(file_name)
-
-    assert expected == test_portfolio_allocation.where_to_contribute(10000000)
-
-
-def test_where_to_contribute_10000(test_portfolio_allocation):
-    file_name = 'expected_deviations/add_10000.csv'
-    expected = csv_to_numeric_dict_list(file_name)
-
-    assert expected == test_portfolio_allocation.where_to_contribute(100000000)
-
-
-def test_where_to_contribute_100000(test_portfolio_allocation):
-    file_name = 'expected_deviations/add_100000.csv'
-    expected = csv_to_numeric_dict_list(file_name)
-
-    assert expected == test_portfolio_allocation.where_to_contribute(1000000000)

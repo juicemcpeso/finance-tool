@@ -2,52 +2,77 @@ import pytest
 
 import app
 import portfolio
+import text_ui
 
 
-def test_data_csv(directory_name, table_name):
-    return directory_name + table_name + '.csv'
+# Test portfolios
+@pytest.fixture
+def empty_portfolio():
+    test_portfolio = portfolio.Portfolio('./test.db')
+    test_portfolio.drop_all_tables()
+    test_portfolio.create_all_tables()
+    return test_portfolio
 
 
 @pytest.fixture
-def empty_portfolio():
-    empty_portfolio = portfolio.Portfolio('./test.db')
-    empty_portfolio.drop_all_tables()
-    empty_portfolio.create_all_tables()
+def test_portfolio(empty_portfolio):
+    for table_name in empty_portfolio:
+        empty_portfolio.add_from_csv('./test_data/' + table_name + '.csv', table_name)
     return empty_portfolio
 
 
 @pytest.fixture
-def test_portfolio():
-    test_portfolio = portfolio.Portfolio('./test.db')
-    test_portfolio.drop_all_tables()
-    test_portfolio.create_all_tables()
-    add_all_test_data_from_csv(test_portfolio, './test_data/')
-
-    return test_portfolio
+def test_portfolio_allocation(empty_portfolio):
+    for table_name in empty_portfolio:
+        empty_portfolio.add_from_csv('./test_data_allocations/' + table_name + '.csv', table_name)
+    return empty_portfolio
 
 
+# Test apps
 @pytest.fixture
-def test_portfolio_allocation():
-    test_portfolio = portfolio.Portfolio('./test_allocation.db')
-    test_portfolio.drop_all_tables()
-    test_portfolio.create_all_tables()
-    add_all_test_data_from_csv(test_portfolio, './test_data_allocations/')
-
-    return test_portfolio
+def test_app_empty(empty_portfolio):
+    return app.App(empty_portfolio)
 
 
 @pytest.fixture
 def test_app(test_portfolio):
-    test_app = app.App
-    test_app.portfolio = test_portfolio
-
-    return test_app
+    return app.App(test_portfolio)
 
 
-def add_all_test_data_from_csv(test_portfolio, directory_name):
-    for table_name in test_portfolio.add_to_table:
-        add_test_data_from_csv(test_portfolio, directory_name, table_name)
+@pytest.fixture
+def test_app_allocation(test_portfolio_allocation):
+    return app.App(test_portfolio_allocation)
 
 
-def add_test_data_from_csv(test_portfolio, directory_name, table_name):
-    test_portfolio.add_from_csv(test_data_csv(directory_name, table_name), table_name)
+# Test Text UIs
+@pytest.fixture
+def test_ui(test_app):
+    return text_ui.TextUI(test_app)
+
+
+@pytest.fixture
+def test_ui_empty(test_app_empty):
+    return text_ui.TextUI(test_app_empty)
+
+
+table_names = ['account',
+               'account_type',
+               'allocation',
+               'asset',
+               'asset_class',
+               'balance',
+               'component',
+               'institution',
+               'location',
+               'owner',
+               'price']
+
+
+@pytest.fixture(params=table_names)
+def portfolio_table_name(request):
+    return request.param
+
+
+@pytest.fixture(params=table_names)
+def app_table_name(request):
+    return request.param.replace('_', ' ')

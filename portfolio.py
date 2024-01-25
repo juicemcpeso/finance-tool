@@ -223,20 +223,33 @@ class Portfolio(sql_database.Database):
         super().__init__(portfolio_path, create_tables_and_views_commands, drop_tables_and_views_commands)
 
         self._lookup = {}
-        self._construct_lookup()
-        self.decimal = 10000
+        # self.decimal = 10000
 
-        self.add_to_table = {'accounts': self.add_account,
-                             'account_types': self.add_account_type,
-                             'allocations': self.add_allocation,
-                             'assets': self.add_asset,
-                             'asset_classes': self.add_asset_class,
-                             'balances': self.add_balance,
-                             'components': self.add_component,
-                             'institutions': self.add_institution,
-                             'locations': self.add_location,
-                             'owners': self.add_owner,
-                             'prices': self.add_price}
+        self.table_commands = {'account': "SELECT * FROM account",
+                               'account_type': "SELECT * FROM account_type",
+                               'allocation': "SELECT * FROM allocation",
+                               'asset': "SELECT * FROM asset",
+                               'asset_class': "SELECT * FROM asset_class",
+                               'balance': "SELECT * FROM balance",
+                               'component': "SELECT * FROM component",
+                               'institution': "SELECT * FROM institution",
+                               'location': "SELECT * FROM location",
+                               'owner': "SELECT * FROM owner",
+                               'price': "SELECT * FROM price"}
+
+        self.add_to_table = {'account': self.add_account,
+                             'account_type': self.add_account_type,
+                             'allocation': self.add_allocation,
+                             'asset': self.add_asset,
+                             'asset_class': self.add_asset_class,
+                             'balance': self.add_balance,
+                             'component': self.add_component,
+                             'institution': self.add_institution,
+                             'location': self.add_location,
+                             'owner': self.add_owner,
+                             'price': self.add_price}
+
+        self._construct_lookup()
 
     def __iter__(self):
         return iter(self._lookup.keys())
@@ -248,20 +261,8 @@ class Portfolio(sql_database.Database):
         self._lookup[key] = value
 
     def _construct_lookup(self):
-        get_commands = {'accounts': "SELECT * FROM account",
-                        'account_types': "SELECT * FROM account_type",
-                        'allocations': "SELECT * FROM allocation",
-                        'assets': "SELECT * FROM asset",
-                        'asset_classes': "SELECT * FROM asset_class",
-                        'balances': "SELECT * FROM balance",
-                        'components': "SELECT * FROM component",
-                        'institutions': "SELECT * FROM institution",
-                        'locations': "SELECT * FROM location",
-                        'owners': "SELECT * FROM owner",
-                        'prices': "SELECT * FROM price"}
-
-        for item in get_commands:
-            self._lookup[item] = get_commands[item]
+        for item in self.table_commands:
+            self._lookup[item] = self.table_commands[item]
 
     # IO
     # Add
@@ -478,72 +479,7 @@ class Portfolio(sql_database.Database):
     def net_worth(self):
         return self.net_worth_dict()['net_worth']
 
-    # Tools
-    def where_to_contribute(self, contribution_amount):
-        deviation_table = self.allocation_deviation(contribution_amount)
-        asset_deviation_level_cost = self.create_asset_deviation_level_cost_dict(deviation_table)
-        total_deviation_level_cost = {key: 0 for key in range(len(deviation_table))}
-        accessible_level = 0
-
-        for line_number in asset_deviation_level_cost:
-            for key in asset_deviation_level_cost[line_number]:
-                total_deviation_level_cost[key] += asset_deviation_level_cost[line_number][key]
-
-        for key in total_deviation_level_cost:
-            if total_deviation_level_cost[key] < contribution_amount:
-                accessible_level = key
-
-        contribution_table = deviation_table[:(accessible_level + 1)]
-
-        for line_number in range(accessible_level):
-            contribution_table[line_number]['contribution'] += asset_deviation_level_cost[line_number][accessible_level]
-
-        amount_remaining = contribution_amount - total_deviation_level_cost[accessible_level]
-
-        total_percentage = 0
-        for line_number in range(accessible_level + 1):
-            total_percentage += contribution_table[line_number]['plan_percent']
-
-        for line_number in range(accessible_level + 1):
-            contribution_table[line_number]['contribution'] += amount_remaining * contribution_table[line_number][
-                'plan_percent'] // total_percentage
-
-        assign_leftovers(contribution_table, contribution_amount)
-
-        return contribution_table
-
-    def money_to_get_to_target_deviation(self, deviation_dict, target):
-        return ((target + self.decimal) * deviation_dict['plan_value'] / self.decimal) - deviation_dict['current_value']
-
-    def create_asset_deviation_level_cost_dict(self, deviation_table):
-        asset_deviation_level_cost = {0: 0}
-
-        for line_number, line in enumerate(deviation_table):
-            asset_deviation_level_cost.update({line_number: {}})
-
-            for next_number in range(line_number + 1, len(deviation_table)):
-                dev_next_level = deviation_table[next_number]['deviation']
-                asset_deviation_level_cost[line_number].update(
-                    {next_number: self.money_to_get_to_target_deviation(line, dev_next_level)})
-
-        return asset_deviation_level_cost
-
-    # CSV loader
+    # I/O
     def add_from_csv(self, file_name, table_name):
         for line in csv.DictReader(open(file_name)):
             self.add_to_table[table_name](kwargs=line)
-
-
-def assign_leftovers(contribution_table, contribution_amount):
-    amount_contributed = 0
-    for line in contribution_table:
-        amount_contributed += line['contribution']
-
-    leftover = contribution_amount - amount_contributed
-
-    while leftover > 0:
-        for line in contribution_table:
-            line['contribution'] += 1
-            leftover -= 1
-            if leftover == 0:
-                break
