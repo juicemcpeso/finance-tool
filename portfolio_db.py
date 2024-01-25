@@ -392,10 +392,15 @@ SELECT * FROM asset_price_newest
 """
 
 asset_quantity = """
-SELECT asset_id, SUM(quantity) quantity
-FROM asset_quantity_by_account_current
-GROUP BY asset_id
-ORDER BY asset_id
+SELECT
+    asset_id,
+    SUM(quantity) quantity
+FROM
+    asset_quantity_by_account_current
+GROUP BY
+    asset_id
+ORDER BY
+    asset_id
 """
 
 asset_value_current = """
