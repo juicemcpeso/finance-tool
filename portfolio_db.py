@@ -352,3 +352,96 @@ SELECT * FROM owner
 select_price = """
 SELECT * FROM price
 """
+
+
+# Calculations
+# Accounts
+account_asset_quantity_current = """
+SELECT * FROM asset_quantity_by_account_current
+"""
+
+account_value_current_by_asset = """
+SELECT * FROM account_value_current_by_asset 
+"""
+
+# Allocation
+allocation_deviation = """
+SELECT
+    plan.asset_class_id,
+    plan.location_id,
+    current_values.current_value,
+    plan.percentage AS plan_percent,
+    plan.percentage * :net_worth / 10000 AS plan_value,
+    (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation,
+    0 AS contribution
+FROM 
+    allocation AS plan
+JOIN 
+    asset_class_value_by_location AS current_values ON 
+        current_values.asset_class_id == plan.asset_class_id AND 
+        current_values.location_id == plan.location_id 
+WHERE
+    deviation < 0        
+ORDER BY
+    deviation ASC
+"""
+
+# Assets
+asset_price_newest = """
+SELECT * FROM asset_price_newest
+"""
+
+asset_quantity = """
+SELECT asset_id, SUM(quantity) quantity
+FROM asset_quantity_by_account_current
+GROUP BY asset_id
+ORDER BY asset_id
+"""
+
+asset_value_current = """
+SELECT * FROM asset_value_current
+"""
+
+# Asset class
+asset_class_percentage = """
+SELECT
+    asset_class_id, 
+    100.0 * SUM(current_value) / :net_worth AS percentage
+FROM
+    component_value
+GROUP BY
+    asset_class_id
+"""
+
+asset_class_percentage_by_location = """
+SELECT
+    asset_class_id, 
+    location_id,
+    100.0 * SUM(current_value) / :net_worth AS percentage
+FROM
+    component_value
+GROUP BY
+    asset_class_id, location_id
+"""
+
+asset_class_value = """
+SELECT
+    asset_class_id, 
+    SUM(current_value) current_value
+FROM
+    component_value
+GROUP BY
+    asset_class_id
+"""
+
+asset_class_value_by_location = """
+SELECT * FROM asset_class_value_by_location
+"""
+
+# Net worth
+net_worth = """
+SELECT 
+    SUM(current_values.current_value) AS net_worth
+FROM
+    account_value_current_by_asset AS current_values
+"""
