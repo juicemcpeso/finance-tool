@@ -9,21 +9,26 @@ import sqlite3
 import pytest
 import tests.test_data as td
 
+
+@pytest.fixture
+def test_db_1():
+    pass
+
 # TODO - remove once no longer needed
-def csv_to_dict(directory):
-    test_dict = {}
-    for table_name_tuple in create_table_sequence:
-        table_name = table_name_tuple[0]
-        file_path = directory + table_name + '.csv'
-        test_dict.update({table_name: list(csv.DictReader(open(file_path)))})
-    return test_dict
-
-
-def print_csv_as_dict(directory):
-    test_dict = csv_to_dict(directory)
-    for key in sorted(test_dict):
-        print(f"\'{key}\': {test_dict[key]},")
-    assert True
+# def csv_to_dict(directory):
+#     test_dict = {}
+#     for table_name_tuple in create_table_sequence:
+#         table_name = table_name_tuple[0]
+#         file_path = directory + table_name + '.csv'
+#         test_dict.update({table_name: list(csv.DictReader(open(file_path)))})
+#     return test_dict
+#
+#
+# def print_csv_as_dict(directory):
+#     test_dict = csv_to_dict(directory)
+#     for key in sorted(test_dict):
+#         print(f"\'{key}\': {test_dict[key]},")
+#     assert True
 
 # create_table_sequence = {('account', db.create_table_account),
 #                          ('account_type', db.create_table_account_type),
@@ -36,6 +41,19 @@ def print_csv_as_dict(directory):
 #                          ('location', db.create_table_location),
 #                          ('owner', db.create_table_owner),
 #                          ('price', db.create_table_price)}
+
+
+table_names = {'account',
+               'account_type',
+               'allocation',
+               'asset',
+               'asset_class',
+               'balance',
+               'component',
+               'institution',
+               'location',
+               'owner',
+               'price'}
 
 create_table_sequence = {('account', db.create_table_account),
                          ('account_type', db.create_table_account_type),
@@ -69,3 +87,14 @@ def test_create_table_columns(tmp_path, table_name, command):
     sql = f"SELECT * FROM {table_name}"
 
     assert db.column_names(database=db_test, cmd=sql) == list(td.db_1[table_name][0].keys())
+
+
+def test_create_tables(tmp_path):
+    db_test = tmp_path / "test.db"
+    db.execute_script(database=db_test, cmd=db.create_tables)
+
+    sql = """SELECT * FROM sqlite_master WHERE type = 'table'"""
+
+    result_list = db.sql_fetch_all(database=db_test, cmd=sql)
+
+    assert set(line['name'] for line in result_list) == set(td.db_1.keys())

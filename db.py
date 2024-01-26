@@ -39,6 +39,16 @@ def execute_many(database, cmd, data_sequence):
     con.close()
 
 
+# TODO - test?
+def execute_script(database, cmd):
+    """Execute script of commands"""
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    cur.executescript(cmd)
+    con.commit()
+    con.close()
+
+
 # TODO - test
 def sql_fetch_one(database, cmd, params=None):
     con = sqlite3.connect(database)
@@ -167,17 +177,29 @@ CREATE TABLE IF NOT EXISTS price (
     FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
 
-create_tables = {create_table_account,
-                 create_table_account_type,
-                 create_table_allocation,
-                 create_table_asset,
-                 create_table_asset_class,
-                 create_table_balance,
-                 create_table_component,
-                 create_table_institution,
-                 create_table_location,
-                 create_table_owner,
-                 create_table_price}
+# create_tables = {create_table_account,
+#                  create_table_account_type,
+#                  create_table_allocation,
+#                  create_table_asset,
+#                  create_table_asset_class,
+#                  create_table_balance,
+#                  create_table_component,
+#                  create_table_institution,
+#                  create_table_location,
+#                  create_table_owner,
+#                  create_table_price}
+
+create_tables = create_table_account + \
+                create_table_account_type + \
+                create_table_allocation + \
+                create_table_asset + \
+                create_table_asset_class + \
+                create_table_balance + \
+                create_table_component + \
+                create_table_institution + \
+                create_table_location + \
+                create_table_owner + \
+                create_table_price
 
 # CREATE - views
 create_view_account_value_current_by_asset = """
