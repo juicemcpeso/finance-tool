@@ -3,9 +3,27 @@
 # 2024-01-25
 # @juicemcpeso
 
+import csv
 import db
 import sqlite3
 import pytest
+import tests.test_data as td
+
+# TODO - remove once no longer needed
+def csv_to_dict(directory):
+    test_dict = {}
+    for table_name_tuple in create_table_sequence:
+        table_name = table_name_tuple[0]
+        file_path = directory + table_name + '.csv'
+        test_dict.update({table_name: list(csv.DictReader(open(file_path)))})
+    return test_dict
+
+
+def print_csv_as_dict(directory):
+    test_dict = csv_to_dict(directory)
+    for key in sorted(test_dict):
+        print(f"\'{key}\': {test_dict[key]},")
+    assert True
 
 # create_table_sequence = {('account', db.create_table_account),
 #                          ('account_type', db.create_table_account_type),
@@ -41,3 +59,13 @@ def test_create_table(tmp_path, table_name, command):
 
     assert db.sql_fetch_all(database=db_test, cmd=sql)[0]['name'] == table_name
     assert len(db.sql_fetch_all(database=db_test, cmd=sql)) == 1
+
+
+@pytest.mark.parametrize('table_name, command', create_table_sequence)
+def test_create_table_columns(tmp_path, table_name, command):
+    db_test = tmp_path / "test.db"
+    db.execute(database=db_test, cmd=command)
+
+    sql = f"SELECT * FROM {table_name}"
+
+    assert db.column_names(database=db_test, cmd=sql) == list(td.db_1[table_name][0].keys())
