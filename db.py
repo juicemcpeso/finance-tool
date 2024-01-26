@@ -1,7 +1,75 @@
-# portfolio_db.py
+# db.py
 # SQL statements for the portfolio logic
 # 2024-01-25
 # @juicemcpeso
+
+import sqlite3
+
+
+def dict_factory(cursor, row):
+    fields = [column[0] for column in cursor.description]
+    return {key: value for key, value in zip(fields, row)}
+
+
+# TODO - figure out the best way to write these
+# def execute(database, cmd, params=None):
+#     with sqlite3.connect(database) as con:
+#         cur = con.cursor()
+#         cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+#     con.close()
+
+
+# TODO - test?
+def execute(database, cmd, params=None):
+    """Execute a single command"""
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+    con.commit()
+    con.close()
+
+
+# TODO - test?
+def execute_many(database, cmd, data_sequence):
+    """Execute a single command multiple times with different data"""
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    cur.executemany(cmd, data_sequence)
+    con.commit()
+    con.close()
+
+
+# TODO - test
+def sql_fetch_one(database, cmd, params=None):
+    con = sqlite3.connect(database)
+    con.row_factory = dict_factory
+    cur = con.cursor()
+    result = cur.execute(cmd, params).fetchone() if params is not None else cur.execute(cmd).fetchone()
+    con.commit()
+    con.close()
+    return result
+
+
+# TODO - test
+def sql_fetch_all(database, cmd, params=None):
+    con = sqlite3.connect(database)
+    con.row_factory = dict_factory
+    cur = con.cursor()
+    result = cur.execute(cmd, params).fetchall() if params is not None else cur.execute(cmd).fetchall()
+    con.commit()
+    con.close()
+    return result
+
+
+# TODO - test
+def column_names(database, cmd):
+    con = sqlite3.connect(database)
+    cur = con.execute(cmd)
+    result = [description[0] for description in cur.description]
+    con.commit()
+    con.close()
+    return result
+
 
 # CREATE - tables
 create_table_account = """
