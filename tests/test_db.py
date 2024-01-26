@@ -17,6 +17,7 @@ def test_db_0(tmp_path):
     db.execute_script(db_test, db.create_views)
     return db_test
 
+
 # TODO - remove once no longer needed
 # def csv_to_dict(directory):
 #     test_dict = {}
@@ -32,18 +33,6 @@ def test_db_0(tmp_path):
 #     for key in sorted(test_dict):
 #         print(f"\'{key}\': {test_dict[key]},")
 #     assert True
-
-# create_table_sequence = {('account', db.create_table_account),
-#                          ('account_type', db.create_table_account_type),
-#                          ('allocation', db.create_table_allocation),
-#                          ('asset', db.create_table_asset),
-#                          ('asset_class', db.create_table_asset_class),
-#                          ('balance', db.create_table_balance),
-#                          ('component', db.create_table_component),
-#                          ('institution', db.create_table_institution),
-#                          ('location', db.create_table_location),
-#                          ('owner', db.create_table_owner),
-#                          ('price', db.create_table_price)}
 
 
 table_names = {'account',
@@ -83,6 +72,20 @@ create_table_sequence = {('account', db.create_table_account),
                          ('location', db.create_table_location),
                          ('owner', db.create_table_owner),
                          ('price', db.create_table_price)}
+
+insert_sequence = {('account', db.insert_account),
+                   ('account_type', db.insert_account_type),
+                   ('allocation', db.insert_allocation),
+                   ('asset', db.insert_asset),
+                   ('asset_class', db.insert_asset_class),
+                   ('balance', db.insert_balance),
+                   ('component', db.insert_component),
+                   ('institution', db.insert_institution),
+                   ('location', db.insert_location),
+                   ('owner', db.insert_owner),
+                   ('price', db.insert_price)}
+
+first_lines = {table_name: td.db_1[table_name][0] for table_name in td.db_1}
 
 
 @pytest.mark.parametrize('table_name, command', create_table_sequence)
@@ -155,17 +158,28 @@ def test_create_views_test_db_0(test_db_0):
     assert set(line['name'] for line in result_list) == view_names
 
 
-# TODO - make these paramterized for all insert cases
-def test_insert_asset(test_db_0):
-    sql = """SELECT * FROM asset"""
-    test_data = {'id': 1, 'name': 'Test fund', 'symbol': 'TESTF'}
-    db.execute(database=test_db_0, cmd=db.insert_asset, params=test_data)
+@pytest.mark.parametrize('table_name, command', insert_sequence)
+def test_insert(test_db_0, table_name, command):
+    sql = f"""SELECT * FROM {table_name}"""
+    test_data = first_lines[table_name]
+    db.execute(database=test_db_0, cmd=command, params=test_data)
     assert db.sql_fetch_one(database=test_db_0, cmd=sql) == test_data
 
 
-def test_insert_asset_no_id(test_db_0):
-    sql = """SELECT * FROM asset"""
-    test_data = {'id': None, 'name': 'Test fund', 'symbol': 'TESTF'}
-    db.execute(database=test_db_0, cmd=db.insert_asset, params=test_data)
+@pytest.mark.parametrize('table_name, command', insert_sequence)
+def test_insert_no_id(test_db_0, table_name, command):
+    sql = f"""SELECT * FROM {table_name}"""
+    test_data = first_lines[table_name]
+    test_data.update({'id': None})
+    db.execute(database=test_db_0, cmd=command, params=test_data)
     test_data.update({'id': 1})
+    assert db.sql_fetch_one(database=test_db_0, cmd=sql) == test_data
+
+
+@pytest.mark.parametrize('table_name, command', insert_sequence)
+def test_insert_id_2(test_db_0, table_name, command):
+    sql = f"""SELECT * FROM {table_name}"""
+    test_data = first_lines[table_name]
+    test_data.update({'id': 2})
+    db.execute(database=test_db_0, cmd=command, params=test_data)
     assert db.sql_fetch_one(database=test_db_0, cmd=sql) == test_data

@@ -398,18 +398,18 @@ drop_views = {drop_view_account_value_current_by_asset,
 
 # INSERT
 insert_account = """
-INSERT INTO account(name, account_type_id, institution_id, owner_id) 
-VALUES(:name, :account_type_id, :institution_id, :owner_id)
+INSERT INTO account(id, name, account_type_id, institution_id, owner_id) 
+VALUES(:id, :name, :account_type_id, :institution_id, :owner_id)
 """
 
 insert_account_type = """
-INSERT INTO account_type(name, tax_in, tax_growth, tax_out) 
-VALUES(:name, :tax_in, :tax_growth, :tax_out)
+INSERT INTO account_type(id, name, tax_in, tax_growth, tax_out) 
+VALUES(:id, :name, :tax_in, :tax_growth, :tax_out)
 """
 
 insert_allocation = """
-INSERT INTO allocation(asset_class_id, location_id, percentage) 
-VALUES(:asset_class_id, :location_id, :percentage)
+INSERT INTO allocation(id, asset_class_id, location_id, percentage) 
+VALUES(:id, :asset_class_id, :location_id, :percentage)
 """
 
 insert_asset = """
@@ -417,65 +417,39 @@ INSERT INTO asset(id, name, symbol)
 VALUES(:id, :name, :symbol)
 """
 
-# TODO - combine with above statement using if
-# insert_asset_no_id = """
-# INSERT INTO asset(name, symbol)
-# VALUES(:name, :symbol)
-# """
-
-# insert_asset = """
-#
-# CASE
-#     WHEN :id exists
-#         THEN INSERT INTO asset(id, name, symbol) VALUES (:id, :name, :symbol)
-#     ELSE
-#         INSERT INTO asset(name, symbol) VALUES (:name, :symbol)
-# END;
-# """
-#
-# insert_asset = """
-# INSERT INTO asset
-# CASE
-#     WHEN :id exists
-#         THEN INSERT INTO asset(id, name, symbol) VALUES (:id, :name, :symbol)
-#     ELSE
-#         INSERT INTO asset(name, symbol) VALUES (:name, :symbol)
-# END;
-# """
-
 insert_asset_class = """
-INSERT INTO asset_class(name) 
-VALUES(:name)
+INSERT INTO asset_class(id, name) 
+VALUES(:id, :name)
 """
 
 insert_balance = """
-INSERT INTO balance(account_id, asset_id, balance_date, quantity) 
-VALUES(:account_id, :asset_id, :balance_date, :quantity)
+INSERT INTO balance(id, account_id, asset_id, balance_date, quantity) 
+VALUES(:id, :account_id, :asset_id, :balance_date, :quantity)
 """
 
 insert_component = """
-INSERT INTO component(asset_id, asset_class_id, location_id, percentage) 
-VALUES(:asset_id, :asset_class_id, :location_id, :percentage)
+INSERT INTO component(id, asset_id, asset_class_id, location_id, percentage) 
+VALUES(:id, :asset_id, :asset_class_id, :location_id, :percentage)
 """
 
 insert_institution = """
-INSERT INTO institution(name) 
-VALUES(:name)
+INSERT INTO institution(id, name) 
+VALUES(:id, :name)
 """
 
 insert_location = """
-INSERT INTO location(name) 
-VALUES(:name)
+INSERT INTO location(id, name) 
+VALUES(:id, :name)
 """
 
 insert_owner = """
-INSERT INTO owner(name, birthday) 
-VALUES(:name, :birthday)
+INSERT INTO owner(id, name, birthday) 
+VALUES(:id, :name, :birthday)
 """
 
 insert_price = """
-INSERT INTO price(asset_id, price_date, amount) 
-VALUES(:asset_id, :price_date, :amount)
+INSERT INTO price(id, asset_id, price_date, amount) 
+VALUES(:id, :asset_id, :price_date, :amount)
 """
 
 # SELECT
