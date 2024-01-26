@@ -153,3 +153,19 @@ def test_create_views_test_db_0(test_db_0):
     result_list = db.sql_fetch_all(database=test_db_0, cmd=sql)
 
     assert set(line['name'] for line in result_list) == view_names
+
+
+# TODO - make these paramterized for all insert cases
+def test_insert_asset(test_db_0):
+    sql = """SELECT * FROM asset"""
+    test_data = {'id': 1, 'name': 'Test fund', 'symbol': 'TESTF'}
+    db.execute(database=test_db_0, cmd=db.insert_asset, params=test_data)
+    assert db.sql_fetch_one(database=test_db_0, cmd=sql) == test_data
+
+
+def test_insert_asset_no_id(test_db_0):
+    sql = """SELECT * FROM asset"""
+    test_data = {'id': None, 'name': 'Test fund', 'symbol': 'TESTF'}
+    db.execute(database=test_db_0, cmd=db.insert_asset, params=test_data)
+    test_data.update({'id': 1})
+    assert db.sql_fetch_one(database=test_db_0, cmd=sql) == test_data

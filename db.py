@@ -413,9 +413,35 @@ VALUES(:asset_class_id, :location_id, :percentage)
 """
 
 insert_asset = """
-INSERT INTO asset(name, symbol) 
-VALUES(:name, :symbol)
+INSERT INTO asset(id, name, symbol)
+VALUES(:id, :name, :symbol)
 """
+
+# TODO - combine with above statement using if
+# insert_asset_no_id = """
+# INSERT INTO asset(name, symbol)
+# VALUES(:name, :symbol)
+# """
+
+# insert_asset = """
+#
+# CASE
+#     WHEN :id exists
+#         THEN INSERT INTO asset(id, name, symbol) VALUES (:id, :name, :symbol)
+#     ELSE
+#         INSERT INTO asset(name, symbol) VALUES (:name, :symbol)
+# END;
+# """
+#
+# insert_asset = """
+# INSERT INTO asset
+# CASE
+#     WHEN :id exists
+#         THEN INSERT INTO asset(id, name, symbol) VALUES (:id, :name, :symbol)
+#     ELSE
+#         INSERT INTO asset(name, symbol) VALUES (:name, :symbol)
+# END;
+# """
 
 insert_asset_class = """
 INSERT INTO asset_class(name) 
