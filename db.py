@@ -208,6 +208,7 @@ create_tables = create_table_account + \
                 create_table_price
 
 # CREATE - views
+# TODO - test
 create_view_account_value_current_by_asset = """
 CREATE VIEW IF NOT EXISTS account_value_current_by_asset AS
 SELECT 
@@ -223,6 +224,7 @@ GROUP BY
     b.account_id, b.asset_id
 ;"""
 
+# TODO - test
 create_view_asset_price_newest = """
 CREATE VIEW IF NOT EXISTS asset_price_newest AS
 SELECT
@@ -235,6 +237,7 @@ GROUP BY
     asset_id
 ;"""
 
+# TODO - test
 create_view_asset_quantity_by_account_current = """
 CREATE VIEW IF NOT EXISTS asset_quantity_by_account_current AS
 SELECT
@@ -248,6 +251,7 @@ GROUP BY
     account_id, asset_id
 ;"""
 
+# TODO - test
 create_view_asset_value_current = """
 CREATE VIEW IF NOT EXISTS asset_value_current AS
 SELECT
@@ -261,6 +265,7 @@ ORDER BY
     asset_id
 ;"""
 
+# TODO - test
 create_view_asset_class_value_by_location = """
 CREATE VIEW IF NOT EXISTS asset_class_value_by_location aS
 SELECT
@@ -273,6 +278,7 @@ GROUP BY
     asset_class_id, location_id
 ;"""
 
+# TODO - test
 create_view_component_value = """
 CREATE VIEW IF NOT EXISTS component_value AS
 SELECT
