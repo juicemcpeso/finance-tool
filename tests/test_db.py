@@ -11,8 +11,11 @@ import tests.test_data as td
 
 
 @pytest.fixture
-def test_db_1():
-    pass
+def test_db_0(tmp_path):
+    db_test = tmp_path / "test.db"
+    db.execute_script(db_test, db.create_tables)
+    db.execute_set(db_test, db.create_views)
+    return db_test
 
 # TODO - remove once no longer needed
 # def csv_to_dict(directory):
@@ -97,4 +100,12 @@ def test_create_tables(tmp_path):
 
     result_list = db.sql_fetch_all(database=db_test, cmd=sql)
 
-    assert set(line['name'] for line in result_list) == set(td.db_1.keys())
+    assert set(line['name'] for line in result_list) == table_names
+
+
+def test_create_tables_test_db_0(test_db_0):
+    sql = """SELECT * FROM sqlite_master WHERE type = 'table'"""
+
+    result_list = db.sql_fetch_all(database=test_db_0, cmd=sql)
+
+    assert set(line['name'] for line in result_list) == table_names

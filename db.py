@@ -39,6 +39,12 @@ def execute_many(database, cmd, data_sequence):
     con.close()
 
 
+def execute_set(database, cmd_set):
+    """Execute a set of commands"""
+    for command in cmd_set:
+        execute(database=database, cmd=command)
+
+
 # TODO - test?
 def execute_script(database, cmd):
     """Execute script of commands"""
