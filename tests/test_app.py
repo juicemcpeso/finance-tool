@@ -8,7 +8,7 @@ import pytest
 
 
 def data_file_path(table_name):
-    return './test_data/' + table_name + '.csv'
+    return './old_test_data/' + table_name + '.csv'
 
 
 def csv_to_numeric_dict_list(file_name):

@@ -9,7 +9,7 @@ import portfolio_db
 
 # Get csv files
 def data_file_path(table_name):
-    return './test_data/' + table_name + '.csv'
+    return './old_test_data/' + table_name + '.csv'
 
 
 def add_test_data_from_csv(portfolio_to_test, table_name):
