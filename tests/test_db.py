@@ -14,7 +14,7 @@ import tests.test_data as td
 def test_db_0(tmp_path):
     db_test = tmp_path / "test.db"
     db.execute_script(db_test, db.create_tables)
-    db.execute_set(db_test, db.create_views)
+    db.execute_script(db_test, db.create_views)
     return db_test
 
 # TODO - remove once no longer needed
@@ -57,6 +57,13 @@ table_names = {'account',
                'location',
                'owner',
                'price'}
+
+view_names = {'account_value_current_by_asset',
+              'asset_price_newest',
+              'asset_quantity_by_account_current',
+              'asset_value_current',
+              'asset_class_value_by_location',
+              'component_value'}
 
 create_table_sequence = {('account', db.create_table_account),
                          ('account_type', db.create_table_account_type),
@@ -109,3 +116,14 @@ def test_create_tables_test_db_0(test_db_0):
     result_list = db.sql_fetch_all(database=test_db_0, cmd=sql)
 
     assert set(line['name'] for line in result_list) == table_names
+
+
+def test_create_views(tmp_path):
+    db_test = tmp_path / "test.db"
+    db.execute_script(database=db_test, cmd=db.create_views)
+
+    sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
+
+    result_list = db.sql_fetch_all(database=db_test, cmd=sql)
+
+    assert set(line['name'] for line in result_list) == view_names

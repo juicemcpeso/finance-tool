@@ -221,7 +221,7 @@ JOIN
     asset_price_newest AS p ON b.asset_id = p.asset_id
 GROUP BY 
     b.account_id, b.asset_id
-"""
+;"""
 
 create_view_asset_price_newest = """
 CREATE VIEW IF NOT EXISTS asset_price_newest AS
@@ -233,9 +233,9 @@ FROM
     price
 GROUP BY
     asset_id
-"""
+;"""
 
-create_view_asset_quantity_by_account = """
+create_view_asset_quantity_by_account_current = """
 CREATE VIEW IF NOT EXISTS asset_quantity_by_account_current AS
 SELECT
     account_id,
@@ -246,7 +246,7 @@ FROM
     balance
 GROUP BY
     account_id, asset_id
-"""
+;"""
 
 create_view_asset_value_current = """
 CREATE VIEW IF NOT EXISTS asset_value_current AS
@@ -259,7 +259,7 @@ GROUP BY
     asset_id
 ORDER BY
     asset_id
-"""
+;"""
 
 create_view_asset_class_value_by_location = """
 CREATE VIEW IF NOT EXISTS asset_class_value_by_location aS
@@ -271,7 +271,7 @@ FROM
     component_value
 GROUP BY
     asset_class_id, location_id
-"""
+;"""
 
 create_view_component_value = """
 CREATE VIEW IF NOT EXISTS component_value AS
@@ -284,15 +284,23 @@ FROM
     component AS c
 JOIN
     asset_value_current AS v ON c.asset_id = v.asset_id
-"""
+;"""
 
-create_views = {create_view_account_value_current_by_asset,
-                create_view_asset_price_newest,
-                create_view_asset_quantity_by_account,
-                create_view_asset_value_current,
-                create_view_asset_class_value_by_location,
-                create_view_component_value}
+# create_views = {create_view_account_value_current_by_asset,
+#                 create_view_asset_price_newest,
+#                 create_view_asset_quantity_by_account,
+#                 create_view_asset_value_current,
+#                 create_view_asset_class_value_by_location,
+#                 create_view_component_value}
 
+create_views = create_view_account_value_current_by_asset + \
+               create_view_asset_price_newest + \
+               create_view_asset_quantity_by_account_current + \
+               create_view_asset_value_current + \
+               create_view_asset_class_value_by_location + \
+               create_view_component_value
+
+# TODO - write tests for drop functions (if still needed)
 # DROP - tables
 drop_table_account = """
 DROP TABLE IF EXISTS account
