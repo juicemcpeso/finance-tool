@@ -37,12 +37,12 @@ def execute_many(database, cmd, data_sequence):
     cur.executemany(cmd, data_sequence)
     con.commit()
     con.close()
-
-
-def execute_set(database, cmd_set):
-    """Execute a set of commands"""
-    for command in cmd_set:
-        execute(database=database, cmd=command)
+#
+#
+# def execute_set(database, cmd_set):
+#     """Execute a set of commands"""
+#     for command in cmd_set:
+#         execute(database=database, cmd=command)
 
 
 # TODO - test?

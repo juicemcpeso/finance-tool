@@ -65,6 +65,13 @@ view_names = {'account_value_current_by_asset',
               'asset_class_value_by_location',
               'component_value'}
 
+create_view_sequence = {('account_value_current_by_asset', db.create_view_account_value_current_by_asset),
+                        ('asset_price_newest', db.create_view_asset_price_newest),
+                        ('asset_quantity_by_account_current', db.create_view_asset_quantity_by_account_current),
+                        ('asset_value_current', db.create_view_asset_value_current),
+                        ('asset_class_value_by_location', db.create_view_asset_class_value_by_location),
+                        ('component_value', db.create_view_component_value)}
+
 create_table_sequence = {('account', db.create_table_account),
                          ('account_type', db.create_table_account_type),
                          ('allocation', db.create_table_allocation),
@@ -118,6 +125,17 @@ def test_create_tables_test_db_0(test_db_0):
     assert set(line['name'] for line in result_list) == table_names
 
 
+@pytest.mark.parametrize('view_name, command', create_view_sequence)
+def test_create_view(tmp_path, view_name, command):
+    db_test = tmp_path / "test.db"
+    db.execute(database=db_test, cmd=command)
+
+    sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
+
+    assert db.sql_fetch_all(database=db_test, cmd=sql)[0]['name'] == view_name
+    assert len(db.sql_fetch_all(database=db_test, cmd=sql)) == 1
+
+
 def test_create_views(tmp_path):
     db_test = tmp_path / "test.db"
     db.execute_script(database=db_test, cmd=db.create_views)
@@ -125,5 +143,13 @@ def test_create_views(tmp_path):
     sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
 
     result_list = db.sql_fetch_all(database=db_test, cmd=sql)
+
+    assert set(line['name'] for line in result_list) == view_names
+
+
+def test_create_views_test_db_0(test_db_0):
+    sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
+
+    result_list = db.sql_fetch_all(database=test_db_0, cmd=sql)
 
     assert set(line['name'] for line in result_list) == view_names
