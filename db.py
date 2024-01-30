@@ -397,7 +397,6 @@ drop_views = {drop_view_account_value_current_by_asset,
               drop_view_asset_value_current,
               drop_view_component_value}
 
-# TODO - test
 # INSERT
 insert_account = """
 INSERT INTO account(id, name, account_type_id, institution_id, owner_id) 
@@ -601,7 +600,6 @@ SELECT * FROM asset_class_value_by_location
 """
 
 # Net worth
-# TODO - test
 net_worth = """
 SELECT 
     SUM(current_values.current_value) AS net_worth

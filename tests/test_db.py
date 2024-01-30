@@ -9,12 +9,34 @@ import sqlite3
 import pytest
 import tests.test_data as td
 
+insert_dict = {'account': db.insert_account,
+               'account_type': db.insert_account_type,
+               'allocation': db.insert_allocation,
+               'asset': db.insert_asset,
+               'asset_class': db.insert_asset_class,
+               'balance': db.insert_balance,
+               'component': db.insert_component,
+               'institution': db.insert_institution,
+               'location': db.insert_location,
+               'owner': db.insert_owner,
+               'price': db.insert_price}
+
 
 @pytest.fixture
 def test_db_0(tmp_path):
     db_test = tmp_path / "test.db"
     db.execute_script(db_test, db.create_tables)
     db.execute_script(db_test, db.create_views)
+    return db_test
+
+
+@pytest.fixture
+def test_db_2(tmp_path):
+    db_test = tmp_path / "test.db"
+    db.execute_script(db_test, db.create_tables)
+    db.execute_script(db_test, db.create_views)
+    for table_name in insert_dict:
+        db.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=td.db_2[table_name])
     return db_test
 
 
@@ -187,3 +209,12 @@ def test_insert_id_2(test_db_0, table_name, command):
     test_data.update({'id': 2})
     db.execute(database=test_db_0, cmd=command, params=test_data)
     assert db.sql_fetch_one(database=test_db_0, cmd=sql) == test_data
+
+
+# Test views
+def test_view_asset_value_current():
+    pass
+
+
+def test_net_worth(test_db_2):
+    assert db.sql_fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
