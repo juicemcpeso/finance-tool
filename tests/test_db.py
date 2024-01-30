@@ -291,6 +291,11 @@ def test_view_component_value(test_db_2):
     assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
 
 
+def test_allocation_deviation(test_db_2):
+    expected =
+    assert expected == db.sql_fetch_all(database=test_db_2, cmd=db.allocation_deviation)
+
+
 # Test calculations
 def test_net_worth(test_db_2):
     assert db.sql_fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
