@@ -261,7 +261,7 @@ SELECT
     c.asset_id,
     c.asset_class_id,
     c.location_id,
-    c.percentage * v.current_value / (10000 * 100) as current_value
+    c.percentage * v.current_value / 10000 as current_value
 FROM
     component AS c
 JOIN
@@ -396,7 +396,7 @@ JOIN
         current_values.asset_class_id == plan.asset_class_id AND 
         current_values.location_id == plan.location_id 
 WHERE
-    deviation < 0        
+    deviation < 0
 ORDER BY
     deviation ASC
 """

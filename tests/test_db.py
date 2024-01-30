@@ -8,6 +8,7 @@ import db
 import sqlite3
 import pytest
 import tests.test_data as td
+import tests.test_data_deviation as td_deviation
 
 insert_dict = {'account': db.insert_account,
                'account_type': db.insert_account_type,
@@ -30,9 +31,21 @@ def test_db_0(tmp_path):
     return db_test
 
 
+# Use for simplified allocation data
+@pytest.fixture
+def test_db_1(tmp_path):
+    db_test = tmp_path / "test_1.db"
+    db.execute_script(db_test, db.create_tables)
+    db.execute_script(db_test, db.create_views)
+    for table_name in insert_dict:
+        db.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=td.db_1[table_name])
+    return db_test
+
+
+# Use for general testing (has multiple of each item)
 @pytest.fixture
 def test_db_2(tmp_path):
-    db_test = tmp_path / "test.db"
+    db_test = tmp_path / "test_2.db"
     db.execute_script(db_test, db.create_tables)
     db.execute_script(db_test, db.create_views)
     for table_name in insert_dict:
@@ -111,8 +124,6 @@ insert_sequence = {('account', db.insert_account),
                    ('owner', db.insert_owner),
                    ('price', db.insert_price)}
 
-first_lines = {table_name: td.db_1[table_name][0] for table_name in td.db_1}
-
 
 @pytest.mark.parametrize('table_name, command', create_table_sequence)
 def test_create_table(tmp_path, table_name, command):
@@ -187,7 +198,7 @@ def test_create_views_test_db_0(test_db_0):
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = first_lines[table_name]
+    test_data = td.first_lines[table_name][0]
     db.execute(database=test_db_0, cmd=command, params=test_data)
     assert db.sql_fetch_one(database=test_db_0, cmd=sql) == test_data
 
@@ -195,7 +206,7 @@ def test_insert(test_db_0, table_name, command):
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert_no_id(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = first_lines[table_name]
+    test_data = td.first_lines[table_name][0]
     test_data.update({'id': None})
     db.execute(database=test_db_0, cmd=command, params=test_data)
     test_data.update({'id': 1})
@@ -205,7 +216,7 @@ def test_insert_no_id(test_db_0, table_name, command):
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert_id_2(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = first_lines[table_name]
+    test_data = td.first_lines[table_name][0]
     test_data.update({'id': 2})
     db.execute(database=test_db_0, cmd=command, params=test_data)
     assert db.sql_fetch_one(database=test_db_0, cmd=sql) == test_data
@@ -291,9 +302,10 @@ def test_view_component_value(test_db_2):
     assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
 
 
-def test_allocation_deviation(test_db_2):
-    expected = []
-    assert expected == db.sql_fetch_all(database=test_db_2, cmd=db.allocation_deviation)
+def test_allocation_deviation(test_db_1):
+    expected = td_deviation.expected[0]
+
+    assert expected == db.sql_fetch_all(database=test_db_1, cmd=db.allocation_deviation, params={'net_worth': 1000000000})
 
 
 # Test calculations
