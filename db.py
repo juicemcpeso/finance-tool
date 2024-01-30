@@ -224,7 +224,6 @@ GROUP BY
     asset_id
 ;"""
 
-# TODO - test
 create_view_asset_quantity_by_account_current = """
 CREATE VIEW IF NOT EXISTS asset_quantity_by_account_current AS
 SELECT

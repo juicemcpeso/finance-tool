@@ -227,6 +227,18 @@ def test_view_asset_price_newest(test_db_2):
     assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
 
 
+def test_view_asset_quantity_by_account_current(test_db_2):
+    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'quantity': 500000},
+                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'quantity': 1000000},
+                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'quantity': 100000000},
+                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'quantity': 50000000},
+                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 500000},
+                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 200000000}]
+    command = "SELECT * FROM asset_quantity_by_account_current"
+
+    assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
+
+
 # Test calculations
 def test_net_worth(test_db_2):
     assert db.sql_fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
