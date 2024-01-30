@@ -5,7 +5,6 @@
 
 import datetime
 import os
-import portfolio
 import structures
 
 
@@ -59,19 +58,19 @@ class DeleteFile(FileAction):
     def __call__(self):
         os.remove(self.file_path())
 
-
-class LoadFile(FileAction):
-    def __call__(self):
-        self.app.portfolio = portfolio.Portfolio(self.file_path())
+#
+# class LoadFile(FileAction):
+#     def __call__(self):
+#         self.app.portfolio = portfolio.Portfolio(self.file_path())
 
 
 class NewFile(FileAction):
     def __init__(self, app):
         super().__init__(app, 'New')
 
-    def __call__(self):
-        self.file_name = str(input("Enter new portfolio name: "))
-        self.app.portfolio = portfolio.Portfolio(self.file_path())
+    # def __call__(self):
+    #     self.file_name = str(input("Enter new portfolio name: "))
+    #     self.app.portfolio = portfolio.Portfolio(self.file_path())
 
 
 # Add actions

@@ -292,7 +292,7 @@ def test_view_component_value(test_db_2):
 
 
 def test_allocation_deviation(test_db_2):
-    expected =
+    expected = []
     assert expected == db.sql_fetch_all(database=test_db_2, cmd=db.allocation_deviation)
 
 
