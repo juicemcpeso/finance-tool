@@ -73,49 +73,49 @@ def test_add_from_csv(empty_portfolio, portfolio_table_name):
 
 
 # Calculations
-def test_asset_price_newest(test_portfolio):
-    expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 10000},
-                {'asset_id': 2, 'price_date': '2022-01-01', 'amount': 28100},
-                {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 113900},
-                {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 478900},
-                {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 10000}]
-
-    assert expected == test_portfolio.asset_price_newest()
-
-
-def test_account_asset_quantity_current(test_portfolio):
-    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'quantity': 100000},
-                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'quantity': 75000},
-                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'quantity': 100000000},
-                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'quantity': 80000},
-                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 60000},
-                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 60000000}]
-
-    assert expected == test_portfolio.account_asset_quantity_current()
+# def test_asset_price_newest(test_portfolio):
+#     expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 10000},
+#                 {'asset_id': 2, 'price_date': '2022-01-01', 'amount': 28100},
+#                 {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 113900},
+#                 {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 478900},
+#                 {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 10000}]
+#
+#     assert expected == test_portfolio.asset_price_newest()
 
 
-def test_account_value_current_by_asset(test_portfolio):
-    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 4789000},
-                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 854250},
-                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 100000000},
-                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 224800},
-                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 683400},
-                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 60000000}]
+# def test_account_asset_quantity_current(test_portfolio):
+#     expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'quantity': 100000},
+#                 {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'quantity': 75000},
+#                 {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'quantity': 100000000},
+#                 {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'quantity': 80000},
+#                 {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 60000},
+#                 {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 60000000}]
+#
+#     assert expected == test_portfolio.account_asset_quantity_current()
 
-    assert expected == test_portfolio.account_value_current_by_asset()
+
+# def test_account_value_current_by_asset(test_portfolio):
+#     expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 4789000},
+#                 {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 854250},
+#                 {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 100000000},
+#                 {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 224800},
+#                 {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 683400},
+#                 {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 60000000}]
+#
+#     assert expected == test_portfolio.account_value_current_by_asset()
 
 
-def test_account_value_current_by_asset_sum(test_portfolio):
-    assert sum_to_amount(test_portfolio.account_value_current_by_asset, 'current_value', 166551450)
+# def test_account_value_current_by_asset_sum(test_portfolio):
+#     assert sum_to_amount(test_portfolio.account_value_current_by_asset, 'current_value', 166551450)
 
 
 # def test_net_worth(test_portfolio):
 #     expected = {'net_worth': 166551450}
 #     assert expected == test_portfolio.net_worth_dict()
 
-def test_net_worth(test_database):
-    expected = {'net_worth': 166551450}
-    assert expected == test_database.execute(portfolio_db.net_worth)
+# def test_net_worth(test_database):
+#     expected = {'net_worth': 166551450}
+#     assert expected == test_database.execute(portfolio_db.net_worth)
 
 
 # def test_net_worth(test_portfolio):
@@ -189,18 +189,18 @@ def test_asset_quantity(test_portfolio):
     assert expected == test_portfolio.asset_quantity()
 
 
-def test_asset_value_current(test_portfolio):
-    expected = [{'asset_id': 1, 'current_value': 60000000},
-                {'asset_id': 2, 'current_value': 224800},
-                {'asset_id': 3, 'current_value': 1537650},
-                {'asset_id': 4, 'current_value': 4789000},
-                {'asset_id': 5, 'current_value': 100000000}]
-
-    assert expected == test_portfolio.asset_value_current()
-
-
-def test_asset_value_current_sum(test_portfolio):
-    assert sum_to_amount(test_portfolio.asset_value_current, 'current_value', 166551450)
+# def test_asset_value_current(test_portfolio):
+#     expected = [{'asset_id': 1, 'current_value': 60000000},
+#                 {'asset_id': 2, 'current_value': 224800},
+#                 {'asset_id': 3, 'current_value': 1537650},
+#                 {'asset_id': 4, 'current_value': 4789000},
+#                 {'asset_id': 5, 'current_value': 100000000}]
+#
+#     assert expected == test_portfolio.asset_value_current()
+#
+#
+# def test_asset_value_current_sum(test_portfolio):
+#     assert sum_to_amount(test_portfolio.asset_value_current, 'current_value', 166551450)
 
 
 def test_allocation_deviation(test_portfolio_allocation):

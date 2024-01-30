@@ -225,8 +225,16 @@ def test_view_account_value_current_by_asset(test_db_2):
     assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
 
 
-def test_view_asset_value_current():
-    pass
+def test_view_asset_value_current(test_db_2):
+    expected = [{'asset_id': 1, 'current_value': 200000000},
+                {'asset_id': 2, 'current_value': 100000000},
+                {'asset_id': 3, 'current_value': 60000000},
+                {'asset_id': 4, 'current_value': 40000000},
+                {'asset_id': 5, 'current_value': 100000000}]
+
+    command = "SELECT * FROM asset_value_current"
+
+    assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
 
 
 def test_view_asset_price_newest(test_db_2):
