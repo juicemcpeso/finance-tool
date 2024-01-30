@@ -216,5 +216,17 @@ def test_view_asset_value_current():
     pass
 
 
+def test_view_asset_price_newest(test_db_2):
+    expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 10000},
+                {'asset_id': 2, 'price_date': '2022-01-01', 'amount': 20000},
+                {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 400000},
+                {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 800000},
+                {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 10000}]
+    command = "SELECT * FROM asset_price_newest"
+
+    assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
+
+
+# Test calculations
 def test_net_worth(test_db_2):
     assert db.sql_fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
