@@ -249,7 +249,6 @@ ORDER BY
     asset_id
 ;"""
 
-# TODO - test
 create_view_asset_class_value_by_location = """
 CREATE VIEW IF NOT EXISTS asset_class_value_by_location aS
 SELECT

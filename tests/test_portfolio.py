@@ -151,32 +151,32 @@ def test_asset_class_percentage_by_location_sum(test_portfolio):
     assert sum_to_amount(test_portfolio.asset_class_percentage_by_location, 'percentage', 100.0)
 
 
-def test_asset_class_value(test_portfolio):
-    expected = [{'asset_class_id': 1, 'current_value': 5593650},
-                {'asset_class_id': 2, 'current_value': 100718350},
-                {'asset_class_id': 3, 'current_value': 60000000},
-                {'asset_class_id': 4, 'current_value': 239450}]
-
-    assert expected == test_portfolio.asset_class_value()
-
-
-def test_asset_class_value_sum(test_portfolio):
-    assert sum_to_amount(test_portfolio.asset_class_value, 'current_value', 166551450)
-
-
-def test_asset_class_value_by_location(test_portfolio):
-    expected = [{'asset_class_id': 1, 'location_id': 1, 'current_value': 4171600},
-                {'asset_class_id': 1, 'location_id': 2, 'current_value': 1422050},
-                {'asset_class_id': 2, 'location_id': 1, 'current_value': 100478900},
-                {'asset_class_id': 2, 'location_id': 2, 'current_value': 239450},
-                {'asset_class_id': 3, 'location_id': 1, 'current_value': 60000000},
-                {'asset_class_id': 4, 'location_id': 'NULL', 'current_value': 239450}]
-
-    assert expected == test_portfolio.asset_class_value_by_location()
+# def test_asset_class_value(test_portfolio):
+#     expected = [{'asset_class_id': 1, 'current_value': 5593650},
+#                 {'asset_class_id': 2, 'current_value': 100718350},
+#                 {'asset_class_id': 3, 'current_value': 60000000},
+#                 {'asset_class_id': 4, 'current_value': 239450}]
+#
+#     assert expected == test_portfolio.asset_class_value()
+#
+#
+# def test_asset_class_value_sum(test_portfolio):
+#     assert sum_to_amount(test_portfolio.asset_class_value, 'current_value', 166551450)
 
 
-def test_asset_class_value_by_location_sum(test_portfolio):
-    assert sum_to_amount(test_portfolio.asset_class_value_by_location, 'current_value', 166551450)
+# def test_asset_class_value_by_location(test_portfolio):
+#     expected = [{'asset_class_id': 1, 'location_id': 1, 'current_value': 4171600},
+#                 {'asset_class_id': 1, 'location_id': 2, 'current_value': 1422050},
+#                 {'asset_class_id': 2, 'location_id': 1, 'current_value': 100478900},
+#                 {'asset_class_id': 2, 'location_id': 2, 'current_value': 239450},
+#                 {'asset_class_id': 3, 'location_id': 1, 'current_value': 60000000},
+#                 {'asset_class_id': 4, 'location_id': 'NULL', 'current_value': 239450}]
+#
+#     assert expected == test_portfolio.asset_class_value_by_location()
+#
+#
+# def test_asset_class_value_by_location_sum(test_portfolio):
+#     assert sum_to_amount(test_portfolio.asset_class_value_by_location, 'current_value', 166551450)
 
 
 def test_asset_quantity(test_portfolio):

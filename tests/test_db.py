@@ -262,6 +262,19 @@ def test_view_asset_quantity_by_account_current(test_db_2):
     assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
 
 
+def test_view_asset_class_value_by_location(test_db_2):
+    expected = [{'asset_class_id': 1, 'location_id': 1, 'current_value': 82000000},
+                {'asset_class_id': 1, 'location_id': 2, 'current_value': 110000000},
+                {'asset_class_id': 2, 'location_id': 1, 'current_value': 104000000},
+                {'asset_class_id': 2, 'location_id': 2, 'current_value': 2000000},
+                {'asset_class_id': 3, 'location_id': 1, 'current_value': 200000000},
+                {'asset_class_id': 4, 'location_id': None, 'current_value': 2000000}]
+
+    command = "SELECT * FROM asset_class_value_by_location"
+
+    assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
+
+
 # Test calculations
 def test_net_worth(test_db_2):
     assert db.sql_fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
