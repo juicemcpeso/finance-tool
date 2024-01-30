@@ -183,18 +183,6 @@ CREATE TABLE IF NOT EXISTS price (
     FOREIGN KEY(asset_id) REFERENCES asset(id)
 );"""
 
-# create_tables = {create_table_account,
-#                  create_table_account_type,
-#                  create_table_allocation,
-#                  create_table_asset,
-#                  create_table_asset_class,
-#                  create_table_balance,
-#                  create_table_component,
-#                  create_table_institution,
-#                  create_table_location,
-#                  create_table_owner,
-#                  create_table_price}
-
 create_tables = create_table_account + \
                 create_table_account_type + \
                 create_table_allocation + \
@@ -224,7 +212,6 @@ GROUP BY
     b.account_id, b.asset_id
 ;"""
 
-# TODO - test
 create_view_asset_price_newest = """
 CREATE VIEW IF NOT EXISTS asset_price_newest AS
 SELECT
@@ -291,13 +278,6 @@ FROM
 JOIN
     asset_value_current AS v ON c.asset_id = v.asset_id
 ;"""
-
-# create_views = {create_view_account_value_current_by_asset,
-#                 create_view_asset_price_newest,
-#                 create_view_asset_quantity_by_account,
-#                 create_view_asset_value_current,
-#                 create_view_asset_class_value_by_location,
-#                 create_view_component_value}
 
 create_views = create_view_account_value_current_by_asset + \
                create_view_asset_price_newest + \
