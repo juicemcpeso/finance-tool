@@ -212,6 +212,19 @@ def test_insert_id_2(test_db_0, table_name, command):
 
 
 # Test views
+def test_view_account_value_current_by_asset(test_db_2):
+    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 40000000},
+                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 40000000},
+                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 100000000},
+                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 100000000},
+                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 20000000},
+                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 200000000}]
+
+    command = "SELECT * FROM account_value_current_by_asset"
+
+    assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
+
+
 def test_view_asset_value_current():
     pass
 
@@ -222,6 +235,7 @@ def test_view_asset_price_newest(test_db_2):
                 {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 400000},
                 {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 800000},
                 {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 10000}]
+
     command = "SELECT * FROM asset_price_newest"
 
     assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
@@ -234,6 +248,7 @@ def test_view_asset_quantity_by_account_current(test_db_2):
                 {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'quantity': 50000000},
                 {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 500000},
                 {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 200000000}]
+
     command = "SELECT * FROM asset_quantity_by_account_current"
 
     assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)

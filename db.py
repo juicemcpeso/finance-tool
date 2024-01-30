@@ -196,7 +196,6 @@ create_tables = create_table_account + \
                 create_table_price
 
 # CREATE - views
-# TODO - test
 create_view_account_value_current_by_asset = """
 CREATE VIEW IF NOT EXISTS account_value_current_by_asset AS
 SELECT 
