@@ -261,7 +261,6 @@ GROUP BY
     asset_class_id, location_id
 ;"""
 
-# TODO - test
 create_view_component_value = """
 CREATE VIEW IF NOT EXISTS component_value AS
 SELECT
