@@ -364,6 +364,7 @@ drop_tables = {drop_table_account,
                drop_table_owner,
                drop_table_price}
 
+# TODO - test
 # DROP - views
 drop_view_account_value_current_by_asset = """
 DROP VIEW IF EXISTS account_value_current_by_asset
@@ -396,6 +397,7 @@ drop_views = {drop_view_account_value_current_by_asset,
               drop_view_asset_value_current,
               drop_view_component_value}
 
+# TODO - test
 # INSERT
 insert_account = """
 INSERT INTO account(id, name, account_type_id, institution_id, owner_id) 
@@ -452,6 +454,7 @@ INSERT INTO price(id, asset_id, price_date, amount)
 VALUES(:id, :asset_id, :price_date, :amount)
 """
 
+# TODO - test
 # SELECT
 select_account = """
 SELECT * FROM account
@@ -500,15 +503,18 @@ SELECT * FROM price
 
 # Calculations
 # Accounts
+# TODO - test
 account_asset_quantity_current = """
 SELECT * FROM asset_quantity_by_account_current
 """
 
+# TODO - test
 account_value_current_by_asset = """
 SELECT * FROM account_value_current_by_asset 
 """
 
 # Allocation
+# TODO - test
 allocation_deviation = """
 SELECT
     plan.asset_class_id,
@@ -531,10 +537,12 @@ ORDER BY
 """
 
 # Assets
+# TODO - test
 asset_price_newest = """
 SELECT * FROM asset_price_newest
 """
 
+# TODO - test
 asset_quantity = """
 SELECT
     asset_id,
@@ -547,11 +555,13 @@ ORDER BY
     asset_id
 """
 
+# TODO - test
 asset_value_current = """
 SELECT * FROM asset_value_current
 """
 
 # Asset class
+# TODO - test
 asset_class_percentage = """
 SELECT
     asset_class_id, 
@@ -562,6 +572,7 @@ GROUP BY
     asset_class_id
 """
 
+# TODO - test
 asset_class_percentage_by_location = """
 SELECT
     asset_class_id, 
@@ -573,6 +584,7 @@ GROUP BY
     asset_class_id, location_id
 """
 
+# TODO - test
 asset_class_value = """
 SELECT
     asset_class_id, 
@@ -583,11 +595,13 @@ GROUP BY
     asset_class_id
 """
 
+# TODO - test
 asset_class_value_by_location = """
 SELECT * FROM asset_class_value_by_location
 """
 
 # Net worth
+# TODO - test
 net_worth = """
 SELECT 
     SUM(current_values.current_value) AS net_worth

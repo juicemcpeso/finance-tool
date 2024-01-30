@@ -19,24 +19,24 @@ def test_db_0(tmp_path):
 
 
 # TODO - remove once no longer needed
-def csv_to_dict(directory):
-    test_dict = {}
-    for table_name_tuple in create_table_sequence:
-        table_name = table_name_tuple[0]
-        file_path = directory + table_name + '.csv'
-        test_dict.update({table_name: list(csv.DictReader(open(file_path)))})
-    return test_dict
-
-
-def print_csv_as_dict(directory):
-    test_dict = csv_to_dict(directory)
-    for key in sorted(test_dict):
-        print(f"\'{key}\': {test_dict[key]},")
-    assert True
-
-
-def test_print_csv():
-    print_csv_as_dict('./old_test_data/')
+# def csv_to_dict(directory):
+#     test_dict = {}
+#     for table_name_tuple in create_table_sequence:
+#         table_name = table_name_tuple[0]
+#         file_path = directory + table_name + '.csv'
+#         test_dict.update({table_name: list(csv.DictReader(open(file_path)))})
+#     return test_dict
+#
+#
+# def print_csv_as_dict(directory):
+#     test_dict = csv_to_dict(directory)
+#     for key in sorted(test_dict):
+#         print(f"\'{key}\': {test_dict[key]},")
+#     assert True
+#
+#
+# def test_print_csv():
+#     print_csv_as_dict('./old_test_data/')
 
 
 table_names = {'account',
