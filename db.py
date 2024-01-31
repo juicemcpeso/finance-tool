@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS asset (
 create_table_asset_class = """
 CREATE TABLE IF NOT EXISTS asset_class (
     id INTEGER PRIMARY KEY,
-    name TEXT
+    name TEXT NOT NULL
 );"""
 
 create_table_balance = """
