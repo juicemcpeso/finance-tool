@@ -102,16 +102,3 @@ expected = {0: [{'asset_class_id': 1,
                       'plan_value': 200000000,
                       'deviation': -3000,
                       'contribution': 60000000}]}
-
-#
-# expected_no_contribution = copy.copy(expected)
-# for key in expected_no_contribution:
-#     for line in expected_no_contribution[key]:
-#         print(line)
-#         expected_no_contribution.update({'contribution': 0})
-#
-# {'asset_class_id':,'location_id':,'current_value':,'plan_percent':,'plan_value':,'deviation':,'contribution':},
-# {'asset_class_id':,'location_id':,'current_value':,'plan_percent':,'plan_value':,'deviation':,'contribution':}]}
-#
-
-# {'asset_class_id':,'location_id':,'current_value':,'plan_percent':,'plan_value':,'deviation':,'contribution':},
