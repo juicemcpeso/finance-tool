@@ -38,7 +38,10 @@ def execute_many(database, cmd, data_sequence):
     """Execute a single command multiple times with different data"""
     con = sqlite3.connect(database)
     cur = con.cursor()
-    cur.executemany(cmd, data_sequence)
+    try:
+        cur.executemany(cmd, data_sequence)
+    except sqlite3.IntegrityError:
+        pass
     con.commit()
     con.close()
 
@@ -101,13 +104,12 @@ CREATE TABLE IF NOT EXISTS account (
 create_table_account_type = """
 CREATE TABLE IF NOT EXISTS account_type (
     id INTEGER PRIMARY KEY,
-    name TEXT,
+    name TEXT NOT NULL,
     tax_in INTEGER,
     tax_growth INTEGER,
     tax_out INTEGER, 
     
-    CHECK ( name IS NOT NULL 
-        AND tax_in IN (0, 1)
+    CHECK (tax_in IN (0, 1)
         AND tax_growth IN (0, 1)
         AND tax_out IN (0, 1))
 );"""
@@ -117,9 +119,11 @@ CREATE TABLE IF NOT EXISTS allocation (
     id INTEGER PRIMARY KEY,
     asset_class_id INTEGER,
     location_id INTEGER,
-    percentage INTEGER,
+    percentage INTEGER NOT NULL,
     FOREIGN KEY(asset_class_id) REFERENCES asset_class(id),
     FOREIGN KEY(location_id) REFERENCES location(id)
+    
+    CHECK (percentage BETWEEN 0 AND 10000)
 );"""
 
 create_table_asset = """
@@ -156,6 +160,8 @@ CREATE TABLE IF NOT EXISTS component (
     FOREIGN KEY(asset_id) REFERENCES asset(id),
     FOREIGN KEY(asset_class_id) REFERENCES asset_class(id),
     FOREIGN KEY(location_id) REFERENCES location(id)
+    
+    CHECK (percentage BETWEEN 0 AND 10000)
 );"""
 
 create_table_institution = """
@@ -283,6 +289,82 @@ create_views = create_view_account_value_current_by_asset + \
                create_view_asset_value_current + \
                create_view_asset_class_value_by_location + \
                create_view_component_value
+
+# create_trigger_convert_decimal_allocation = """
+# CREATE TRIGGER IF NOT EXISTS convert_decimal BEFORE INSERT ON allocation
+#
+# BEGIN
+#     WHEN TYPEOF(NEW.percentage) = "real" OR TYPEOF(NEW.percentage) == "integer"
+#         NEW.percentage = ROUND(NEW.percentage * 10000)
+#         --INSERT INTO allocation(percentage)
+#         --VALUES(ROUND(NEW.percentage * 10000));
+# END
+# ;"""
+
+# create_trigger_convert_decimal_allocation = """
+# CREATE TRIGGER IF NOT EXISTS convert_decimal BEFORE INSERT ON allocation
+#
+# BEGIN
+# SELECT
+#     CASE
+#         WHEN TYPEOF(NEW.percentage) = "real" OR TYPEOF(NEW.percentage) == "integer" THEN
+#             INSERT INTO allocation(percentage)
+#             VALUES(ROUND(NEW.percentage * 10000));
+#     END;
+# END
+# ;"""
+
+# create_trigger_convert_decimal_allocation = """
+# CREATE TRIGGER IF NOT EXISTS convert_decimal AFTER INSERT ON allocation
+# BEGIN
+#     UPDATE allocation SET percentage = ROUND(percentage * 10000);
+# END
+# ;"""
+
+# create_trigger_convert_decimal_allocation = """
+# CREATE TRIGGER IF NOT EXISTS convert_decimal_allocation AFTER INSERT ON allocation
+# BEGIN
+#     UPDATE allocation SET percentage = ROUND(percentage * 10000);
+# END
+# ;"""
+#
+# create_trigger_convert_decimal_component = """
+# CREATE TRIGGER IF NOT EXISTS convert_decimal_component AFTER INSERT ON component
+# BEGIN
+#     UPDATE component SET percentage = ROUND(percentage * 10000);
+# END
+# ;"""
+
+# create_trigger_convert_decimal_allocation = """
+# CREATE TRIGGER IF NOT EXISTS convert_decimal BEFORE INSERT ON allocation
+# WHEN TYPEOF(NEW.percentage) = "real" OR TYPEOF(NEW.percentage) == "integer"
+# BEGIN
+#     ROUND(NEW.percentage * 10000)
+# END;
+# ;"""
+
+# create_trigger_convert_decimal_allocation = """
+# CREATE TRIGGER IF NOT EXISTS convert_decimal BEFORE INSERT ON allocation
+# BEGIN
+#     INSERT INTO allocation(percentage)
+#     VALUES(ROUND(NEW.percentage * 10000));
+# END
+# ;"""
+create_trigger_convert_decimal_allocation = """
+CREATE TRIGGER IF NOT EXISTS convert_decimal_allocation AFTER INSERT ON allocation
+BEGIN
+    UPDATE allocation SET percentage = ROUND(percentage * 10000) WHERE id = NEW.id;
+END
+;"""
+
+create_trigger_convert_decimal_component = """
+CREATE TRIGGER IF NOT EXISTS convert_decimal_component AFTER INSERT ON component 
+BEGIN
+    UPDATE component SET percentage = ROUND(percentage * 10000) WHERE id = NEW.id;
+END
+;"""
+
+create_triggers = create_trigger_convert_decimal_allocation + create_trigger_convert_decimal_component
 
 # INSERT
 insert_account = """

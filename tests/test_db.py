@@ -138,7 +138,7 @@ def test_create_table_columns(tmp_path, table_name, command):
 
     sql = f"SELECT * FROM {table_name}"
 
-    assert db.column_names(database=db_test, cmd=sql) == list(td.db_1[table_name][0].keys())
+    assert db.column_names(database=db_test, cmd=sql) == list(td.db_1_entry[table_name][0].keys())
 
 
 def test_create_tables(tmp_path):
@@ -194,35 +194,38 @@ def test_create_views_test_db_0(test_db_0):
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = td.first_lines[table_name][0]
+    test_data = td.first_lines_entry[table_name][0]
     db.execute(database=test_db_0, cmd=command, params=test_data)
-    assert db.fetch_one(database=test_db_0, cmd=sql) == test_data
+    assert db.fetch_one(database=test_db_0, cmd=sql) == td.first_lines_response[table_name][0]
 
 
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert_no_id(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = td.first_lines[table_name][0]
+    test_data = td.first_lines_entry[table_name][0]
     test_data.update({'id': None})
     db.execute(database=test_db_0, cmd=command, params=test_data)
     test_data.update({'id': 1})
-    assert db.fetch_one(database=test_db_0, cmd=sql) == test_data
+    assert db.fetch_one(database=test_db_0, cmd=sql) == td.first_lines_response[table_name][0]
 
 
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert_id_2(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = td.first_lines[table_name][0]
+    test_data = td.first_lines_entry[table_name][0]
     test_data.update({'id': 2})
     db.execute(database=test_db_0, cmd=command, params=test_data)
-    assert db.fetch_one(database=test_db_0, cmd=sql) == test_data
+    response = td.first_lines_response[table_name][0]
+    response.update({'id': 2})
+    assert db.fetch_one(database=test_db_0, cmd=sql) == response
 
 
 # Test select
 @pytest.mark.parametrize('table_name, command', select_sequence)
 def test_select(test_db_2, table_name, command):
-    expected = td.db_2[table_name]
-    assert expected == db.fetch_all(database=test_db_2, cmd=command)
+    expected = td.db_2_response[table_name]
+    print(expected)
+    assert db.fetch_all(database=test_db_2, cmd=command) == expected
 
 
 # Test views
