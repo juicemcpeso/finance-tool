@@ -308,6 +308,17 @@ def test_allocation_deviation(test_db_1):
     assert expected == db.sql_fetch_all(database=test_db_1, cmd=db.allocation_deviation, params={'net_worth': 1000000000})
 
 
+@pytest.mark.parametrize('contribution', [0, 1000, 10000, 100000])
+def test_allocation_deviation(test_db_1, contribution):
+    expected = td_deviation.expected[contribution]
+    for line in expected:
+        line.update({'contribution': 0})
+
+    assert expected == db.sql_fetch_all(database=test_db_1,
+                                        cmd=db.allocation_deviation,
+                                        params={'net_worth': (1000000000 + contribution * 10000)})
+
+
 # Test calculations
 def test_net_worth(test_db_2):
     assert db.sql_fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
