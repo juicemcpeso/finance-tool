@@ -129,8 +129,8 @@ CREATE TABLE IF NOT EXISTS allocation (
 create_table_asset = """
 CREATE TABLE IF NOT EXISTS asset (
     id INTEGER PRIMARY KEY,
-    name TEXT,
-    symbol TEXT
+    name TEXT NOT NULL,
+    symbol TEXT NOT NULL
 );"""
 
 create_table_asset_class = """
