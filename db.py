@@ -50,7 +50,7 @@ def execute_script(database, cmd):
 
 
 # TODO - test
-def sql_fetch_one(database, cmd, params=None):
+def fetch_one(database, cmd, params=None):
     con = sqlite3.connect(database)
     con.row_factory = dict_factory
     cur = con.cursor()
@@ -61,7 +61,7 @@ def sql_fetch_one(database, cmd, params=None):
 
 
 # TODO - test
-def sql_fetch_all(database, cmd, params=None):
+def fetch_all(database, cmd, params=None):
     con = sqlite3.connect(database)
     con.row_factory = dict_factory
     cur = con.cursor()
