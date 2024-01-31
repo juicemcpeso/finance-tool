@@ -24,7 +24,11 @@ def execute(database, cmd, params=None):
     """Execute a single command"""
     con = sqlite3.connect(database)
     cur = con.cursor()
-    cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+    try:
+        cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+    except sqlite3.IntegrityError:
+        pass
+
     con.commit()
     con.close()
 
@@ -89,7 +93,7 @@ CREATE TABLE IF NOT EXISTS account (
     account_type_id INTEGER,
     institution_id INTEGER,
     owner_id INTEGER,
-    FOREIGN KEY(account_type_id) REFERENCES account_type(id)
+    FOREIGN KEY(account_type_id) REFERENCES account_type(id),
     FOREIGN KEY(owner_id) REFERENCES owner(id),
     FOREIGN KEY(institution_id) REFERENCES institution(id)
 );"""
@@ -100,7 +104,12 @@ CREATE TABLE IF NOT EXISTS account_type (
     name TEXT,
     tax_in INTEGER,
     tax_growth INTEGER,
-    tax_out INTEGER
+    tax_out INTEGER, 
+    
+    CHECK ( name IS NOT NULL 
+        AND tax_in IN (0, 1)
+        AND tax_growth IN (0, 1)
+        AND tax_out IN (0, 1))
 );"""
 
 create_table_allocation = """

@@ -5,8 +5,11 @@
 
 import db
 import pytest
+import sqlite3
+
 import tests.test_data as td
 import tests.test_data_deviation as td_deviation
+import tests.test_data_constraints as td_constraints
 
 # TODO - remove once no longer needed
 # def csv_to_dict(directory):
@@ -90,6 +93,31 @@ select_sequence = {('account', db.select_account),
                    ('location', db.select_location),
                    ('owner', db.select_owner),
                    ('price', db.select_price)}
+
+insert_dict = {'account': db.insert_account,
+               'account_type': db.insert_account_type,
+               'allocation': db.insert_allocation,
+               'asset': db.insert_asset,
+               'asset_class': db.insert_asset_class,
+               'balance': db.insert_balance,
+               'component': db.insert_component,
+               'institution': db.insert_institution,
+               'location': db.insert_location,
+               'owner': db.insert_owner,
+               'price': db.insert_price}
+
+
+select_dict = {'account': db.select_account,
+               'account_type': db.select_account_type,
+               'allocation': db.select_allocation,
+               'asset': db.select_asset,
+               'asset_class': db.select_asset_class,
+               'balance': db.select_balance,
+               'component': db.select_component,
+               'institution': db.select_institution,
+               'location': db.select_location,
+               'owner': db.select_owner,
+               'price': db.select_price}
 
 
 @pytest.mark.parametrize('table_name, command', create_table_sequence)
@@ -299,3 +327,10 @@ def test_allocation_deviation(test_db_1, contribution):
 # Test calculations
 def test_net_worth(test_db_2):
     assert db.fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
+
+
+@pytest.mark.parametrize('table_name, expected', td_constraints.formatted_expected)
+def test_constraints(test_db_0, table_name, expected):
+    db.execute(database=test_db_0, cmd=insert_dict[table_name], params=expected)
+
+    assert db.fetch_all(database=test_db_0, cmd=select_dict[table_name]) == []
