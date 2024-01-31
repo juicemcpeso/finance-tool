@@ -331,7 +331,6 @@ INSERT INTO price(id, asset_id, price_date, amount)
 VALUES(:id, :asset_id, :price_date, :amount)
 """
 
-# TODO - test?
 # SELECT
 select_account = """
 SELECT * FROM account
@@ -379,7 +378,6 @@ SELECT * FROM price
 
 # Calculations
 # Allocation
-# TODO - test
 allocation_deviation = """
 SELECT
     plan.asset_class_id,

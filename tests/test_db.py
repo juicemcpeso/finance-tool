@@ -124,6 +124,18 @@ insert_sequence = {('account', db.insert_account),
                    ('owner', db.insert_owner),
                    ('price', db.insert_price)}
 
+select_sequence = {('account', db.select_account),
+                   ('account_type', db.select_account_type),
+                   ('allocation', db.select_allocation),
+                   ('asset', db.select_asset),
+                   ('asset_class', db.select_asset_class),
+                   ('balance', db.select_balance),
+                   ('component', db.select_component),
+                   ('institution', db.select_institution),
+                   ('location', db.select_location),
+                   ('owner', db.select_owner),
+                   ('price', db.select_price)}
+
 
 @pytest.mark.parametrize('table_name, command', create_table_sequence)
 def test_create_table(tmp_path, table_name, command):
@@ -195,6 +207,7 @@ def test_create_views_test_db_0(test_db_0):
     assert set(line['name'] for line in result_list) == view_names
 
 
+# Test - insert
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
@@ -220,6 +233,13 @@ def test_insert_id_2(test_db_0, table_name, command):
     test_data.update({'id': 2})
     db.execute(database=test_db_0, cmd=command, params=test_data)
     assert db.sql_fetch_one(database=test_db_0, cmd=sql) == test_data
+
+
+# Test select
+@pytest.mark.parametrize('table_name, command', select_sequence)
+def test_select(test_db_2, table_name, command):
+    expected = td.db_2[table_name]
+    assert expected == db.sql_fetch_all(database=test_db_2, cmd=command)
 
 
 # Test views
@@ -305,7 +325,9 @@ def test_view_component_value(test_db_2):
 def test_allocation_deviation(test_db_1):
     expected = td_deviation.expected[0]
 
-    assert expected == db.sql_fetch_all(database=test_db_1, cmd=db.allocation_deviation, params={'net_worth': 1000000000})
+    assert expected == db.sql_fetch_all(database=test_db_1,
+                                        cmd=db.allocation_deviation,
+                                        params={'net_worth': 1000000000})
 
 
 @pytest.mark.parametrize('contribution', [0, 1000, 10000, 100000])
