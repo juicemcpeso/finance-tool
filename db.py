@@ -92,7 +92,7 @@ def column_names(database, cmd):
 create_table_account = """
 CREATE TABLE IF NOT EXISTS account (
     id INTEGER PRIMARY KEY,
-    name TEXT,
+    name TEXT NOT NULL,
     account_type_id INTEGER,
     institution_id INTEGER,
     owner_id INTEGER,
