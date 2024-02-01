@@ -184,8 +184,11 @@ CREATE TABLE IF NOT EXISTS location (
 create_table_owner = """
 CREATE TABLE IF NOT EXISTS owner (
     id INTEGER PRIMARY KEY,
-    name TEXT,
+    name TEXT NOT NULL,
     birthday TEXT
+    
+    CHECK (TYPEOF(birthday) IS "text")
+    CHECK (birthday IS strftime('%Y-%m-%d', birthday))   
 );"""
 
 create_table_price = """
@@ -384,9 +387,17 @@ BEGIN
 END
 ;"""
 
+create_trigger_convert_decimal_owner = """
+CREATE TRIGGER IF NOT EXISTS convert_decimal_owner AFTER INSERT ON owner 
+BEGIN
+    UPDATE owner SET birthday = date(birthday, '0 days') WHERE id = NEW.id;
+END
+;"""
+
 create_triggers = create_trigger_convert_decimal_allocation + \
                   create_trigger_convert_decimal_balance + \
                   create_trigger_convert_decimal_component + \
+                  create_trigger_convert_decimal_owner + \
                   create_trigger_convert_decimal_price
 
 # INSERT
