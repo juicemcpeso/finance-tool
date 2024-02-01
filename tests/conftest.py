@@ -22,6 +22,7 @@ def test_db_0(tmp_path):
     db_test = tmp_path / "test.db"
     db.execute_script(db_test, db.create_tables)
     db.execute_script(db_test, db.create_views)
+    db.execute_script(database=db_test, cmd=db.create_triggers)
     return db_test
 
 
@@ -31,8 +32,10 @@ def test_db_1(tmp_path):
     db_test = tmp_path / "test_1.db"
     db.execute_script(db_test, db.create_tables)
     db.execute_script(db_test, db.create_views)
+    db.execute_script(database=db_test, cmd=db.create_triggers)
     for table_name in insert_dict:
-        db.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=td.db_1[table_name])
+        db.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=td.db_1_entry[table_name])
+
     return db_test
 
 
@@ -42,8 +45,9 @@ def test_db_2(tmp_path):
     db_test = tmp_path / "test_2.db"
     db.execute_script(db_test, db.create_tables)
     db.execute_script(db_test, db.create_views)
+    db.execute_script(database=db_test, cmd=db.create_triggers)
     for table_name in insert_dict:
-        db.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=td.db_2[table_name])
+        db.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=td.db_2_entry[table_name])
     return db_test
 
 

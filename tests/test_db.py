@@ -5,8 +5,11 @@
 
 import db
 import pytest
+import sqlite3
+
 import tests.test_data as td
 import tests.test_data_deviation as td_deviation
+import tests.test_data_constraints as td_constraints
 
 # TODO - remove once no longer needed
 # def csv_to_dict(directory):
@@ -91,6 +94,31 @@ select_sequence = {('account', db.select_account),
                    ('owner', db.select_owner),
                    ('price', db.select_price)}
 
+insert_dict = {'account': db.insert_account,
+               'account_type': db.insert_account_type,
+               'allocation': db.insert_allocation,
+               'asset': db.insert_asset,
+               'asset_class': db.insert_asset_class,
+               'balance': db.insert_balance,
+               'component': db.insert_component,
+               'institution': db.insert_institution,
+               'location': db.insert_location,
+               'owner': db.insert_owner,
+               'price': db.insert_price}
+
+
+select_dict = {'account': db.select_account,
+               'account_type': db.select_account_type,
+               'allocation': db.select_allocation,
+               'asset': db.select_asset,
+               'asset_class': db.select_asset_class,
+               'balance': db.select_balance,
+               'component': db.select_component,
+               'institution': db.select_institution,
+               'location': db.select_location,
+               'owner': db.select_owner,
+               'price': db.select_price}
+
 
 @pytest.mark.parametrize('table_name, command', create_table_sequence)
 def test_create_table(tmp_path, table_name, command):
@@ -110,7 +138,7 @@ def test_create_table_columns(tmp_path, table_name, command):
 
     sql = f"SELECT * FROM {table_name}"
 
-    assert db.column_names(database=db_test, cmd=sql) == list(td.db_1[table_name][0].keys())
+    assert db.column_names(database=db_test, cmd=sql) == list(td.db_1_entry[table_name][0].keys())
 
 
 def test_create_tables(tmp_path):
@@ -166,35 +194,38 @@ def test_create_views_test_db_0(test_db_0):
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = td.first_lines[table_name][0]
+    test_data = td.first_lines_entry[table_name][0]
     db.execute(database=test_db_0, cmd=command, params=test_data)
-    assert db.fetch_one(database=test_db_0, cmd=sql) == test_data
+    assert db.fetch_one(database=test_db_0, cmd=sql) == td.first_lines_response[table_name][0]
 
 
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert_no_id(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = td.first_lines[table_name][0]
+    test_data = td.first_lines_entry[table_name][0]
     test_data.update({'id': None})
     db.execute(database=test_db_0, cmd=command, params=test_data)
     test_data.update({'id': 1})
-    assert db.fetch_one(database=test_db_0, cmd=sql) == test_data
+    assert db.fetch_one(database=test_db_0, cmd=sql) == td.first_lines_response[table_name][0]
 
 
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert_id_2(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = td.first_lines[table_name][0]
+    test_data = td.first_lines_entry[table_name][0]
     test_data.update({'id': 2})
     db.execute(database=test_db_0, cmd=command, params=test_data)
-    assert db.fetch_one(database=test_db_0, cmd=sql) == test_data
+    response = td.first_lines_response[table_name][0]
+    response.update({'id': 2})
+    assert db.fetch_one(database=test_db_0, cmd=sql) == response
 
 
 # Test select
 @pytest.mark.parametrize('table_name, command', select_sequence)
 def test_select(test_db_2, table_name, command):
-    expected = td.db_2[table_name]
-    assert expected == db.fetch_all(database=test_db_2, cmd=command)
+    expected = td.db_2_response[table_name]
+    print(expected)
+    assert db.fetch_all(database=test_db_2, cmd=command) == expected
 
 
 # Test views
@@ -299,3 +330,10 @@ def test_allocation_deviation(test_db_1, contribution):
 # Test calculations
 def test_net_worth(test_db_2):
     assert db.fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
+
+
+@pytest.mark.parametrize('table_name, expected', td_constraints.formatted_expected)
+def test_constraints(test_db_0, table_name, expected):
+    db.execute(database=test_db_0, cmd=insert_dict[table_name], params=expected)
+
+    assert db.fetch_all(database=test_db_0, cmd=select_dict[table_name]) == []

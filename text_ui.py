@@ -71,55 +71,20 @@ def user_input(input_type, label):
     else:
         response = input_dict['input'](label)
 
-    return response if input_dict['verify'](response) else None
+    return response
 
 
 def input_bool(label):
     return input(f"Input {label} (t = true, f = false): ")
 
 
-def format_bool(response):
-    lowered_response = response.lower()
-    format_dict = {'t': True,
-                   'f': False}
-    return format_dict[lowered_response] if lowered_response in format_dict else response
-
-
-def verify_bool(response):
-    return True if response in {True, False} else False
-
-
 def input_date(label):
     return input(f"Input {label} in YYYY-MM-DD format: ")
-
-
-def verify_date(response):
-    try:
-        datetime.date.fromisoformat(response)
-    except ValueError:
-        return False
-    else:
-        return True
-
-
-# TODO - test
-# TODO - is this where I want to convert to the decimal form? That should be a function in the app module
-def user_input_number(label):
-    pass
-
-
-# TODO - may need to split this into price and shares
-def verify_number(response):
-    pass
 
 
 # TODO - test
 def input_text(label):
     return input(f"Input {label}: ")
-
-
-def verify_text(response):
-    return isinstance(response, str)
 
 
 # User - selection
@@ -135,8 +100,5 @@ def user_selection(option_list):
                 return option_list[option_number]
 
 
-input_lookup = {'bool': {'input': input_bool,
-                         'format': format_bool,
-                         'verify': verify_bool},
-                'date': {'input': input_date,
-                         'verify': verify_date}}
+input_lookup = {'bool': {'input': input_bool},
+                'date': {'input': input_date}}
