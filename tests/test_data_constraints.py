@@ -21,6 +21,30 @@ expected = [{'table': 'account',
             {'table': 'asset',
              'expected': {'id': None, 'name': None, 'symbol': 'TEST'}},
             {'table': 'asset_class',
-             'expected': {'id': None, 'name': None}}]
+             'expected': {'id': None, 'name': None}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 6, 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'test', 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'April 16, 2023', 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2024-15-43', 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': None, 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': None}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01',
+                          'quantity': 'test'}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': ''}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': -123}},
+            ]
 
 formatted_expected = [(line['table'], line['expected']) for line in expected]
+
+# This test does not work, as per SQLite - https://sqlite.org/forum/forumpost/4881adaae991d922
+# {'table': 'balance',
+# 'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2023-02-29', 'quantity': 1}}

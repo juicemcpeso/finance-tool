@@ -144,10 +144,15 @@ CREATE TABLE IF NOT EXISTS balance (
     id INTEGER PRIMARY KEY,
     account_id INTEGER,
     asset_id INTEGER,
-    balance_date TEXT,
-    quantity INT,
+    balance_date TEXT NOT NULL,
+    quantity INT NOT NULL,
     FOREIGN KEY(account_id) REFERENCES account(id),
     FOREIGN KEY(asset_id) REFERENCES asset(id)
+    
+    CHECK (TYPEOF(balance_date) IS "text")
+    CHECK (balance_date IS strftime('%Y-%m-%d', balance_date))   
+    CHECK (TYPEOF(quantity) IS "integer" OR TYPEOF(quantity) IS "real")
+    CHECK (quantity >= 0)
 );"""
 
 create_table_component = """
@@ -357,6 +362,14 @@ BEGIN
 END
 ;"""
 
+create_trigger_convert_decimal_balance = """
+CREATE TRIGGER IF NOT EXISTS convert_decimal_balance AFTER INSERT ON balance 
+BEGIN
+    UPDATE balance SET quantity = ROUND(quantity * 10000) WHERE id = NEW.id;
+    UPDATE balance SET balance_date = date(balance_date, '0 days') WHERE id = NEW.id;
+END
+;"""
+
 create_trigger_convert_decimal_component = """
 CREATE TRIGGER IF NOT EXISTS convert_decimal_component AFTER INSERT ON component 
 BEGIN
@@ -364,7 +377,17 @@ BEGIN
 END
 ;"""
 
-create_triggers = create_trigger_convert_decimal_allocation + create_trigger_convert_decimal_component
+create_trigger_convert_decimal_price = """
+CREATE TRIGGER IF NOT EXISTS convert_decimal_price AFTER INSERT ON price
+BEGIN
+    UPDATE price SET amount = ROUND(amount * 10000) WHERE id = NEW.id;
+END
+;"""
+
+create_triggers = create_trigger_convert_decimal_allocation + \
+                  create_trigger_convert_decimal_balance + \
+                  create_trigger_convert_decimal_component + \
+                  create_trigger_convert_decimal_price
 
 # INSERT
 insert_account = """
