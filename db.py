@@ -198,6 +198,10 @@ CREATE TABLE IF NOT EXISTS price (
     price_date TEXT,
     amount INT,
     FOREIGN KEY(asset_id) REFERENCES asset(id)
+    
+    CHECK (TYPEOF(price_date) IS "text")
+    CHECK (price_date IS strftime('%Y-%m-%d', price_date))   
+    CHECK (TYPEOF(amount) IS "integer" OR TYPEOF(amount) IS "real")
 );"""
 
 create_tables = create_table_account + \
