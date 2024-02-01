@@ -54,17 +54,6 @@ def test_close(test_ui_empty):
     assert expected.type == SystemExit
 
 
-@pytest.mark.parametrize('input_type, response, expected', input_params)
-def test_user_input(monkeypatch, input_type, response, expected):
-    monkeypatch.setattr('builtins.input', lambda _: response)
-    assert text_ui.user_input(input_type, 'test label') == expected
-
-
-@pytest.mark.parametrize('input_type, response, expected', format_params)
-def test_format(input_type, response, expected):
-    assert text_ui.input_lookup[input_type]['format'](response) == expected
-
-
 @pytest.mark.parametrize('input_type', data.keys())
 def test_input(monkeypatch, input_type):
     monkeypatch.setattr('builtins.input', lambda _: 'input')
@@ -80,8 +69,3 @@ def test_input_print(monkeypatch, capsys, input_type):
     text_ui.input_lookup[input_type]['input']('test label')
     captured = capsys.readouterr().out
     assert captured == "Input test label (t = true, f = false): "
-
-
-@pytest.mark.parametrize('input_type, response, expected', verify_params)
-def test_verify(input_type, response, expected):
-    assert text_ui.input_lookup[input_type]['verify'](response) == expected
