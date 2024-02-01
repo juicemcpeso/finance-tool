@@ -41,7 +41,14 @@ expected = [{'table': 'account',
              'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': ''}},
             {'table': 'balance',
              'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': -123}},
-            ]
+            {'table': 'component',
+             'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.01}},
+            {'table': 'component',
+             'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': -0.01}},
+            {'table': 'institution',
+             'expected': {'id': None, 'name': None}},
+            {'table': 'location',
+             'expected': {'id': None, 'name': None}}]
 
 formatted_expected = [(line['table'], line['expected']) for line in expected]
 

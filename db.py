@@ -172,13 +172,13 @@ CREATE TABLE IF NOT EXISTS component (
 create_table_institution = """
 CREATE TABLE IF NOT EXISTS institution(
     id INTEGER PRIMARY KEY,
-    name TEXT
+    name TEXT NOT NULL
 );"""
 
 create_table_location = """
 CREATE TABLE IF NOT EXISTS location (
     id INTEGER PRIMARY KEY,
-    name TEXT
+    name TEXT NOT NULL
 );"""
 
 create_table_owner = """
