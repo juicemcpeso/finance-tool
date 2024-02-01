@@ -302,107 +302,47 @@ create_views = create_view_account_value_current_by_asset + \
                create_view_asset_class_value_by_location + \
                create_view_component_value
 
-# create_trigger_convert_decimal_allocation = """
-# CREATE TRIGGER IF NOT EXISTS convert_decimal BEFORE INSERT ON allocation
-#
-# BEGIN
-#     WHEN TYPEOF(NEW.percentage) = "real" OR TYPEOF(NEW.percentage) == "integer"
-#         NEW.percentage = ROUND(NEW.percentage * 10000)
-#         --INSERT INTO allocation(percentage)
-#         --VALUES(ROUND(NEW.percentage * 10000));
-# END
-# ;"""
-
-# create_trigger_convert_decimal_allocation = """
-# CREATE TRIGGER IF NOT EXISTS convert_decimal BEFORE INSERT ON allocation
-#
-# BEGIN
-# SELECT
-#     CASE
-#         WHEN TYPEOF(NEW.percentage) = "real" OR TYPEOF(NEW.percentage) == "integer" THEN
-#             INSERT INTO allocation(percentage)
-#             VALUES(ROUND(NEW.percentage * 10000));
-#     END;
-# END
-# ;"""
-
-# create_trigger_convert_decimal_allocation = """
-# CREATE TRIGGER IF NOT EXISTS convert_decimal AFTER INSERT ON allocation
-# BEGIN
-#     UPDATE allocation SET percentage = ROUND(percentage * 10000);
-# END
-# ;"""
-
-# create_trigger_convert_decimal_allocation = """
-# CREATE TRIGGER IF NOT EXISTS convert_decimal_allocation AFTER INSERT ON allocation
-# BEGIN
-#     UPDATE allocation SET percentage = ROUND(percentage * 10000);
-# END
-# ;"""
-#
-# create_trigger_convert_decimal_component = """
-# CREATE TRIGGER IF NOT EXISTS convert_decimal_component AFTER INSERT ON component
-# BEGIN
-#     UPDATE component SET percentage = ROUND(percentage * 10000);
-# END
-# ;"""
-
-# create_trigger_convert_decimal_allocation = """
-# CREATE TRIGGER IF NOT EXISTS convert_decimal BEFORE INSERT ON allocation
-# WHEN TYPEOF(NEW.percentage) = "real" OR TYPEOF(NEW.percentage) == "integer"
-# BEGIN
-#     ROUND(NEW.percentage * 10000)
-# END;
-# ;"""
-
-# create_trigger_convert_decimal_allocation = """
-# CREATE TRIGGER IF NOT EXISTS convert_decimal BEFORE INSERT ON allocation
-# BEGIN
-#     INSERT INTO allocation(percentage)
-#     VALUES(ROUND(NEW.percentage * 10000));
-# END
-# ;"""
-create_trigger_convert_decimal_allocation = """
-CREATE TRIGGER IF NOT EXISTS convert_decimal_allocation AFTER INSERT ON allocation
+create_trigger_format_allocation = """
+CREATE TRIGGER IF NOT EXISTS format_allocation AFTER INSERT ON allocation
 BEGIN
     UPDATE allocation SET percentage = ROUND(percentage * 10000) WHERE id = NEW.id;
 END
 ;"""
 
-create_trigger_convert_decimal_balance = """
-CREATE TRIGGER IF NOT EXISTS convert_decimal_balance AFTER INSERT ON balance 
+create_trigger_format_balance = """
+CREATE TRIGGER IF NOT EXISTS format_balance AFTER INSERT ON balance 
 BEGIN
     UPDATE balance SET quantity = ROUND(quantity * 10000) WHERE id = NEW.id;
     UPDATE balance SET balance_date = date(balance_date, '0 days') WHERE id = NEW.id;
 END
 ;"""
 
-create_trigger_convert_decimal_component = """
-CREATE TRIGGER IF NOT EXISTS convert_decimal_component AFTER INSERT ON component 
+create_trigger_format_component = """
+CREATE TRIGGER IF NOT EXISTS format_component AFTER INSERT ON component 
 BEGIN
     UPDATE component SET percentage = ROUND(percentage * 10000) WHERE id = NEW.id;
 END
 ;"""
 
-create_trigger_convert_decimal_price = """
-CREATE TRIGGER IF NOT EXISTS convert_decimal_price AFTER INSERT ON price
-BEGIN
-    UPDATE price SET amount = ROUND(amount * 10000) WHERE id = NEW.id;
-END
-;"""
-
-create_trigger_convert_decimal_owner = """
-CREATE TRIGGER IF NOT EXISTS convert_decimal_owner AFTER INSERT ON owner 
+create_trigger_format_owner = """
+CREATE TRIGGER IF NOT EXISTS format_owner AFTER INSERT ON owner 
 BEGIN
     UPDATE owner SET birthday = date(birthday, '0 days') WHERE id = NEW.id;
 END
 ;"""
 
-create_triggers = create_trigger_convert_decimal_allocation + \
-                  create_trigger_convert_decimal_balance + \
-                  create_trigger_convert_decimal_component + \
-                  create_trigger_convert_decimal_owner + \
-                  create_trigger_convert_decimal_price
+create_trigger_format_price = """
+CREATE TRIGGER IF NOT EXISTS format_price AFTER INSERT ON price
+BEGIN
+    UPDATE price SET amount = ROUND(amount * 10000) WHERE id = NEW.id;
+END
+;"""
+
+create_triggers = create_trigger_format_allocation + \
+                  create_trigger_format_balance + \
+                  create_trigger_format_component + \
+                  create_trigger_format_owner + \
+                  create_trigger_format_price
 
 # INSERT
 insert_account = """
