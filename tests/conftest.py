@@ -52,6 +52,11 @@ def test_db_2(tmp_path):
 
 
 @pytest.fixture
+def test_app_db_0(test_db_0):
+    return app.App(test_db_0)
+
+
+@pytest.fixture
 def test_app_db_1(test_db_1):
     return app.App(test_db_1)
 

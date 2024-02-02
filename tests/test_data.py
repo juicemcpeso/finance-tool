@@ -28,7 +28,7 @@ db_1_entry = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, '
               'asset': [
                   {'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
                   {'id': 2, 'name': 'Rearguard Total International Stock Index Fund', 'symbol': 'RSINT'},
-                  {'id': 3, 'name': 'Rearguard Total Bond Market Index Fund', 'symbol': ' RBUSA'},
+                  {'id': 3, 'name': 'Rearguard Total Bond Market Index Fund', 'symbol': 'RBUSA'},
                   {'id': 4, 'name': 'Rearguard Total International Bond Index Fund', 'symbol': 'RBINT'},
                   {'id': 5, 'name': 'US Dollars', 'symbol': 'USD'}],
               'asset_class': [{'id': 1, 'name': 'stocks'},
@@ -52,11 +52,11 @@ db_1_entry = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, '
                   {'id': 2, 'name': 'International'},
                   {'id': 3, 'name': 'World'}],
               'owner': [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'}],
-              'price': [{'id': 1, 'asset_id': 1, 'price_date': '1776-07-04', 'amount': 1},
+              'price': [{'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1},
                         {'id': 2, 'asset_id': 2, 'price_date': '2020-01-01', 'amount': 1},
                         {'id': 3, 'asset_id': 3, 'price_date': '2020-01-01', 'amount': 1},
                         {'id': 4, 'asset_id': 4, 'price_date': '2020-01-01', 'amount': 1},
-                        {'id': 5, 'asset_id': 5, 'price_date': '2020-01-01', 'amount': 1}]}
+                        {'id': 5, 'asset_id': 5, 'price_date': '1776-07-04', 'amount': 1}]}
 
 db_2_entry = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
                           {'id': 2, 'name': "Bob's Roth IRA", 'account_type_id': 2, 'institution_id': 1,
@@ -152,7 +152,7 @@ db_1_response = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1
                  'asset': [
                      {'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
                      {'id': 2, 'name': 'Rearguard Total International Stock Index Fund', 'symbol': 'RSINT'},
-                     {'id': 3, 'name': 'Rearguard Total Bond Market Index Fund', 'symbol': ' RBUSA'},
+                     {'id': 3, 'name': 'Rearguard Total Bond Market Index Fund', 'symbol': 'RBUSA'},
                      {'id': 4, 'name': 'Rearguard Total International Bond Index Fund', 'symbol': 'RBINT'},
                      {'id': 5, 'name': 'US Dollars', 'symbol': 'USD'}],
                  'asset_class': [{'id': 1, 'name': 'stocks'},
@@ -176,11 +176,11 @@ db_1_response = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1
                      {'id': 2, 'name': 'International'},
                      {'id': 3, 'name': 'World'}],
                  'owner': [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'}],
-                 'price': [{'id': 1, 'asset_id': 1, 'price_date': '1776-07-04', 'amount': 10000},
+                 'price': [{'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 10000},
                            {'id': 2, 'asset_id': 2, 'price_date': '2020-01-01', 'amount': 10000},
                            {'id': 3, 'asset_id': 3, 'price_date': '2020-01-01', 'amount': 10000},
                            {'id': 4, 'asset_id': 4, 'price_date': '2020-01-01', 'amount': 10000},
-                           {'id': 5, 'asset_id': 5, 'price_date': '2020-01-01', 'amount': 10000}]}
+                           {'id': 5, 'asset_id': 5, 'price_date': '1776-07-04', 'amount': 10000}]}
 
 db_2_response = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
                              {'id': 2, 'name': "Bob's Roth IRA", 'account_type_id': 2, 'institution_id': 1,
