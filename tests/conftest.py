@@ -3,18 +3,7 @@ import app
 import db
 import pytest
 import tests.test_data as td
-
-insert_dict = {'account': db.insert_account,
-               'account_type': db.insert_account_type,
-               'allocation': db.insert_allocation,
-               'asset': db.insert_asset,
-               'asset_class': db.insert_asset_class,
-               'balance': db.insert_balance,
-               'component': db.insert_component,
-               'institution': db.insert_institution,
-               'location': db.insert_location,
-               'owner': db.insert_owner,
-               'price': db.insert_price}
+import tests.test_lookup as test_lookup
 
 
 @pytest.fixture
@@ -33,8 +22,8 @@ def test_db_1(tmp_path):
     db.execute_script(db_test, db.create_tables)
     db.execute_script(db_test, db.create_views)
     db.execute_script(database=db_test, cmd=db.create_triggers)
-    for table_name in insert_dict:
-        db.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=td.db_1_entry[table_name])
+    for table_name in test_lookup.insert_dict:
+        db.execute_many(database=db_test, cmd=test_lookup.insert_dict[table_name], data_sequence=td.db_1_entry[table_name])
 
     return db_test
 
@@ -46,8 +35,8 @@ def test_db_2(tmp_path):
     db.execute_script(db_test, db.create_tables)
     db.execute_script(db_test, db.create_views)
     db.execute_script(database=db_test, cmd=db.create_triggers)
-    for table_name in insert_dict:
-        db.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=td.db_2_entry[table_name])
+    for table_name in test_lookup.insert_dict:
+        db.execute_many(database=db_test, cmd=test_lookup.insert_dict[table_name], data_sequence=td.db_2_entry[table_name])
     return db_test
 
 
