@@ -32,8 +32,8 @@ def test_insert_from_csv_directory(test_app_db_0):
     test_app_db_0.insert_from_csv_directory('./test_csv_data/')
     results_dict = {}
 
-    for table_name in test_app_db_0.select_lookup:
-        result = db.fetch_all(database=test_app_db_0.db, cmd=test_app_db_0.select_lookup[table_name])
+    for table_name in test_app_db_0['select']:
+        result = db.fetch_all(database=test_app_db_0.db, cmd=test_app_db_0['select'][table_name])
         results_dict.update({table_name: result})
     assert results_dict == td.db_1_response
 
