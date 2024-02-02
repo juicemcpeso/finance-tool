@@ -5,8 +5,8 @@
 
 import db
 import pytest
-import sqlite3
 
+import tests.test_lookup as test_lookup
 import tests.test_data as td
 import tests.test_data_deviation as td_deviation
 import tests.test_data_constraints as td_constraints
@@ -31,18 +31,6 @@ import tests.test_data_constraints as td_constraints
 # def test_print_csv():
 #     print_csv_as_dict('./old_test_data/')
 
-
-table_names = {'account',
-               'account_type',
-               'allocation',
-               'asset',
-               'asset_class',
-               'balance',
-               'component',
-               'institution',
-               'location',
-               'owner',
-               'price'}
 
 view_names = {'account_value_current_by_asset',
               'asset_price_newest',
@@ -69,55 +57,6 @@ create_table_sequence = {('account', db.create_table_account),
                          ('location', db.create_table_location),
                          ('owner', db.create_table_owner),
                          ('price', db.create_table_price)}
-
-insert_sequence = {('account', db.insert_account),
-                   ('account_type', db.insert_account_type),
-                   ('allocation', db.insert_allocation),
-                   ('asset', db.insert_asset),
-                   ('asset_class', db.insert_asset_class),
-                   ('balance', db.insert_balance),
-                   ('component', db.insert_component),
-                   ('institution', db.insert_institution),
-                   ('location', db.insert_location),
-                   ('owner', db.insert_owner),
-                   ('price', db.insert_price)}
-
-select_sequence = {('account', db.select_account),
-                   ('account_type', db.select_account_type),
-                   ('allocation', db.select_allocation),
-                   ('asset', db.select_asset),
-                   ('asset_class', db.select_asset_class),
-                   ('balance', db.select_balance),
-                   ('component', db.select_component),
-                   ('institution', db.select_institution),
-                   ('location', db.select_location),
-                   ('owner', db.select_owner),
-                   ('price', db.select_price)}
-
-insert_dict = {'account': db.insert_account,
-               'account_type': db.insert_account_type,
-               'allocation': db.insert_allocation,
-               'asset': db.insert_asset,
-               'asset_class': db.insert_asset_class,
-               'balance': db.insert_balance,
-               'component': db.insert_component,
-               'institution': db.insert_institution,
-               'location': db.insert_location,
-               'owner': db.insert_owner,
-               'price': db.insert_price}
-
-
-select_dict = {'account': db.select_account,
-               'account_type': db.select_account_type,
-               'allocation': db.select_allocation,
-               'asset': db.select_asset,
-               'asset_class': db.select_asset_class,
-               'balance': db.select_balance,
-               'component': db.select_component,
-               'institution': db.select_institution,
-               'location': db.select_location,
-               'owner': db.select_owner,
-               'price': db.select_price}
 
 
 @pytest.mark.parametrize('table_name, command', create_table_sequence)
@@ -149,7 +88,7 @@ def test_create_tables(tmp_path):
 
     result_list = db.fetch_all(database=db_test, cmd=sql)
 
-    assert set(line['name'] for line in result_list) == table_names
+    assert set(line['name'] for line in result_list) == test_lookup.table_names
 
 
 def test_create_tables_test_db_0(test_db_0):
@@ -157,7 +96,7 @@ def test_create_tables_test_db_0(test_db_0):
 
     result_list = db.fetch_all(database=test_db_0, cmd=sql)
 
-    assert set(line['name'] for line in result_list) == table_names
+    assert set(line['name'] for line in result_list) == test_lookup.table_names
 
 
 @pytest.mark.parametrize('view_name, command', create_view_sequence)
@@ -191,7 +130,7 @@ def test_create_views_test_db_0(test_db_0):
 
 
 # Test - insert
-@pytest.mark.parametrize('table_name, command', insert_sequence)
+@pytest.mark.parametrize('table_name, command', test_lookup.insert_sequence)
 def test_insert(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
     test_data = td.first_lines_entry[table_name][0]
@@ -199,7 +138,7 @@ def test_insert(test_db_0, table_name, command):
     assert db.fetch_one(database=test_db_0, cmd=sql) == td.first_lines_response[table_name][0]
 
 
-@pytest.mark.parametrize('table_name, command', insert_sequence)
+@pytest.mark.parametrize('table_name, command', test_lookup.insert_sequence)
 def test_insert_no_id(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
     test_data = td.first_lines_entry[table_name][0]
@@ -209,7 +148,7 @@ def test_insert_no_id(test_db_0, table_name, command):
     assert db.fetch_one(database=test_db_0, cmd=sql) == td.first_lines_response[table_name][0]
 
 
-@pytest.mark.parametrize('table_name, command', insert_sequence)
+@pytest.mark.parametrize('table_name, command', test_lookup.insert_sequence)
 def test_insert_id_2(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
     test_data = td.first_lines_entry[table_name][0]
@@ -221,7 +160,7 @@ def test_insert_id_2(test_db_0, table_name, command):
 
 
 # Test select
-@pytest.mark.parametrize('table_name, command', select_sequence)
+@pytest.mark.parametrize('table_name, command', test_lookup.select_sequence)
 def test_select(test_db_2, table_name, command):
     expected = td.db_2_response[table_name]
     print(expected)
@@ -334,6 +273,6 @@ def test_net_worth(test_db_2):
 
 @pytest.mark.parametrize('table_name, expected', td_constraints.formatted_expected)
 def test_constraints(test_db_0, table_name, expected):
-    db.execute(database=test_db_0, cmd=insert_dict[table_name], params=expected)
+    db.execute(database=test_db_0, cmd=test_lookup.insert_dict[table_name], params=expected)
 
-    assert db.fetch_all(database=test_db_0, cmd=select_dict[table_name]) == []
+    assert db.fetch_all(database=test_db_0, cmd=test_lookup.select_dict[table_name]) == []
