@@ -271,6 +271,12 @@ def test_net_worth(test_db_2):
     assert db.fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
 
 
+def test_net_worth_formatted(test_db_2):
+    assert db.fetch_one(database=test_db_2,
+                        cmd=db.net_worth_formatted,
+                        params={'decimal': 10000}) == {'net_worth': 50000.0}
+
+
 @pytest.mark.parametrize('table_name, expected', td_constraints.formatted_expected)
 def test_constraints(test_db_0, table_name, expected):
     db.execute(database=test_db_0, cmd=test_lookup.insert_dict[table_name], params=expected)

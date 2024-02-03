@@ -474,3 +474,10 @@ SELECT
 FROM
     account_value_current_by_asset AS current_values
 """
+
+net_worth_formatted = """
+SELECT 
+    SUM(current_values.current_value) / :decimal AS net_worth
+FROM
+    account_value_current_by_asset AS current_values
+"""
