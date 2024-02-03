@@ -12,6 +12,7 @@ first_lines_entry = {
     'balance': [
         {'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000}],
     'component': [{'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000}],
+    'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
     'institution': [{'id': 1, 'name': 'Rearguard Investments'}],
     'location': [{'id': 1, 'name': 'USA'}],
     'owner': [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'}],
@@ -46,6 +47,7 @@ db_1_entry = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, '
                             {'id': 3, 'asset_id': 3, 'asset_class_id': 2, 'location_id': 1, 'percentage': 1.0000},
                             {'id': 4, 'asset_id': 4, 'asset_class_id': 2, 'location_id': 2, 'percentage': 1.0000},
                             {'id': 5, 'asset_id': 5, 'asset_class_id': 3, 'location_id': 1, 'percentage': 1.0000}],
+              'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
               'institution': [{'id': 1, 'name': 'Rearguard Investments'}],
               'location': [
                   {'id': 1, 'name': 'USA'},
@@ -109,6 +111,7 @@ db_2_entry = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, '
                             {'id': 7, 'asset_id': 4, 'asset_class_id': 2, 'location_id': 2, 'percentage': .0500},
                             {'id': 8, 'asset_id': 4, 'asset_class_id': 4, 'location_id': None, 'percentage': .0500},
                             {'id': 9, 'asset_id': 5, 'asset_class_id': 2, 'location_id': 1, 'percentage': 1.0000}],
+              'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
               'institution': [{'id': 1, 'name': 'Rearguard Investments'},
                               {'id': 2, 'name': 'Capital Two'},
                               {'id': 3, 'name': 'Treasury Indirect'}],
@@ -136,6 +139,7 @@ first_lines_response = {
     'balance': [
         {'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 340000000}],
     'component': [{'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 10000}],
+    'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
     'institution': [{'id': 1, 'name': 'Rearguard Investments'}],
     'location': [{'id': 1, 'name': 'USA'}],
     'owner': [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'}],
@@ -165,6 +169,7 @@ db_1_response = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1
                      {'id': 3, 'account_id': 1, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 340000000},
                      {'id': 4, 'account_id': 1, 'asset_id': 4, 'balance_date': '2021-01-01', 'quantity': 40000000},
                      {'id': 5, 'account_id': 1, 'asset_id': 5, 'balance_date': '2021-01-01', 'quantity': 140000000}],
+                 'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
                  'component': [{'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 10000},
                                {'id': 2, 'asset_id': 2, 'asset_class_id': 1, 'location_id': 2, 'percentage': 10000},
                                {'id': 3, 'asset_id': 3, 'asset_class_id': 2, 'location_id': 1, 'percentage': 10000},
@@ -234,6 +239,7 @@ db_2_response = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1
                                {'id': 7, 'asset_id': 4, 'asset_class_id': 2, 'location_id': 2, 'percentage': 500},
                                {'id': 8, 'asset_id': 4, 'asset_class_id': 4, 'location_id': None, 'percentage': 500},
                                {'id': 9, 'asset_id': 5, 'asset_class_id': 2, 'location_id': 1, 'percentage': 10000}],
+                 'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
                  'institution': [{'id': 1, 'name': 'Rearguard Investments'},
                                  {'id': 2, 'name': 'Capital Two'},
                                  {'id': 3, 'name': 'Treasury Indirect'}],

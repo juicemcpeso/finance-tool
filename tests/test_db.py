@@ -37,7 +37,8 @@ view_names = {'account_value_current_by_asset',
               'asset_quantity_by_account_current',
               'asset_value_current',
               'asset_class_value_by_location',
-              'component_value'}
+              'component_value',
+              'decimal_constant'}
 
 create_view_sequence = {('account_value_current_by_asset', db.create_view_account_value_current_by_asset),
                         ('asset_price_newest', db.create_view_asset_price_newest),
@@ -163,7 +164,7 @@ def test_insert_id_2(test_db_0, table_name, command):
 @pytest.mark.parametrize('table_name, command', test_lookup.select_sequence)
 def test_select(test_db_2, table_name, command):
     expected = td.db_2_response[table_name]
-    print(expected)
+
     assert db.fetch_all(database=test_db_2, cmd=command) == expected
 
 
@@ -245,6 +246,14 @@ def test_view_component_value(test_db_2):
     command = "SELECT * FROM component_value"
 
     assert expected == db.fetch_all(database=test_db_2, cmd=command)
+
+
+def test_view_decimal(test_db_2):
+    expected = {'decimal': 10000}
+
+    command = "SELECT * FROM decimal_constant"
+
+    assert expected == db.fetch_one(database=test_db_2, cmd=command)
 
 
 def test_allocation_deviation(test_db_1):

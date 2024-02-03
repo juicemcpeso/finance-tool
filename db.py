@@ -169,6 +169,13 @@ CREATE TABLE IF NOT EXISTS component (
     CHECK (percentage BETWEEN 0 AND 10000)
 );"""
 
+create_table_constant = """
+CREATE TABLE IF NOT EXISTS constant (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    amount INT
+);"""
+
 create_table_institution = """
 CREATE TABLE IF NOT EXISTS institution(
     id INTEGER PRIMARY KEY,
@@ -211,6 +218,7 @@ create_tables = create_table_account + \
                 create_table_asset_class + \
                 create_table_balance + \
                 create_table_component + \
+                create_table_constant + \
                 create_table_institution + \
                 create_table_location + \
                 create_table_owner + \
@@ -271,7 +279,7 @@ ORDER BY
 ;"""
 
 create_view_asset_class_value_by_location = """
-CREATE VIEW IF NOT EXISTS asset_class_value_by_location aS
+CREATE VIEW IF NOT EXISTS asset_class_value_by_location AS
 SELECT
     asset_class_id, 
     location_id,
@@ -295,12 +303,20 @@ JOIN
     asset_value_current AS v ON c.asset_id = v.asset_id
 ;"""
 
+create_view_decimal = """
+CREATE VIEW IF NOT EXISTS decimal_constant AS
+    SELECT amount AS decimal
+    FROM constant
+    WHERE name = 'decimal'
+;"""
+
 create_views = create_view_account_value_current_by_asset + \
                create_view_asset_price_newest + \
                create_view_asset_quantity_by_account_current + \
                create_view_asset_value_current + \
                create_view_asset_class_value_by_location + \
-               create_view_component_value
+               create_view_component_value + \
+               create_view_decimal
 
 create_trigger_format_allocation = """
 CREATE TRIGGER IF NOT EXISTS format_allocation AFTER INSERT ON allocation
@@ -380,6 +396,11 @@ INSERT INTO component(id, asset_id, asset_class_id, location_id, percentage)
 VALUES(:id, :asset_id, :asset_class_id, :location_id, :percentage)
 """
 
+insert_constant = """
+INSERT INTO constant(id, name, amount)
+VALUES(:id, :name, :amount)
+"""
+
 insert_institution = """
 INSERT INTO institution(id, name) 
 VALUES(:id, :name)
@@ -427,6 +448,10 @@ SELECT * FROM balance
 
 select_component = """
 SELECT * FROM component
+"""
+
+select_constant = """
+SELECT * FROM constant
 """
 
 select_institution = """
