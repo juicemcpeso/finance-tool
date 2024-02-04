@@ -231,9 +231,9 @@ SELECT
     b.account_id, 
     b.asset_id, 
     MAX(b.balance_date) balance_date, 
-    b.quantity * p.amount / 10000 AS current_value
+    b.quantity * p.amount / constant.decimal AS current_value
 FROM 
-    balance AS b
+    balance AS b, decimal_constant AS constant
 JOIN
     asset_price_newest AS p ON b.asset_id = p.asset_id
 GROUP BY 
@@ -296,9 +296,9 @@ SELECT
     c.asset_id,
     c.asset_class_id,
     c.location_id,
-    c.percentage * v.current_value / 10000 as current_value
+    c.percentage * v.current_value / constant.decimal as current_value
 FROM
-    component AS c
+    component AS c, decimal_constant AS constant
 JOIN
     asset_value_current AS v ON c.asset_id = v.asset_id
 ;"""
@@ -478,11 +478,12 @@ SELECT
     plan.location_id,
     current_values.current_value,
     plan.percentage AS plan_percent,
-    plan.percentage * :net_worth / 10000 AS plan_value,
-    (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation,
+    plan.percentage * :net_worth / constant.decimal AS plan_value,
+    (constant.decimal * current_values.current_value) / 
+    (plan.percentage * :net_worth / constant.decimal) - constant.decimal as deviation,
     0 AS contribution
 FROM 
-    allocation AS plan
+    allocation AS plan, decimal_constant AS constant
 JOIN 
     asset_class_value_by_location AS current_values ON 
         current_values.asset_class_id == plan.asset_class_id AND 
