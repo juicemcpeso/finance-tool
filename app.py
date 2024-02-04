@@ -63,10 +63,9 @@ class App:
 
     # Tools
     def where_to_contribute(self, contribution_amount):
-        new_net_worth = db.fetch_one(database=self.db, cmd=db.net_worth)['net_worth'] + contribution_amount
         deviation_table = db.fetch_all(database=self.db,
                                        cmd=db.allocation_deviation,
-                                       params={'net_worth': new_net_worth})
+                                       params={'change': contribution_amount})
         asset_deviation_level_cost = self.create_asset_deviation_level_cost_dict(deviation_table)
         total_deviation_level_cost = {key: 0 for key in range(len(deviation_table))}
         accessible_level = 0

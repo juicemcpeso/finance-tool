@@ -310,13 +310,22 @@ CREATE VIEW IF NOT EXISTS decimal_constant AS
     WHERE name = 'decimal'
 ;"""
 
+create_view_net_worth = """
+CREATE VIEW IF NOT EXISTS net_worth AS
+    SELECT 
+        SUM(current_values.current_value) AS net_worth
+    FROM
+        account_value_current_by_asset AS current_values
+;"""
+
 create_views = create_view_account_value_current_by_asset + \
                create_view_asset_price_newest + \
                create_view_asset_quantity_by_account_current + \
                create_view_asset_value_current + \
                create_view_asset_class_value_by_location + \
                create_view_component_value + \
-               create_view_decimal
+               create_view_decimal + \
+               create_view_net_worth
 
 create_trigger_format_allocation = """
 CREATE TRIGGER IF NOT EXISTS format_allocation AFTER INSERT ON allocation
@@ -472,38 +481,37 @@ SELECT * FROM price
 
 # Calculations
 # Allocation
+
+# Divide by the decimal constant at the end, otherwise integer division results in 0
+#
+# In calculation for deviation, multiply by constant twice: once to convert plan.percentage to a decimal, and the second
+# time to convert the entire calculation from a decimal to an integer.
+# TODO - test to make sure this works with decimal contributions
 allocation_deviation = """
 SELECT
     plan.asset_class_id,
     plan.location_id,
     current_values.current_value,
     plan.percentage AS plan_percent,
-    plan.percentage * :net_worth / constant.decimal AS plan_value,
-    (constant.decimal * current_values.current_value) / 
-    (plan.percentage * :net_worth / constant.decimal) - constant.decimal as deviation,
+    plan.percentage * (net_worth.net_worth + (:change * constant.decimal)) / constant.decimal AS plan_value,
+    current_values.current_value * constant.decimal * constant.decimal / 
+        (plan.percentage * (net_worth.net_worth + (:change * constant.decimal))) - constant.decimal AS deviation,
     0 AS contribution
 FROM 
-    allocation AS plan, decimal_constant AS constant
+    allocation AS plan, decimal_constant AS constant, net_worth
 JOIN 
     asset_class_value_by_location AS current_values ON 
         current_values.asset_class_id == plan.asset_class_id AND 
         current_values.location_id == plan.location_id 
 WHERE
-    deviation < 0
+    deviation < 0 
 ORDER BY
     deviation ASC
 """
 
-net_worth = """
-SELECT 
-    SUM(current_values.current_value) AS net_worth
+net_worth_formatted = """   
+SELECT
+    net_worth.net_worth / constant.decimal AS net_worth
 FROM
-    account_value_current_by_asset AS current_values
-"""
-
-net_worth_formatted = """
-SELECT 
-    SUM(current_values.current_value) / :decimal AS net_worth
-FROM
-    account_value_current_by_asset AS current_values
+    net_worth, decimal_constant AS constant 
 """

@@ -38,7 +38,8 @@ view_names = {'account_value_current_by_asset',
               'asset_value_current',
               'asset_class_value_by_location',
               'component_value',
-              'decimal_constant'}
+              'decimal_constant',
+              'net_worth'}
 
 create_view_sequence = {('account_value_current_by_asset', db.create_view_account_value_current_by_asset),
                         ('asset_price_newest', db.create_view_asset_price_newest),
@@ -256,34 +257,39 @@ def test_view_decimal(test_db_2):
     assert expected == db.fetch_one(database=test_db_2, cmd=command)
 
 
-def test_allocation_deviation(test_db_1):
-    expected = td_deviation.expected[0]
+def test_view_net_worth(test_db_2):
+    expected = {'net_worth': 500000000}
 
-    assert expected == db.fetch_all(database=test_db_1,
-                                    cmd=db.allocation_deviation,
-                                    params={'net_worth': 1000000000})
+    command = "SELECT * FROM net_worth"
+
+    assert expected == db.fetch_one(database=test_db_2, cmd=command)
 
 
-@pytest.mark.parametrize('contribution', [0, 1000, 10000, 100000])
-def test_allocation_deviation(test_db_1, contribution):
-    expected = td_deviation.expected[contribution]
+# def test_allocation_deviation(test_db_1):
+#     expected = td_deviation.expected[0]
+#
+#     assert expected == db.fetch_all(database=test_db_1,
+#                                     cmd=db.allocation_deviation,
+#                                     params={'net_worth': 1000000000})
+
+
+@pytest.mark.parametrize('change', [0, 1000, 10000, 100000])
+def test_allocation_deviation(test_db_1, change):
+    expected = td_deviation.expected[change]
     for line in expected:
         line.update({'contribution': 0})
-
+    print(db.fetch_all(database=test_db_1,
+                                    cmd=db.allocation_deviation,
+                                    params={'change': change})
+)
     assert expected == db.fetch_all(database=test_db_1,
                                     cmd=db.allocation_deviation,
-                                    params={'net_worth': (1000000000 + contribution * 10000)})
+                                    params={'change': change})
 
 
 # Test calculations
-def test_net_worth(test_db_2):
-    assert db.fetch_one(database=test_db_2, cmd=db.net_worth) == {'net_worth': 500000000}
-
-
 def test_net_worth_formatted(test_db_2):
-    assert db.fetch_one(database=test_db_2,
-                        cmd=db.net_worth_formatted,
-                        params={'decimal': 10000}) == {'net_worth': 50000.0}
+    assert db.fetch_one(database=test_db_2, cmd=db.net_worth_formatted) == {'net_worth': 50000.0}
 
 
 @pytest.mark.parametrize('table_name, expected', td_constraints.formatted_expected)
