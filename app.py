@@ -75,23 +75,23 @@ class App:
                 total_deviation_level_cost[key] += asset_deviation_level_cost[line_number][key]
 
         for key in total_deviation_level_cost:
-            if total_deviation_level_cost[key] < contribution_amount:
+            if total_deviation_level_cost[key] < contribution_amount * self.decimal:
                 accessible_level = key
 
         for line_number in range(accessible_level):
             deviation_table[line_number]['contribution'] += asset_deviation_level_cost[line_number][accessible_level]
 
-        amount_remaining = contribution_amount - total_deviation_level_cost[accessible_level]
+        amount_remaining = contribution_amount * self.decimal - total_deviation_level_cost[accessible_level]
 
         total_percentage = 0
         for line_number in range(accessible_level + 1):
             total_percentage += deviation_table[line_number]['plan_percent']
 
         for line_number in range(accessible_level + 1):
-            deviation_table[line_number]['contribution'] += amount_remaining * deviation_table[line_number][
-                'plan_percent'] // total_percentage
+            deviation_table[line_number]['contribution'] += \
+                amount_remaining * deviation_table[line_number]['plan_percent'] // total_percentage
 
-        assign_leftovers(deviation_table, contribution_amount)
+        assign_leftovers(deviation_table, contribution_amount * self.decimal)
 
         return deviation_table
 

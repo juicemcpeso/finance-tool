@@ -278,10 +278,7 @@ def test_allocation_deviation(test_db_1, change):
     expected = td_deviation.expected[change]
     for line in expected:
         line.update({'contribution': 0})
-    print(db.fetch_all(database=test_db_1,
-                                    cmd=db.allocation_deviation,
-                                    params={'change': change})
-)
+
     assert expected == db.fetch_all(database=test_db_1,
                                     cmd=db.allocation_deviation,
                                     params={'change': change})
