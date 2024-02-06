@@ -299,5 +299,7 @@ def test_deviation_levels(test_db_1):
     assert expected == db.fetch_all(database=test_db_1, cmd=db.deviation_levels, params={'change': 0})
 
 
-def test_next_deviation_level(test_db_1):
-    assert td_deviation.cross_join_expected == db.fetch_all(database=test_db_1, cmd=db.next_deviation_level, params={'change': 0})
+@pytest.mark.parametrize('change', [0, 100000])
+def test_next_deviation_level(test_db_1, change):
+    expected = td_deviation.cross_join_expected[change]
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.next_deviation_level, params={'change': change})
