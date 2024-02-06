@@ -275,9 +275,7 @@ def test_view_net_worth(test_db_2):
 
 @pytest.mark.parametrize('change', [0, 1000, 10000, 100000])
 def test_allocation_deviation(test_db_1, change):
-    expected = td_deviation.expected[change]
-    for line in expected:
-        line.update({'contribution': 0})
+    expected = td_deviation.allocation_expected[change]
 
     assert expected == db.fetch_all(database=test_db_1,
                                     cmd=db.allocation_deviation,

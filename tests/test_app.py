@@ -29,5 +29,5 @@ def test_insert_from_csv_directory(test_app_db_0):
 
 @pytest.mark.parametrize('amount', [0, 1000, 10000, 100000])
 def test_where_to_contribute(test_app_db_1, amount):
-    expected = td_deviation.expected[amount]
+    expected = td_deviation.where_to_contribute_expected[amount]
     assert expected == test_app_db_1.where_to_contribute(amount)

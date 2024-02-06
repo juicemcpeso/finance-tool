@@ -495,14 +495,12 @@ SELECT
     plan.percentage AS plan_percent,
     plan.percentage * (net_worth.net_worth + (:change * constant.decimal)) / constant.decimal AS plan_value,
     current_values.current_value * constant.decimal * constant.decimal / 
-        (plan.percentage * (net_worth.net_worth + (:change * constant.decimal))) - constant.decimal AS deviation,
-    0 AS contribution
+        (plan.percentage * (net_worth.net_worth + (:change * constant.decimal))) - constant.decimal AS deviation
 FROM 
     allocation AS plan, decimal_constant AS constant, net_worth
 JOIN 
-    asset_class_value_by_location AS current_values ON 
-        current_values.asset_class_id == plan.asset_class_id AND 
-        current_values.location_id == plan.location_id 
+    asset_class_value_by_location AS current_values ON current_values.asset_class_id == plan.asset_class_id AND 
+    current_values.location_id == plan.location_id
 WHERE
     deviation < 0 
 ORDER BY
