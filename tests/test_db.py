@@ -292,3 +292,12 @@ def test_constraints(test_db_0, table_name, expected):
     db.execute(database=test_db_0, cmd=test_lookup.insert_dict[table_name], params=expected)
 
     assert db.fetch_all(database=test_db_0, cmd=test_lookup.select_dict[table_name]) == []
+
+
+def test_deviation_levels(test_db_1):
+    expected = [{'deviation': -3000}, {'deviation': -2000}, {'deviation': -1500}]
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.deviation_levels, params={'change': 0})
+
+
+def test_next_deviation_level(test_db_1):
+    assert td_deviation.cross_join_expected == db.fetch_all(database=test_db_1, cmd=db.next_deviation_level, params={'change': 0})
