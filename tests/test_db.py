@@ -254,3 +254,8 @@ def test_value_at_each_deviation_level(test_db_1):
 def test_value_difference_at_each_deviation_level(test_db_1):
     expected = td_deviation.value_difference_deviation_level_expected
     assert expected == db.fetch_all(database=test_db_1, cmd=db.value_difference_at_each_deviation_level)
+
+
+def test_sum_value_difference_at_each_deviation_level(test_db_1):
+    expected = td_deviation.sum_value_difference_at_each_deviation_level
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.sum_value_difference_at_each_deviation_level)

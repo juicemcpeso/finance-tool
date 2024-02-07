@@ -105,10 +105,10 @@ allocation_deviation_with_next_level_expected = [{'asset_class_id': 1,
                                                   'deviation': 3600,
                                                   'next_deviation': 4000}]
 
-sum_value_difference_at_each_level = [{'deviation': -2000, 'total_difference': 20000000},
-                                      {'deviation': -1500, 'total_difference': 32500000},
-                                      {'deviation': 3600, 'total_difference': 364000000},
-                                      {'deviation': 4000, 'total_difference': 400000000}]
+sum_value_difference_at_each_deviation_level = [{'deviation': -2000, 'total_difference': 20000000},
+                                                {'deviation': -1500, 'total_difference': 32500000},
+                                                {'deviation': 3600, 'total_difference': 364000000},
+                                                {'deviation': 4000, 'total_difference': 400000000}]
 
 value_at_each_deviation_level_expected = [{'asset_class_id': 1,
                                            'location_id': 2,
