@@ -531,7 +531,7 @@ ORDER BY
     next_deviation ASC
 """
 
-value_to_next_deviation_level = """
+value_at_each_deviation_level = """
 SELECT
     allocation_deviation.asset_class_id,
     allocation_deviation.location_id,
@@ -540,8 +540,7 @@ SELECT
     allocation_deviation.plan_value,
     allocation_deviation.deviation,
     d.deviation AS next_deviation,
-    (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant - allocation_deviation.current_value 
-        AS value_to_next_level
+    (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS level_value 
 FROM 
     allocation_deviation, decimal 
 CROSS JOIN
