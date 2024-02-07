@@ -134,14 +134,6 @@ def test_view_account_value_current_by_asset(test_db_2):
     assert expected == db.fetch_all(database=test_db_2, cmd=command)
 
 
-# def test_allocation_deviation(test_db_1, change):
-#     expected = td_deviation.allocation_expected[change]
-#
-#     assert expected == db.fetch_all(database=test_db_1,
-#                                     cmd=db.allocation_deviation,
-#                                     params={'change': change})
-
-
 def test_view_allocation_deviation(test_db_1):
     expected = td_deviation.allocation_expected[0]
 
@@ -246,7 +238,7 @@ def test_constraints(test_db_0, table_name, expected):
 
 def test_deviation_levels(test_db_1):
     expected = [{'deviation': d['deviation']} for d in td_deviation.allocation_expected[0]]
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.deviation_levels, params={'change': 0})
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.deviation_levels)
 
 
 def test_next_deviation_level(test_db_1):
