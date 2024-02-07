@@ -2,7 +2,7 @@ import pytest
 import app
 import db
 import pytest
-import tests.test_data as td
+import tests.data.setup as setup
 import tests.test_lookup as test_lookup
 
 
@@ -23,7 +23,7 @@ def test_db_1(tmp_path):
     db.execute_script(db_test, db.create_views)
     db.execute_script(database=db_test, cmd=db.create_triggers)
     for table_name in test_lookup.insert_dict:
-        db.execute_many(database=db_test, cmd=test_lookup.insert_dict[table_name], data_sequence=td.db_1_entry[table_name])
+        db.execute_many(database=db_test, cmd=test_lookup.insert_dict[table_name], data_sequence=setup.db_1[table_name])
 
     return db_test
 
@@ -36,7 +36,7 @@ def test_db_2(tmp_path):
     db.execute_script(db_test, db.create_views)
     db.execute_script(database=db_test, cmd=db.create_triggers)
     for table_name in test_lookup.insert_dict:
-        db.execute_many(database=db_test, cmd=test_lookup.insert_dict[table_name], data_sequence=td.db_2_entry[table_name])
+        db.execute_many(database=db_test, cmd=test_lookup.insert_dict[table_name], data_sequence=setup.db_2[table_name])
     return db_test
 
 

@@ -7,8 +7,8 @@ import db
 import pytest
 
 import tests.test_lookup as test_lookup
-import tests.test_data as td
-import tests.test_data_deviation as td_deviation
+import tests.data.setup as setup
+import tests.data.expected as expected
 import tests.test_data_constraints as td_constraints
 
 
@@ -30,7 +30,7 @@ def test_create_table_columns(tmp_path, table_name, command):
 
     sql = f"SELECT * FROM {table_name}"
 
-    assert db.column_names(database=db_test, cmd=sql) == list(td.db_1_entry[table_name][0].keys())
+    assert db.column_names(database=db_test, cmd=sql) == list(setup.db_1[table_name][0].keys())
 
 
 def test_create_tables(tmp_path):
@@ -86,28 +86,28 @@ def test_create_views_test_db_0(test_db_0):
 @pytest.mark.parametrize('table_name, command', test_lookup.insert_sequence)
 def test_insert(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = td.first_lines_entry[table_name][0]
+    test_data = setup.first_lines[table_name][0]
     db.execute(database=test_db_0, cmd=command, params=test_data)
-    assert db.fetch_one(database=test_db_0, cmd=sql) == td.first_lines_response[table_name][0]
+    assert db.fetch_one(database=test_db_0, cmd=sql) == expected.first_lines[table_name][0]
 
 
 @pytest.mark.parametrize('table_name, command', test_lookup.insert_sequence)
 def test_insert_no_id(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = td.first_lines_entry[table_name][0]
+    test_data = setup.first_lines[table_name][0]
     test_data.update({'id': None})
     db.execute(database=test_db_0, cmd=command, params=test_data)
     test_data.update({'id': 1})
-    assert db.fetch_one(database=test_db_0, cmd=sql) == td.first_lines_response[table_name][0]
+    assert db.fetch_one(database=test_db_0, cmd=sql) == expected.first_lines[table_name][0]
 
 
 @pytest.mark.parametrize('table_name, command', test_lookup.insert_sequence)
 def test_insert_id_2(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = td.first_lines_entry[table_name][0]
+    test_data = setup.first_lines[table_name][0]
     test_data.update({'id': 2})
     db.execute(database=test_db_0, cmd=command, params=test_data)
-    response = td.first_lines_response[table_name][0]
+    response = expected.first_lines[table_name][0]
     response.update({'id': 2})
     assert db.fetch_one(database=test_db_0, cmd=sql) == response
 
@@ -115,9 +115,7 @@ def test_insert_id_2(test_db_0, table_name, command):
 # Test select
 @pytest.mark.parametrize('table_name, command', test_lookup.select_sequence)
 def test_select(test_db_2, table_name, command):
-    expected = td.db_2_response[table_name]
-
-    assert db.fetch_all(database=test_db_2, cmd=command) == expected
+    assert expected.db_2[table_name] == db.fetch_all(database=test_db_2, cmd=command)
 
 
 # Test views
@@ -135,11 +133,9 @@ def test_view_account_value_current_by_asset(test_db_2):
 
 
 def test_view_allocation_deviation(test_db_1):
-    expected = td_deviation.allocation_expected[0]
-
     command = "SELECT * FROM allocation_deviation"
 
-    assert expected == db.fetch_all(database=test_db_1, cmd=command)
+    assert expected.allocation == db.fetch_all(database=test_db_1, cmd=command)
 
 
 def test_view_asset_value_current(test_db_2):
@@ -237,25 +233,20 @@ def test_constraints(test_db_0, table_name, expected):
 
 
 def test_deviation_levels(test_db_1):
-    expected = [{'deviation': d['deviation']} for d in td_deviation.allocation_expected[0]]
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.deviation_levels)
+    assert expected.deviation_levels == db.fetch_all(database=test_db_1, cmd=db.deviation_levels)
 
 
 def test_allocation_deviation_with_next_level(test_db_1):
-    expected = td_deviation.allocation_deviation_with_next_level_expected
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.allocation_deviation_with_next_level)
+    assert expected.allocation_deviation_with_next_level == db.fetch_all(database=test_db_1, cmd=db.allocation_deviation_with_next_level)
 
 
 def test_value_at_each_deviation_level(test_db_1):
-    expected = td_deviation.value_at_each_deviation_level_expected
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.value_at_each_deviation_level)
+    assert expected.value_at_each_deviation_level == db.fetch_all(database=test_db_1, cmd=db.value_at_each_deviation_level)
 
 
 def test_value_difference_at_each_deviation_level(test_db_1):
-    expected = td_deviation.value_difference_deviation_level_expected
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.value_difference_at_each_deviation_level)
+    assert expected.value_difference_deviation_level == db.fetch_all(database=test_db_1, cmd=db.value_difference_at_each_deviation_level)
 
 
 def test_sum_value_difference_at_each_deviation_level(test_db_1):
-    expected = td_deviation.sum_value_difference_at_each_deviation_level
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.sum_value_difference_at_each_deviation_level)
+    assert expected.sum_value_difference_at_each_deviation_level == db.fetch_all(database=test_db_1, cmd=db.sum_value_difference_at_each_deviation_level)
