@@ -11,58 +11,8 @@ import tests.test_data as td
 import tests.test_data_deviation as td_deviation
 import tests.test_data_constraints as td_constraints
 
-# TODO - remove once no longer needed
-# def csv_to_dict(directory):
-#     test_dict = {}
-#     for table_name_tuple in create_table_sequence:
-#         table_name = table_name_tuple[0]
-#         file_path = directory + table_name + '.csv'
-#         test_dict.update({table_name: list(csv.DictReader(open(file_path)))})
-#     return test_dict
-#
-#
-# def print_csv_as_dict(directory):
-#     test_dict = csv_to_dict(directory)
-#     for key in sorted(test_dict):
-#         print(f"\'{key}\': {test_dict[key]},")
-#     assert True
-#
-#
-# def test_print_csv():
-#     print_csv_as_dict('./old_test_data/')
 
-
-view_names = {'account_value_current_by_asset',
-              'allocation_deviation',
-              'asset_price_newest',
-              'asset_quantity_by_account_current',
-              'asset_value_current',
-              'asset_class_value_by_location',
-              'component_value',
-              'decimal_constant',
-              'net_worth'}
-
-create_view_sequence = {('account_value_current_by_asset', db.create_view_account_value_current_by_asset),
-                        ('asset_price_newest', db.create_view_asset_price_newest),
-                        ('asset_quantity_by_account_current', db.create_view_asset_quantity_by_account_current),
-                        ('asset_value_current', db.create_view_asset_value_current),
-                        ('asset_class_value_by_location', db.create_view_asset_class_value_by_location),
-                        ('component_value', db.create_view_component_value)}
-
-create_table_sequence = {('account', db.create_table_account),
-                         ('account_type', db.create_table_account_type),
-                         ('allocation', db.create_table_allocation),
-                         ('asset', db.create_table_asset),
-                         ('asset_class', db.create_table_asset_class),
-                         ('balance', db.create_table_balance),
-                         ('component', db.create_table_component),
-                         ('institution', db.create_table_institution),
-                         ('location', db.create_table_location),
-                         ('owner', db.create_table_owner),
-                         ('price', db.create_table_price)}
-
-
-@pytest.mark.parametrize('table_name, command', create_table_sequence)
+@pytest.mark.parametrize('table_name, command', test_lookup.table_sequence)
 def test_create_table(tmp_path, table_name, command):
     db_test = tmp_path / "test.db"
     db.execute(database=db_test, cmd=command)
@@ -73,7 +23,7 @@ def test_create_table(tmp_path, table_name, command):
     assert len(db.fetch_all(database=db_test, cmd=sql)) == 1
 
 
-@pytest.mark.parametrize('table_name, command', create_table_sequence)
+@pytest.mark.parametrize('table_name, command', test_lookup.table_sequence)
 def test_create_table_columns(tmp_path, table_name, command):
     db_test = tmp_path / "test.db"
     db.execute(database=db_test, cmd=command)
@@ -102,7 +52,7 @@ def test_create_tables_test_db_0(test_db_0):
     assert set(line['name'] for line in result_list) == test_lookup.table_names
 
 
-@pytest.mark.parametrize('view_name, command', create_view_sequence)
+@pytest.mark.parametrize('view_name, command', test_lookup.view_sequence)
 def test_create_view(tmp_path, view_name, command):
     db_test = tmp_path / "test.db"
     db.execute(database=db_test, cmd=command)
@@ -121,7 +71,7 @@ def test_create_views(tmp_path):
 
     result_list = db.fetch_all(database=db_test, cmd=sql)
 
-    assert set(line['name'] for line in result_list) == view_names
+    assert set(line['name'] for line in result_list) == test_lookup.view_names
 
 
 def test_create_views_test_db_0(test_db_0):
@@ -129,7 +79,7 @@ def test_create_views_test_db_0(test_db_0):
 
     result_list = db.fetch_all(database=test_db_0, cmd=sql)
 
-    assert set(line['name'] for line in result_list) == view_names
+    assert set(line['name'] for line in result_list) == test_lookup.view_names
 
 
 # Test - insert
@@ -267,9 +217,9 @@ def test_view_component_value(test_db_2):
 
 
 def test_view_decimal(test_db_2):
-    expected = {'decimal': 10000}
+    expected = {'constant': 10000}
 
-    command = "SELECT * FROM decimal_constant"
+    command = "SELECT * FROM decimal"
 
     assert expected == db.fetch_one(database=test_db_2, cmd=command)
 

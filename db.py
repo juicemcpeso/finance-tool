@@ -231,15 +231,20 @@ SELECT
     b.account_id, 
     b.asset_id, 
     MAX(b.balance_date) balance_date, 
-    b.quantity * p.amount / constant.decimal AS current_value
+    b.quantity * p.amount / decimal.constant AS current_value
 FROM 
-    balance AS b, decimal_constant AS constant
+    balance AS b, decimal
 JOIN
     asset_price_newest AS p ON b.asset_id = p.asset_id
 GROUP BY 
     b.account_id, b.asset_id
 ;"""
 
+# TODO: test to make sure this works with decimal contributions
+# Divide by the decimal constant at the end, otherwise integer division results in 0
+#
+# In calculation for deviation, multiply by constant twice: once to convert plan.percentage to a decimal, and the second
+# time to convert the entire calculation from a decimal to an integer.
 create_view_allocation_deviation = """
 CREATE VIEW IF NOT EXISTS allocation_deviation AS
 SELECT
@@ -247,11 +252,11 @@ SELECT
     plan.location_id,
     current_values.current_value,
     plan.percentage AS plan_percent,
-    plan.percentage * net_worth.net_worth / constant.decimal AS plan_value,
-    current_values.current_value * constant.decimal * constant.decimal / 
-        (plan.percentage * net_worth.net_worth) - constant.decimal AS deviation
+    plan.percentage * net_worth.net_worth / decimal.constant AS plan_value,
+    current_values.current_value * decimal.constant * decimal.constant / 
+        (plan.percentage * net_worth.net_worth) - decimal.constant AS deviation
 FROM 
-    allocation AS plan, decimal_constant AS constant, net_worth
+    allocation AS plan, decimal, net_worth
 JOIN 
     asset_class_value_by_location AS current_values ON current_values.asset_class_id == plan.asset_class_id AND 
     current_values.location_id == plan.location_id
@@ -315,16 +320,16 @@ SELECT
     c.asset_id,
     c.asset_class_id,
     c.location_id,
-    c.percentage * v.current_value / constant.decimal as current_value
+    c.percentage * v.current_value / decimal.constant as current_value
 FROM
-    component AS c, decimal_constant AS constant
+    component AS c, decimal  
 JOIN
     asset_value_current AS v ON c.asset_id = v.asset_id
 ;"""
 
 create_view_decimal = """
-CREATE VIEW IF NOT EXISTS decimal_constant AS
-    SELECT amount AS decimal
+CREATE VIEW IF NOT EXISTS decimal AS
+    SELECT amount AS constant 
     FROM constant
     WHERE name = 'decimal'
 ;"""
@@ -501,32 +506,6 @@ SELECT * FROM price
 
 # Calculations
 # Allocation
-
-# Divide by the decimal constant at the end, otherwise integer division results in 0
-#
-# In calculation for deviation, multiply by constant twice: once to convert plan.percentage to a decimal, and the second
-# time to convert the entire calculation from a decimal to an integer.
-# TODO - test to make sure this works with decimal contributions
-# allocation_deviation = """
-# SELECT
-#     plan.asset_class_id,
-#     plan.location_id,
-#     current_values.current_value,
-#     plan.percentage AS plan_percent,
-#     plan.percentage * (net_worth.net_worth + (:change * constant.decimal)) / constant.decimal AS plan_value,
-#     current_values.current_value * constant.decimal * constant.decimal /
-#         (plan.percentage * (net_worth.net_worth + (:change * constant.decimal))) - constant.decimal AS deviation
-# FROM
-#     allocation AS plan, decimal_constant AS constant, net_worth
-# JOIN
-#     asset_class_value_by_location AS current_values ON current_values.asset_class_id == plan.asset_class_id AND
-#     current_values.location_id == plan.location_id
-# WHERE
-#     deviation < 0
-# ORDER BY
-#     deviation ASC
-# """
-
 # TODO: test to make sure this works with non distinct values
 deviation_levels = """
 SELECT DISTINCT deviation FROM allocation_deviation
@@ -553,25 +532,6 @@ ORDER BY
 """
 
 value_to_next_deviation_level = """
-WITH allocation_deviation AS ( 
-    SELECT
-        plan.asset_class_id,
-        plan.location_id,
-        current_values.current_value,
-        plan.percentage AS plan_percent,
-        plan.percentage * (net_worth.net_worth + (:change * constant.decimal)) / constant.decimal AS plan_value,
-        current_values.current_value * constant.decimal * constant.decimal / 
-            (plan.percentage * (net_worth.net_worth + (:change * constant.decimal))) - constant.decimal AS deviation
-    FROM 
-        allocation AS plan, decimal_constant AS constant, net_worth
-    JOIN 
-        asset_class_value_by_location AS current_values ON current_values.asset_class_id == plan.asset_class_id AND 
-        current_values.location_id == plan.location_id
-    WHERE
-        deviation < 0 
-    ORDER BY
-        deviation ASC
-)
 SELECT
     allocation_deviation.asset_class_id,
     allocation_deviation.location_id,
@@ -580,10 +540,10 @@ SELECT
     allocation_deviation.plan_value,
     allocation_deviation.deviation,
     d.deviation AS next_deviation,
-    (d.deviation + constant.decimal) * allocation_deviation.plan_value / constant.decimal - allocation_deviation.current_value 
+    (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant - allocation_deviation.current_value 
         AS value_to_next_level
 FROM 
-    allocation_deviation, decimal_constant AS constant
+    allocation_deviation, decimal 
 CROSS JOIN
     (SELECT deviation FROM allocation_deviation) AS d 
 WHERE
@@ -595,7 +555,7 @@ ORDER BY
 
 net_worth_formatted = """   
 SELECT
-    net_worth.net_worth / constant.decimal AS net_worth
+    net_worth.net_worth / decimal.constant AS net_worth
 FROM
-    net_worth, decimal_constant AS constant 
+    net_worth, decimal 
 """
