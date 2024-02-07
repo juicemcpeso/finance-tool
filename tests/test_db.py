@@ -33,6 +33,7 @@ import tests.test_data_constraints as td_constraints
 
 
 view_names = {'account_value_current_by_asset',
+              'allocation_deviation',
               'asset_price_newest',
               'asset_quantity_by_account_current',
               'asset_value_current',
@@ -183,6 +184,14 @@ def test_view_account_value_current_by_asset(test_db_2):
     assert expected == db.fetch_all(database=test_db_2, cmd=command)
 
 
+def test_view_allocation_deviation(test_db_1):
+    expected = td_deviation.allocation_expected[0]
+
+    command = "SELECT * FROM allocation_deviation"
+
+    assert expected == db.fetch_all(database=test_db_1, cmd=command)
+
+
 def test_view_asset_value_current(test_db_2):
     expected = [{'asset_id': 1, 'current_value': 200000000},
                 {'asset_id': 2, 'current_value': 100000000},
@@ -263,14 +272,6 @@ def test_view_net_worth(test_db_2):
     command = "SELECT * FROM net_worth"
 
     assert expected == db.fetch_one(database=test_db_2, cmd=command)
-
-
-# def test_allocation_deviation(test_db_1):
-#     expected = td_deviation.expected[0]
-#
-#     assert expected == db.fetch_all(database=test_db_1,
-#                                     cmd=db.allocation_deviation,
-#                                     params={'net_worth': 1000000000})
 
 
 @pytest.mark.parametrize('change', [0, 1000, 10000, 100000])
