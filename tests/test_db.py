@@ -184,6 +184,14 @@ def test_view_account_value_current_by_asset(test_db_2):
     assert expected == db.fetch_all(database=test_db_2, cmd=command)
 
 
+# def test_allocation_deviation(test_db_1, change):
+#     expected = td_deviation.allocation_expected[change]
+#
+#     assert expected == db.fetch_all(database=test_db_1,
+#                                     cmd=db.allocation_deviation,
+#                                     params={'change': change})
+
+
 def test_view_allocation_deviation(test_db_1):
     expected = td_deviation.allocation_expected[0]
 
@@ -274,15 +282,6 @@ def test_view_net_worth(test_db_2):
     assert expected == db.fetch_one(database=test_db_2, cmd=command)
 
 
-@pytest.mark.parametrize('change', [0, 1000, 10000, 100000])
-def test_allocation_deviation(test_db_1, change):
-    expected = td_deviation.allocation_expected[change]
-
-    assert expected == db.fetch_all(database=test_db_1,
-                                    cmd=db.allocation_deviation,
-                                    params={'change': change})
-
-
 # Test calculations
 def test_net_worth_formatted(test_db_2):
     assert db.fetch_one(database=test_db_2, cmd=db.net_worth_formatted) == {'net_worth': 50000.0}
@@ -296,11 +295,10 @@ def test_constraints(test_db_0, table_name, expected):
 
 
 def test_deviation_levels(test_db_1):
-    expected = [{'deviation': -3000}, {'deviation': -2000}, {'deviation': -1500}]
+    expected = [{'deviation': d['deviation']} for d in td_deviation.allocation_expected[0]]
     assert expected == db.fetch_all(database=test_db_1, cmd=db.deviation_levels, params={'change': 0})
 
 
-@pytest.mark.parametrize('change', [0, 100000])
-def test_next_deviation_level(test_db_1, change):
-    expected = td_deviation.cross_join_expected[change]
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.next_deviation_level, params={'change': change})
+def test_next_deviation_level(test_db_1):
+    expected = td_deviation.cross_join_expected
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.next_deviation_level)

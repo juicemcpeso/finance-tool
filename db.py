@@ -255,8 +255,6 @@ FROM
 JOIN 
     asset_class_value_by_location AS current_values ON current_values.asset_class_id == plan.asset_class_id AND 
     current_values.location_id == plan.location_id
-WHERE
-    deviation < 0 
 ORDER BY
     deviation ASC
 ;"""
@@ -509,69 +507,32 @@ SELECT * FROM price
 # In calculation for deviation, multiply by constant twice: once to convert plan.percentage to a decimal, and the second
 # time to convert the entire calculation from a decimal to an integer.
 # TODO - test to make sure this works with decimal contributions
-allocation_deviation = """
-SELECT
-    plan.asset_class_id,
-    plan.location_id,
-    current_values.current_value,
-    plan.percentage AS plan_percent,
-    plan.percentage * (net_worth.net_worth + (:change * constant.decimal)) / constant.decimal AS plan_value,
-    current_values.current_value * constant.decimal * constant.decimal / 
-        (plan.percentage * (net_worth.net_worth + (:change * constant.decimal))) - constant.decimal AS deviation
-FROM 
-    allocation AS plan, decimal_constant AS constant, net_worth
-JOIN 
-    asset_class_value_by_location AS current_values ON current_values.asset_class_id == plan.asset_class_id AND 
-    current_values.location_id == plan.location_id
-WHERE
-    deviation < 0 
-ORDER BY
-    deviation ASC
-"""
+# allocation_deviation = """
+# SELECT
+#     plan.asset_class_id,
+#     plan.location_id,
+#     current_values.current_value,
+#     plan.percentage AS plan_percent,
+#     plan.percentage * (net_worth.net_worth + (:change * constant.decimal)) / constant.decimal AS plan_value,
+#     current_values.current_value * constant.decimal * constant.decimal /
+#         (plan.percentage * (net_worth.net_worth + (:change * constant.decimal))) - constant.decimal AS deviation
+# FROM
+#     allocation AS plan, decimal_constant AS constant, net_worth
+# JOIN
+#     asset_class_value_by_location AS current_values ON current_values.asset_class_id == plan.asset_class_id AND
+#     current_values.location_id == plan.location_id
+# WHERE
+#     deviation < 0
+# ORDER BY
+#     deviation ASC
+# """
 
+# TODO: test to make sure this works with non distinct values
 deviation_levels = """
-WITH allocation_deviation AS ( 
-    SELECT
-        plan.asset_class_id,
-        plan.location_id,
-        current_values.current_value,
-        plan.percentage AS plan_percent,
-        plan.percentage * (net_worth.net_worth + (:change * constant.decimal)) / constant.decimal AS plan_value,
-        current_values.current_value * constant.decimal * constant.decimal / 
-            (plan.percentage * (net_worth.net_worth + (:change * constant.decimal))) - constant.decimal AS deviation
-    FROM 
-        allocation AS plan, decimal_constant AS constant, net_worth
-    JOIN 
-        asset_class_value_by_location AS current_values ON current_values.asset_class_id == plan.asset_class_id AND 
-        current_values.location_id == plan.location_id
-    WHERE
-        deviation < 0 
-    ORDER BY
-        deviation ASC 
-)
-SELECT deviation FROM allocation_deviation
+SELECT DISTINCT deviation FROM allocation_deviation
 """
 
 next_deviation_level = """
-WITH allocation_deviation AS ( 
-    SELECT
-        plan.asset_class_id,
-        plan.location_id,
-        current_values.current_value,
-        plan.percentage AS plan_percent,
-        plan.percentage * (net_worth.net_worth + (:change * constant.decimal)) / constant.decimal AS plan_value,
-        current_values.current_value * constant.decimal * constant.decimal / 
-            (plan.percentage * (net_worth.net_worth + (:change * constant.decimal))) - constant.decimal AS deviation
-    FROM 
-        allocation AS plan, decimal_constant AS constant, net_worth
-    JOIN 
-        asset_class_value_by_location AS current_values ON current_values.asset_class_id == plan.asset_class_id AND 
-        current_values.location_id == plan.location_id
-    WHERE
-        deviation < 0 
-    ORDER BY
-        deviation ASC
-)
 SELECT
     allocation_deviation.asset_class_id,
     allocation_deviation.location_id,
