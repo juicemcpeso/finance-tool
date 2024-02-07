@@ -511,7 +511,7 @@ deviation_levels = """
 SELECT DISTINCT deviation FROM allocation_deviation
 """
 
-next_deviation_level = """
+allocation_deviation_with_next_level = """
 SELECT
     allocation_deviation.asset_class_id,
     allocation_deviation.location_id,
@@ -523,7 +523,7 @@ SELECT
 FROM 
     allocation_deviation
 CROSS JOIN
-    (SELECT deviation FROM allocation_deviation) AS d 
+    (SELECT DISTINCT deviation FROM allocation_deviation) AS d 
 WHERE
     allocation_deviation.deviation < next_deviation
 ORDER BY

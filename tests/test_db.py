@@ -251,4 +251,4 @@ def test_deviation_levels(test_db_1):
 
 def test_next_deviation_level(test_db_1):
     expected = td_deviation.cross_join_expected
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.next_deviation_level)
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.allocation_deviation_with_next_level)
