@@ -552,6 +552,29 @@ ORDER BY
     next_deviation ASC
 """
 
+value_difference_at_each_deviation_level = """
+SELECT
+    allocation_deviation.asset_class_id,
+    allocation_deviation.location_id,
+    allocation_deviation.current_value,
+    allocation_deviation.plan_percent,
+    allocation_deviation.plan_value,
+    allocation_deviation.deviation,
+    d.deviation AS next_deviation,
+    (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS level_value,
+    ((d.deviation + decimal.constant) * allocation_deviation.plan_value / 
+        decimal.constant) - allocation_deviation.current_value AS value_difference 
+FROM 
+    allocation_deviation, decimal 
+CROSS JOIN
+    (SELECT deviation FROM allocation_deviation) AS d 
+WHERE
+    allocation_deviation.deviation < next_deviation
+ORDER BY
+    allocation_deviation.deviation ASC,
+    next_deviation ASC
+"""
+
 net_worth_formatted = """   
 SELECT
     net_worth.net_worth / decimal.constant AS net_worth
