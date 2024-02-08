@@ -20,25 +20,4 @@ insert_dict = {'account': db.insert_account,
 
 insert_sequence = {(table_name, sql) for table_name, sql in insert_dict.items()}
 
-table_names = {'account',
-               'account_type',
-               'allocation',
-               'asset',
-               'asset_class',
-               'balance',
-               'component',
-               'constant',
-               'institution',
-               'location',
-               'owner',
-               'price'}
 
-view_names = {'account_value_current_by_asset',
-              'allocation_deviation',
-              'asset_price_newest',
-              'asset_quantity_by_account_current',
-              'asset_value_current',
-              'asset_class_value_by_location',
-              'component_value',
-              'decimal',
-              'net_worth'}
