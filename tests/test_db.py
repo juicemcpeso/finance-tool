@@ -761,6 +761,39 @@ def test_remaining_amount(test_db_1, contribution, expected):
                                     params={'contribution': contribution})
 
 
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class_id': 1,
+                                                             'location_id': 2,
+                                                             'contribution': 10000000}]),
+                                                    (10000, [{'asset_class_id': 1,
+                                                              'location_id': 1,
+                                                              'contribution': 41538461},
+                                                             {'asset_class_id': 1,
+                                                              'location_id': 2,
+                                                              'contribution': 20769230},
+                                                             {'asset_class_id': 2,
+                                                              'location_id': 2,
+                                                              'contribution': 5192307}]),
+                                                    (100000, [{'asset_class_id': 1,
+                                                               'location_id': 1,
+                                                               'contribution': 240000000},
+                                                              {'asset_class_id': 1,
+                                                               'location_id': 2,
+                                                               'contribution': 120000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 1,
+                                                               'contribution': 150000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 2,
+                                                               'contribution': 30000000},
+                                                              {'asset_class_id': 3,
+                                                               'location_id': 1,
+                                                               'contribution': 60000000}])])
+def test_assign_remainder_proportionally(test_db_1, contribution, expected):
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.assign_remainder_proportionally,
+                                    params={'contribution': contribution})
+
+
 @pytest.mark.xfail(reason="functionality being refactored")
 @pytest.mark.parametrize('contribution, expected', [(0, []),
                                                     (1000, [{'asset_class_id': 1,
