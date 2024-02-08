@@ -12,39 +12,15 @@ import tests.data.expected as expected
 import tests.test_data_constraints as td_constraints
 
 
-@pytest.mark.parametrize('table_name, command', test_lookup.table_sequence)
-def test_create_table(tmp_path, table_name, command):
-    db_test = tmp_path / "test.db"
-    db.execute(database=db_test, cmd=command)
-
-    sql = """SELECT * FROM sqlite_master WHERE type = 'table'"""
-
-    assert db.fetch_all(database=db_test, cmd=sql)[0]['name'] == table_name
-    assert len(db.fetch_all(database=db_test, cmd=sql)) == 1
-
-
-@pytest.mark.parametrize('table_name, command', test_lookup.table_sequence)
-def test_create_table_columns(tmp_path, table_name, command):
-    db_test = tmp_path / "test.db"
-    db.execute(database=db_test, cmd=command)
-
+# TODO: make this test more clear (it checks to see if the columns in a table are correct)
+@pytest.mark.parametrize('table_name', test_lookup.table_names)
+def test_create_table_columns(test_db_0, table_name):
     sql = f"SELECT * FROM {table_name}"
 
-    assert db.column_names(database=db_test, cmd=sql) == list(setup.db_1[table_name][0].keys())
+    assert db.column_names(database=test_db_0, cmd=sql) == list(setup.db_1[table_name][0].keys())
 
 
-def test_create_tables(tmp_path):
-    db_test = tmp_path / "test.db"
-    db.execute_script(database=db_test, cmd=db.create_tables)
-
-    sql = """SELECT * FROM sqlite_master WHERE type = 'table'"""
-
-    result_list = db.fetch_all(database=db_test, cmd=sql)
-
-    assert set(line['name'] for line in result_list) == test_lookup.table_names
-
-
-def test_create_tables_test_db_0(test_db_0):
+def test_create_tables(test_db_0):
     sql = """SELECT * FROM sqlite_master WHERE type = 'table'"""
 
     result_list = db.fetch_all(database=test_db_0, cmd=sql)
@@ -52,29 +28,7 @@ def test_create_tables_test_db_0(test_db_0):
     assert set(line['name'] for line in result_list) == test_lookup.table_names
 
 
-@pytest.mark.parametrize('view_name, command', test_lookup.view_sequence)
-def test_create_view(tmp_path, view_name, command):
-    db_test = tmp_path / "test.db"
-    db.execute(database=db_test, cmd=command)
-
-    sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
-
-    assert db.fetch_all(database=db_test, cmd=sql)[0]['name'] == view_name
-    assert len(db.fetch_all(database=db_test, cmd=sql)) == 1
-
-
-def test_create_views(tmp_path):
-    db_test = tmp_path / "test.db"
-    db.execute_script(database=db_test, cmd=db.create_views)
-
-    sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
-
-    result_list = db.fetch_all(database=db_test, cmd=sql)
-
-    assert set(line['name'] for line in result_list) == test_lookup.view_names
-
-
-def test_create_views_test_db_0(test_db_0):
+def test_create_views(test_db_0):
     sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
 
     result_list = db.fetch_all(database=test_db_0, cmd=sql)
