@@ -643,9 +643,18 @@ def test_value_difference_at_each_deviation_level(test_db_1):
 
 
 def test_sum_value_difference_at_each_deviation_level(test_db_1):
-    expected = [{'deviation': -2000, 'total_difference': 20000000},
+    expected = [{'deviation': -3000, 'total_difference': 0},
+                {'deviation': -2000, 'total_difference': 20000000},
                 {'deviation': -1500, 'total_difference': 32500000},
                 {'deviation': 3600, 'total_difference': 364000000},
                 {'deviation': 4000, 'total_difference': 400000000}]
 
     assert expected == db.fetch_all(database=test_db_1, cmd=db.sum_value_difference_at_each_deviation_level)
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, {'deviation': -3000}),
+                                                    (1000, {'deviation': -3000}),
+                                                    (10000, {'deviation': -1500}),
+                                                    (100000, {'deviation': 4000})])
+def test_which_deviation_level(test_db_1, contribution, expected):
+    assert expected == db.fetch_one(database=test_db_1, cmd=db.which_deviation_level, params={'contribution': contribution})
