@@ -145,6 +145,29 @@ ORDER BY
     deviation ASC
 ;
 
+CREATE VIEW IF NOT EXISTS allocation_deviation_all_levels AS
+SELECT
+    allocation_deviation.asset_class_id,
+    allocation_deviation.location_id,
+    allocation_deviation.current_value,
+    allocation_deviation.plan_percent,
+    allocation_deviation.plan_value,
+    allocation_deviation.deviation,
+    d.deviation AS next_deviation,
+    (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS level_value,
+    ((d.deviation + decimal.constant) * allocation_deviation.plan_value /
+        decimal.constant) - allocation_deviation.current_value AS value_difference
+FROM
+    allocation_deviation, decimal
+CROSS JOIN
+     deviation_level AS d
+WHERE
+    allocation_deviation.deviation < next_deviation
+ORDER BY
+    allocation_deviation.deviation ASC,
+    next_deviation ASC
+;
+
 CREATE VIEW IF NOT EXISTS asset_price_newest AS
 SELECT
     asset_id,
