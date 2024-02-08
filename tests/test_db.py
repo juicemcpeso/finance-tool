@@ -697,6 +697,39 @@ def test_fill_full_amounts(test_db_1, contribution, expected):
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
                                                     (1000, [{'asset_class_id': 1,
+                                                             'location_id': 2,
+                                                             'contribution': 0}]),
+                                                    (10000, [{'asset_class_id': 1,
+                                                              'location_id': 2,
+                                                              'contribution': 30000000},
+                                                             {'asset_class_id': 2,
+                                                              'location_id': 2,
+                                                              'contribution': 2500000},
+                                                             {'asset_class_id': 1,
+                                                              'location_id': 1,
+                                                              'contribution': 0}]),
+                                                    (100000, [{'asset_class_id': 1,
+                                                               'location_id': 1,
+                                                               'contribution': 220000000},
+                                                              {'asset_class_id': 1,
+                                                               'location_id': 2,
+                                                               'contribution': 140000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 2,
+                                                               'contribution': 30000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 1,
+                                                               'contribution': 10000000},
+                                                              {'asset_class_id': 3,
+                                                               'location_id': 1,
+                                                               'contribution': 0}])])
+def test_fill_full_amounts_inclusive(test_db_1, contribution, expected):
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.fill_full_amounts_inclusive,
+                                    params={'contribution': contribution})
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class_id': 1,
                                                              'location_id': 2}]),
                                                     (10000, [{'asset_class_id': 1,
                                                               'location_id': 1},
@@ -715,7 +748,8 @@ def test_fill_full_amounts(test_db_1, contribution, expected):
                                                               {'asset_class_id': 3,
                                                                'location_id': 1}])])
 def test_which_accounts_receive_funds(test_db_1, contribution, expected):
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.which_accounts_receive_funds, params={'contribution': contribution})
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.which_accounts_receive_funds,
+                                    params={'contribution': contribution})
 
 
 @pytest.mark.xfail(reason="functionality being refactored")
