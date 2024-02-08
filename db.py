@@ -154,55 +154,6 @@ INSERT INTO price(id, asset_id, price_date, amount)
 VALUES(:id, :asset_id, :price_date, :amount)
 """
 
-# SELECT
-select_account = """
-SELECT * FROM account
-"""
-
-select_account_type = """
-SELECT * FROM account_type
-"""
-
-select_allocation = """
-SELECT * FROM allocation
-"""
-
-select_asset = """
-SELECT * FROM asset
-"""
-
-select_asset_class = """
-SELECT * FROM asset_class
-"""
-
-select_balance = """
-SELECT * FROM balance
-"""
-
-select_component = """
-SELECT * FROM component
-"""
-
-select_constant = """
-SELECT * FROM constant
-"""
-
-select_institution = """
-SELECT * FROM institution
-"""
-
-select_location = """
-SELECT * FROM location
-"""
-
-select_owner = """
-SELECT * FROM owner
-"""
-
-select_price = """
-SELECT * FROM price
-"""
-
 # Calculations
 # Allocation
 # TODO: test to make sure this works with non distinct values
