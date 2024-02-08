@@ -209,6 +209,11 @@ CREATE VIEW IF NOT EXISTS decimal AS
     WHERE name = 'decimal'
 ;
 
+-- TODO: make sure this works with non distinct values
+CREATE VIEW IF NOT EXISTS deviation_level AS
+    SELECT DISTINCT deviation FROM allocation_deviation
+;
+
 CREATE VIEW IF NOT EXISTS net_worth AS
     SELECT
         SUM(current_values.current_value) AS net_worth

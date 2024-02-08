@@ -27,6 +27,7 @@ view_names = {'account_value_current_by_asset',
               'asset_class_value_by_location',
               'component_value',
               'decimal',
+              'deviation_level',
               'net_worth'}
 
 
@@ -277,6 +278,16 @@ def test_view_decimal(test_db_2):
     assert expected == db.fetch_one(database=test_db_2, cmd=command)
 
 
+def test_view_deviation_level(test_db_1):
+    expected = [{'deviation': -3000},
+                {'deviation': -2000},
+                {'deviation': -1500},
+                {'deviation': 3600},
+                {'deviation': 4000}]
+    command = "SELECT * FROM deviation_level"
+    assert db.fetch_all(database=test_db_1, cmd=command) == expected
+
+
 def test_view_net_worth(test_db_2):
     expected = {'net_worth': 500000000}
 
@@ -385,15 +396,6 @@ formatted_expected_constraints = [(line['table'], line['expected']) for line in 
 def test_constraints(test_db_0, table_name, expected):
     db.execute(database=test_db_0, cmd=insert_dict[table_name], params=expected)
     assert db.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == []
-
-
-def test_deviation_levels(test_db_1):
-    expected = [{'deviation': -3000},
-                {'deviation': -2000},
-                {'deviation': -1500},
-                {'deviation': 3600},
-                {'deviation': 4000}]
-    assert db.fetch_all(database=test_db_1, cmd=db.deviation_levels) == expected
 
 
 def test_allocation_deviation_with_next_level(test_db_1):
