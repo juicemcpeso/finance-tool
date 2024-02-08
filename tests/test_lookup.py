@@ -19,5 +19,3 @@ insert_dict = {'account': db.insert_account,
                'price': db.insert_price}
 
 insert_sequence = {(table_name, sql) for table_name, sql in insert_dict.items()}
-
-

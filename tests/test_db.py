@@ -5,7 +5,7 @@
 
 import db
 import pytest
-
+import json
 import tests.test_lookup as test_lookup
 import tests.data.setup as setup
 import tests.data.expected as expected
@@ -71,36 +71,75 @@ def test_create_views(test_db_0):
 
 
 # Test - insert
-@pytest.mark.xfail(reason="Need to change how this test is parameterized with new json data")
-@pytest.mark.parametrize('table_name, command', test_lookup.insert_sequence)
+insert_list = [('account', db.insert_account),
+               ('account_type', db.insert_account_type),
+               ('allocation', db.insert_allocation),
+               ('asset', db.insert_asset),
+               ('asset_class', db.insert_asset_class),
+               ('balance', db.insert_balance),
+               ('component', db.insert_component),
+               ('constant', db.insert_constant),
+               ('institution', db.insert_institution),
+               ('location', db.insert_location),
+               ('owner', db.insert_owner),
+               ('price', db.insert_price)]
+
+insert_entry = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
+                'account_type': [{'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}],
+                'allocation': [{'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000}],
+                'asset': [{'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'}],
+                'asset_class': [{'id': 1, 'name': 'stocks'}],
+                'balance': [{'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000}],
+                'component': [{'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000}],
+                'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
+                'institution': [{'id': 1, 'name': 'Rearguard Investments'}],
+                'location': [{'id': 1, 'name': 'USA'}],
+                'owner': [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'}],
+                'price': [{'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}]}
+
+insert_expected = {
+    'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
+    'account_type': [{'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}],
+    'allocation': [{'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 4000}],
+    'asset': [{'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'}],
+    'asset_class': [{'id': 1, 'name': 'stocks'}],
+    'balance': [{'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 340000000}],
+    'component': [{'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 10000}],
+    'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
+    'institution': [{'id': 1, 'name': 'Rearguard Investments'}],
+    'location': [{'id': 1, 'name': 'USA'}],
+    'owner': [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'}],
+    'price': [{'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 10000}]}
+
+
+@pytest.mark.parametrize('table_name, command', insert_list)
 def test_insert(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = setup.first_lines[table_name][0]
-    db.execute(database=test_db_0, cmd=command, params=test_data)
-    assert db.fetch_one(database=test_db_0, cmd=sql) == expected.first_lines[table_name][0]
+
+    db.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry[table_name])
+    assert db.fetch_all(database=test_db_0, cmd=sql) == insert_expected[table_name]
 
 
-@pytest.mark.xfail(reason="Need to change how this test is parameterized with new json data")
-@pytest.mark.parametrize('table_name, command', test_lookup.insert_sequence)
+insert_entry_no_id = {
+    'account': [{'id': None, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
+    'account_type': [{'id': None, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}],
+    'allocation': [{'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000}],
+    'asset': [{'id': None, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'}],
+    'asset_class': [{'id': None, 'name': 'stocks'}],
+    'balance': [{'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000}],
+    'component': [{'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000}],
+    'constant': [{'id': None, 'name': 'decimal', 'amount': 10000}],
+    'institution': [{'id': None, 'name': 'Rearguard Investments'}],
+    'location': [{'id': None, 'name': 'USA'}],
+    'owner': [{'id': None, 'name': 'Bob', 'birthday': '1992-10-31'}],
+    'price': [{'id': None, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}]}
+
+
+@pytest.mark.parametrize('table_name, command', insert_list)
 def test_insert_no_id(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    test_data = setup.first_lines[table_name][0]
-    test_data.update({'id': None})
-    db.execute(database=test_db_0, cmd=command, params=test_data)
-    test_data.update({'id': 1})
-    assert db.fetch_one(database=test_db_0, cmd=sql) == expected.first_lines[table_name][0]
-
-
-@pytest.mark.xfail(reason="Need to change how this test is parameterized with new json data")
-@pytest.mark.parametrize('table_name, command', test_lookup.insert_sequence)
-def test_insert_id_2(test_db_0, table_name, command):
-    sql = f"""SELECT * FROM {table_name}"""
-    test_data = setup.first_lines[table_name][0]
-    test_data.update({'id': 2})
-    db.execute(database=test_db_0, cmd=command, params=test_data)
-    response = expected.first_lines[table_name][0]
-    response.update({'id': 2})
-    assert db.fetch_one(database=test_db_0, cmd=sql) == response
+    db.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry_no_id[table_name])
+    assert db.fetch_all(database=test_db_0, cmd=sql) == insert_expected[table_name]
 
 
 # Test views
