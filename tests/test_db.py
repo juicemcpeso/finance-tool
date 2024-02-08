@@ -5,11 +5,6 @@
 
 import db
 import pytest
-import json
-import tests.test_lookup as test_lookup
-import tests.data.setup as setup
-import tests.data.expected as expected
-import tests.test_data_constraints as td_constraints
 
 table_names = {'account',
                'account_type',
@@ -71,18 +66,33 @@ def test_create_views(test_db_0):
 
 
 # Test - insert
-insert_list = [('account', db.insert_account),
-               ('account_type', db.insert_account_type),
-               ('allocation', db.insert_allocation),
-               ('asset', db.insert_asset),
-               ('asset_class', db.insert_asset_class),
-               ('balance', db.insert_balance),
-               ('component', db.insert_component),
-               ('constant', db.insert_constant),
-               ('institution', db.insert_institution),
-               ('location', db.insert_location),
-               ('owner', db.insert_owner),
-               ('price', db.insert_price)]
+insert_dict = {'account': db.insert_account,
+               'account_type': db.insert_account_type,
+               'allocation': db.insert_allocation,
+               'asset': db.insert_asset,
+               'asset_class': db.insert_asset_class,
+               'balance': db.insert_balance,
+               'component': db.insert_component,
+               'constant': db.insert_constant,
+               'institution': db.insert_institution,
+               'location': db.insert_location,
+               'owner': db.insert_owner,
+               'price': db.insert_price}
+
+insert_sequence = {(table_name, sql) for table_name, sql in insert_dict.items()}
+#
+# insert_list = [('account', db.insert_account),
+#                ('account_type', db.insert_account_type),
+#                ('allocation', db.insert_allocation),
+#                ('asset', db.insert_asset),
+#                ('asset_class', db.insert_asset_class),
+#                ('balance', db.insert_balance),
+#                ('component', db.insert_component),
+#                ('constant', db.insert_constant),
+#                ('institution', db.insert_institution),
+#                ('location', db.insert_location),
+#                ('owner', db.insert_owner),
+#                ('price', db.insert_price)]
 
 insert_entry = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
                 'account_type': [{'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}],
@@ -112,7 +122,7 @@ insert_expected = {
     'price': [{'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 10000}]}
 
 
-@pytest.mark.parametrize('table_name, command', insert_list)
+@pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
 
@@ -135,7 +145,7 @@ insert_entry_no_id = {
     'price': [{'id': None, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}]}
 
 
-@pytest.mark.parametrize('table_name, command', insert_list)
+@pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert_no_id(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
     db.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry_no_id[table_name])
@@ -249,9 +259,91 @@ def test_net_worth_formatted(test_db_2):
     assert db.fetch_one(database=test_db_2, cmd=db.net_worth_formatted) == {'net_worth': 50000.0}
 
 
-@pytest.mark.parametrize('table_name, expected', td_constraints.formatted_expected)
+# Test constraints
+expected = [{'table': 'account',
+             'expected': {'id': None, 'name': None, 'account_type_id': 0, 'institution_id': 0, 'owner_id': 0}},
+            {'table': 'account_type',
+             'expected': {'id': None, 'name': 'test', 'tax_in': 1, 'tax_growth': 4, 'tax_out': 0}},
+            {'table': 'account_type',
+             'expected': {'id': None, 'name': None, 'tax_in': 1, 'tax_growth': 0, 'tax_out': 0}},
+            {'table': 'allocation',
+             'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 3}},
+            {'table': 'allocation',
+             'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 'test'}},
+            {'table': 'allocation',
+             'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': None}},
+            {'table': 'asset',
+             'expected': {'id': None, 'name': 'test', 'symbol': None}},
+            {'table': 'asset',
+             'expected': {'id': None, 'name': None, 'symbol': 'TEST'}},
+            {'table': 'asset_class',
+             'expected': {'id': None, 'name': None}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 6, 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'test', 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'April 16, 2023', 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2024-15-43', 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': None, 'quantity': 1}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': None}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01',
+                          'quantity': 'test'}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': ''}},
+            {'table': 'balance',
+             'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': -123}},
+            {'table': 'component',
+             'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.01}},
+            {'table': 'component',
+             'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': -0.01}},
+            {'table': 'institution',
+             'expected': {'id': None, 'name': None}},
+            {'table': 'location',
+             'expected': {'id': None, 'name': None}},
+            {'table': 'owner',
+             'expected': {'id': None, 'name': None, 'birthday': '2021-01-01'}},
+            {'table': 'owner',
+             'expected': {'id': None, 'name': 'test', 'birthday': 'test'}},
+            {'table': 'owner',
+             'expected': {'id': None, 'name': 'test', 'birthday': ''}},
+            {'table': 'owner',
+             'expected': {'id': None, 'name': 'test', 'birthday': '2024-15-43'}},
+            {'table': 'owner',
+             'expected': {'id': None, 'name': 'test', 'birthday': 'April 16, 2023'}},
+            {'table': 'owner',
+             'expected': {'id': None, 'name': 'test', 'birthday': None}},
+            {'table': 'owner',
+             'expected': {'id': None, 'name': 'test', 'birthday': 6}},
+            {'table': 'price',
+             'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': ''}},
+            {'table': 'price',
+             'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': None}},
+            {'table': 'price',
+             'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': 'six'}},
+            {'table': 'price',
+             'expected': {'id': None, 'asset_id': 1, 'price_date': '2024-51-51', 'amount': 1}},
+            {'table': 'price',
+             'expected': {'id': None, 'asset_id': 1, 'price_date': 'test', 'amount': 1}},
+            {'table': 'price',
+             'expected': {'id': None, 'asset_id': 1, 'price_date': None, 'amount': 1}},
+            {'table': 'price',
+             'expected': {'id': None, 'asset_id': 1, 'price_date': 'April 16, 2023', 'amount': 1}},
+            {'table': 'price',
+             'expected': {'id': None, 'asset_id': 1, 'price_date': 6, 'amount': 1}},
+            {'table': 'price',
+             'expected': {'id': None, 'asset_id': 1, 'price_date': '', 'amount': 1}}]
+
+formatted_expected = [(line['table'], line['expected']) for line in expected]
+
+
+@pytest.mark.parametrize('table_name, expected', formatted_expected)
 def test_constraints(test_db_0, table_name, expected):
-    db.execute(database=test_db_0, cmd=test_lookup.insert_dict[table_name], params=expected)
+    db.execute(database=test_db_0, cmd=insert_dict[table_name], params=expected)
     assert db.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == []
 
 
