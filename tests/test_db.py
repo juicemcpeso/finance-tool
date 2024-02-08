@@ -752,6 +752,15 @@ def test_which_accounts_receive_funds(test_db_1, contribution, expected):
                                     params={'contribution': contribution})
 
 
+@pytest.mark.parametrize('contribution, expected', [(0, {'remainder': 0}),
+                                                    (1000, {'remainder': 10000000}),
+                                                    (10000, {'remainder': 67500000}),
+                                                    (100000, {'remainder': 600000000})])
+def test_remaining_amount(test_db_1, contribution, expected):
+    assert expected == db.fetch_one(database=test_db_1, cmd=db.remaining_amount,
+                                    params={'contribution': contribution})
+
+
 @pytest.mark.xfail(reason="functionality being refactored")
 @pytest.mark.parametrize('contribution, expected', [(0, []),
                                                     (1000, [{'asset_class_id': 1,

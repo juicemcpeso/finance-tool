@@ -445,6 +445,47 @@ WHERE
     allocation_deviation.deviation <= which_deviation_level.deviation and :contribution > 0
 """
 
+remaining_amount = """
+WITH deviation_checkpoint_values AS (
+    WITH value_difference_each_deviation_level  AS (
+    SELECT
+        allocation_deviation.asset_class_id,
+        allocation_deviation.location_id,
+        allocation_deviation.current_value,
+        allocation_deviation.plan_percent,
+        allocation_deviation.plan_value,
+        allocation_deviation.deviation,
+        d.deviation AS next_deviation,
+        (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS level_value,
+        ((d.deviation + decimal.constant) * allocation_deviation.plan_value / 
+            decimal.constant) - allocation_deviation.current_value AS value_difference 
+    FROM 
+        allocation_deviation, decimal 
+    CROSS JOIN
+        (SELECT deviation FROM allocation_deviation) AS d 
+    ORDER BY
+        allocation_deviation.deviation ASC,
+        next_deviation ASC
+    )
+    SELECT
+        next_deviation AS deviation,
+        SUM(value_difference) AS total_difference 
+    FROM
+        value_difference_each_deviation_level 
+    WHERE
+        value_difference >= 0
+    GROUP BY
+        next_deviation
+)
+SELECT
+    :contribution * decimal.constant - MAX(total_difference) AS remainder
+FROM 
+    deviation_checkpoint_values,
+    decimal
+WHERE
+    total_difference <= :contribution * decimal.constant 
+"""
+
 net_worth_formatted = """   
 SELECT
     net_worth.net_worth / decimal.constant AS net_worth
