@@ -297,6 +297,55 @@ WHERE
     total_difference <= :contribution * decimal.constant
 """
 
+fill_full_amounts = """
+WITH value_difference_each_deviation_level  AS (
+SELECT
+    allocation_deviation.asset_class_id,
+    allocation_deviation.location_id,
+    allocation_deviation.current_value,
+    allocation_deviation.plan_percent,
+    allocation_deviation.plan_value,
+    allocation_deviation.deviation,
+    d.deviation AS next_deviation,
+    (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS level_value,
+    ((d.deviation + decimal.constant) * allocation_deviation.plan_value / 
+        decimal.constant) - allocation_deviation.current_value AS value_difference 
+FROM 
+    allocation_deviation, decimal 
+CROSS JOIN
+    (SELECT deviation FROM allocation_deviation) AS d 
+ORDER BY
+    allocation_deviation.deviation ASC,
+    next_deviation ASC
+)
+SELECT
+    asset_class_id,
+    location_id,
+    value_difference AS contribution
+FROM (
+    SELECT
+        MAX(deviation) AS deviation
+    FROM (
+        SELECT
+            next_deviation AS deviation,
+            SUM(value_difference) AS total_difference 
+        FROM
+            value_difference_each_deviation_level 
+        WHERE
+            value_difference >= 0
+        GROUP BY
+            next_deviation),
+        decimal
+    WHERE
+        total_difference <= :contribution * decimal.constant) AS which_deviation_level,
+    value_difference_each_deviation_level
+WHERE
+    next_deviation == which_deviation_level.deviation AND
+    value_difference > 0
+ORDER BY
+    contribution DESC
+"""
+
 net_worth_formatted = """   
 SELECT
     net_worth.net_worth / decimal.constant AS net_worth

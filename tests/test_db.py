@@ -668,3 +668,61 @@ def test_sum_value_difference_at_each_deviation_level(test_db_1):
 def test_which_deviation_level(test_db_1, contribution, expected):
     assert expected == db.fetch_one(database=test_db_1, cmd=db.which_deviation_level,
                                     params={'contribution': contribution})
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, []),
+                                                    (10000, [{'asset_class_id': 1,
+                                                              'location_id': 2,
+                                                              'contribution': 30000000},
+                                                             {'asset_class_id': 2,
+                                                              'location_id': 2,
+                                                              'contribution': 2500000}]),
+                                                    (100000, [{'asset_class_id': 1,
+                                                               'location_id': 1,
+                                                               'contribution': 220000000},
+                                                              {'asset_class_id': 1,
+                                                               'location_id': 2,
+                                                               'contribution': 140000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 2,
+                                                               'contribution': 30000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 1,
+                                                               'contribution': 10000000}])])
+def test_fill_full_amounts(test_db_1, contribution, expected):
+    assert expected == db.fetch_all(database=test_db_1, cmd=db.fill_full_amounts,
+                                    params={'contribution': contribution})
+
+
+@pytest.mark.skip(reason="functionality being refactored")
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class_id': 1,
+                                                             'location_id': 2,
+                                                             'contribution': 10000000}]),
+                                                    (10000, [{'asset_class_id': 1,
+                                                              'location_id': 2,
+                                                              'contribution': 50765539},
+                                                             {'asset_class_id': 2,
+                                                              'location_id': 2,
+                                                              'contribution': 7691385},
+                                                             {'asset_class_id': 1,
+                                                              'location_id': 1,
+                                                              'contribution': 41543076}]),
+                                                    (100000, [{'asset_class_id': 1,
+                                                               'location_id': 2,
+                                                               'contribution': 260000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 2,
+                                                               'contribution': 60000000},
+                                                              {'asset_class_id': 1,
+                                                               'location_id': 1,
+                                                               'contribution': 460000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 1,
+                                                               'contribution': 160000000},
+                                                              {'asset_class_id': 3,
+                                                               'location_id': 1,
+                                                               'contribution': 60000000}])])
+def test_where_to_contribute(test_db_1, contribution, expected):
+    pass
