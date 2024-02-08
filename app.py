@@ -26,21 +26,7 @@ class App:
                                'owner': db.insert_owner,
                                'price': db.insert_price}
 
-        self._lookup_select = {'account': db.select_account,
-                               'account_type': db.select_account_type,
-                               'allocation': db.select_allocation,
-                               'asset': db.select_asset,
-                               'asset_class': db.select_asset_class,
-                               'balance': db.select_balance,
-                               'component': db.select_component,
-                               'constant': db.select_constant,
-                               'institution': db.select_institution,
-                               'location': db.select_location,
-                               'owner': db.select_owner,
-                               'price': db.select_price}
-
-        self._lookup = {'insert': self._lookup_insert,
-                        'select': self._lookup_select}
+        self._lookup = {'insert': self._lookup_insert}
 
     def __getitem__(self, key):
         return self._lookup[key]
@@ -52,14 +38,15 @@ class App:
         return self._lookup.keys()
 
     # CSV
-    def insert_from_csv_file(self, file_path, table_name):
-        with open(file_path) as csv_file:
-            csv_dict = csv.DictReader(csv_file)
-            db.execute_many(database=self.db, cmd=self['insert'][table_name], data_sequence=csv_dict)
-
-    def insert_from_csv_directory(self, directory_path):
-        for file_name in os.listdir(directory_path):
-            self.insert_from_csv_file(file_path=directory_path + file_name, table_name=os.path.splitext(file_name)[0])
+    # TODO: convert to JSON
+    # def insert_from_csv_file(self, file_path, table_name):
+    #     with open(file_path) as csv_file:
+    #         csv_dict = csv.DictReader(csv_file)
+    #         db.execute_many(database=self.db, cmd=self['insert'][table_name], data_sequence=csv_dict)
+    #
+    # def insert_from_csv_directory(self, directory_path):
+    #     for file_name in os.listdir(directory_path):
+    #         self.insert_from_csv_file(file_path=directory_path + file_name, table_name=os.path.splitext(file_name)[0])
 
     # Tools
     def where_to_contribute(self, contribution_amount):

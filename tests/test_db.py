@@ -66,12 +66,6 @@ def test_insert_id_2(test_db_0, table_name, command):
     assert db.fetch_one(database=test_db_0, cmd=sql) == response
 
 
-# Test select
-@pytest.mark.parametrize('table_name, command', test_lookup.select_sequence)
-def test_select(test_db_2, table_name, command):
-    assert expected.db_2[table_name] == db.fetch_all(database=test_db_2, cmd=command)
-
-
 # Test views
 def test_view_account_value_current_by_asset(test_db_2):
     expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 40000000},
@@ -182,8 +176,7 @@ def test_net_worth_formatted(test_db_2):
 @pytest.mark.parametrize('table_name, expected', td_constraints.formatted_expected)
 def test_constraints(test_db_0, table_name, expected):
     db.execute(database=test_db_0, cmd=test_lookup.insert_dict[table_name], params=expected)
-
-    assert db.fetch_all(database=test_db_0, cmd=test_lookup.select_dict[table_name]) == []
+    assert db.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == []
 
 
 def test_deviation_levels(test_db_1):
