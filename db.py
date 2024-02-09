@@ -690,79 +690,77 @@ GROUP BY
 # """
 
 where_to_contribute = """
-WITH assign_remainder AS (
-    WITH 
-    remaining_amount AS (
-        SELECT
-            :contribution * decimal.constant - MAX(level_value) AS remainder
-        FROM 
-            deviation_level_value, 
-            decimal
-        WHERE
-            level_value <= :contribution * decimal.constant),
-    accounts_receiving_funds AS (
-        WITH which_deviation_level AS (
-        SELECT
-            MAX(deviation) AS deviation
-        FROM
-            deviation_level_value,
-            decimal
-        WHERE
-            level_value <= :contribution * decimal.constant
-        )
-        SELECT
-            asset_class_id,
-            location_id,
-            plan_percent
-        FROM
-            allocation_deviation,
-            which_deviation_level
-        WHERE
-            allocation_deviation.deviation <= which_deviation_level.deviation and :contribution > 0)
+WITH 
+level AS (
     SELECT
-        asset_class_id,
-        location_id,
-        remainder * plan_percent / sum AS contribution
+        MAX(deviation) AS deviation
     FROM
-        accounts_receiving_funds,
-        remaining_amount,
-        (SELECT
-            SUM(plan_percent) AS sum
-        FROM
-            accounts_receiving_funds)
-    GROUP BY
-        asset_class_id,
-        location_id),
-fill_to_checkpoint AS (
+        deviation_level_value,
+        decimal
+    WHERE
+        level_value <= :contribution * decimal.constant
+),
+subset_percent AS (
+    SELECT
+        SUM(plan_percent) AS sum
+    FROM
+        allocation_deviation,
+        level
+    WHERE
+        allocation_deviation.deviation <= level.deviation
+),
+fill_to_level AS (
     SELECT
         asset_class_id,
         location_id,
         value_difference AS contribution
-    FROM (
-        SELECT
-            MAX(deviation) AS deviation
-        FROM
-            deviation_level_value,
-            decimal
-        WHERE
-            level_value <= :contribution * decimal.constant) AS which_deviation_level,
+    FROM
+        level,
         allocation_deviation_all_levels 
     WHERE
-        next_deviation == which_deviation_level.deviation AND
+        next_deviation == level.deviation AND
         value_difference >= 0 AND
         :contribution > 0
     ORDER BY
-        contribution DESC)
+        contribution DESC
+),
+remaining_amount AS (
+    SELECT
+        :contribution * decimal.constant - MAX(level_value) AS remainder
+    FROM 
+        deviation_level_value, 
+        decimal
+    WHERE
+        level_value <= :contribution * decimal.constant
+),
+assign_remainder AS (
+    SELECT
+        asset_class_id,
+        location_id,
+        remainder * plan_percent / subset_percent.sum AS contribution
+    FROM
+        allocation_deviation,
+        level,
+        remaining_amount,
+        subset_percent
+    WHERE
+        allocation_deviation.deviation <= level.deviation AND
+        :contribution > 0
+    GROUP BY
+        asset_class_id,
+        location_id
+)
+
 SELECT
-    fill_to_checkpoint.asset_class_id,
-    fill_to_checkpoint.location_id,
-    fill_to_checkpoint.contribution + assign_remainder.contribution AS contribution 
+    fill_to_level.asset_class_id,
+    fill_to_level.location_id,
+    fill_to_level.contribution + assign_remainder.contribution AS contribution 
 FROM
-    fill_to_checkpoint,
+    fill_to_level,
     assign_remainder
 WHERE
-    fill_to_checkpoint.asset_class_id = assign_remainder.asset_class_id AND
-    fill_to_checkpoint.location_id == assign_remainder.location_id 
+    fill_to_level.asset_class_id = assign_remainder.asset_class_id AND
+    fill_to_level.location_id == assign_remainder.location_id 
 """
 
 net_worth_formatted = """   
