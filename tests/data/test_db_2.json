@@ -1,0 +1,379 @@
+{
+    "account": [
+        {
+            "id": 1,
+            "name": "Work 401k",
+            "account_type_id": 1,
+            "institution_id": 1,
+            "owner_id": 1
+        },
+        {
+            "id": 2,
+            "name": "Bob's Roth IRA",
+            "account_type_id": 2,
+            "institution_id": 1,
+            "owner_id": 1
+        },
+        {
+            "id": 3,
+            "name": "Bob's Bonds",
+            "account_type_id": 3,
+            "institution_id": 3,
+            "owner_id": 1
+        },
+        {
+            "id": 4,
+            "name": "Anna's Stocks",
+            "account_type_id": 3,
+            "institution_id": 1,
+            "owner_id": 2
+        },
+        {
+            "id": 5,
+            "name": "Anna's Savings",
+            "account_type_id": 3,
+            "institution_id": 2,
+            "owner_id": 2
+        }
+    ],
+    "account_type": [
+        {
+            "id": 1,
+            "name": "401k",
+            "tax_in": 0,
+            "tax_growth": 0,
+            "tax_out": 1
+        },
+        {
+            "id": 2,
+            "name": "Roth IRA",
+            "tax_in": 1,
+            "tax_growth": 0,
+            "tax_out": 0
+        },
+        {
+            "id": 3,
+            "name": "Taxable",
+            "tax_in": 1,
+            "tax_growth": 1,
+            "tax_out": 1
+        }
+    ],
+    "allocation": [
+        {
+            "id": 1,
+            "asset_class_id": 1,
+            "location_id": 1,
+            "percentage": 0.4
+        },
+        {
+            "id": 2,
+            "asset_class_id": 1,
+            "location_id": 2,
+            "percentage": 0.2
+        },
+        {
+            "id": 3,
+            "asset_class_id": 2,
+            "location_id": 1,
+            "percentage": 0.25
+        },
+        {
+            "id": 4,
+            "asset_class_id": 2,
+            "location_id": 2,
+            "percentage": 0.05
+        },
+        {
+            "id": 5,
+            "asset_class_id": 3,
+            "location_id": 1,
+            "percentage": 0.1
+        }
+    ],
+    "asset": [
+        {
+            "id": 1,
+            "name": "US Dollars",
+            "symbol": "USD"
+        },
+        {
+            "id": 2,
+            "name": "Rearguard Total International Stock Index Fund",
+            "symbol": "RINTL"
+        },
+        {
+            "id": 3,
+            "name": "Rearguard Total Stock Market Index Fund",
+            "symbol": "RUSIF"
+        },
+        {
+            "id": 4,
+            "name": "Bullsye Investments Target Date Fund",
+            "symbol": "BITDF"
+        },
+        {
+            "id": 5,
+            "name": "Series 2021-12 J Bonds",
+            "symbol": "J Bond"
+        }
+    ],
+    "asset_class": [
+        {
+            "id": 1,
+            "name": "stocks"
+        },
+        {
+            "id": 2,
+            "name": "bonds"
+        },
+        {
+            "id": 3,
+            "name": "cash"
+        },
+        {
+            "id": 4,
+            "name": "other"
+        }
+    ],
+    "balance": [
+        {
+            "id": 1,
+            "account_id": 1,
+            "asset_id": 4,
+            "balance_date": "2021-01-01",
+            "quantity": 5
+        },
+        {
+            "id": 2,
+            "account_id": 1,
+            "asset_id": 4,
+            "balance_date": "2022-01-01",
+            "quantity": 50
+        },
+        {
+            "id": 3,
+            "account_id": 2,
+            "asset_id": 3,
+            "balance_date": "2021-01-01",
+            "quantity": 9
+        },
+        {
+            "id": 4,
+            "account_id": 2,
+            "asset_id": 3,
+            "balance_date": "2022-01-01",
+            "quantity": 100
+        },
+        {
+            "id": 5,
+            "account_id": 3,
+            "asset_id": 5,
+            "balance_date": "2021-12-15",
+            "quantity": 10000
+        },
+        {
+            "id": 6,
+            "account_id": 4,
+            "asset_id": 2,
+            "balance_date": "2020-01-01",
+            "quantity": 4000
+        },
+        {
+            "id": 7,
+            "account_id": 4,
+            "asset_id": 3,
+            "balance_date": "2021-01-01",
+            "quantity": 50
+        },
+        {
+            "id": 8,
+            "account_id": 4,
+            "asset_id": 2,
+            "balance_date": "2022-01-01",
+            "quantity": 5000
+        },
+        {
+            "id": 9,
+            "account_id": 5,
+            "asset_id": 1,
+            "balance_date": "2021-01-01",
+            "quantity": 16000
+        },
+        {
+            "id": 10,
+            "account_id": 5,
+            "asset_id": 1,
+            "balance_date": "2022-01-01",
+            "quantity": 20000
+        }
+    ],
+    "component": [
+        {
+            "id": 1,
+            "asset_id": 1,
+            "asset_class_id": 3,
+            "location_id": 1,
+            "percentage": 1.0
+        },
+        {
+            "id": 2,
+            "asset_id": 2,
+            "asset_class_id": 1,
+            "location_id": 2,
+            "percentage": 1.0
+        },
+        {
+            "id": 3,
+            "asset_id": 3,
+            "asset_class_id": 1,
+            "location_id": 1,
+            "percentage": 1.0
+        },
+        {
+            "id": 4,
+            "asset_id": 4,
+            "asset_class_id": 1,
+            "location_id": 1,
+            "percentage": 0.55
+        },
+        {
+            "id": 5,
+            "asset_id": 4,
+            "asset_class_id": 1,
+            "location_id": 2,
+            "percentage": 0.25
+        },
+        {
+            "id": 6,
+            "asset_id": 4,
+            "asset_class_id": 2,
+            "location_id": 1,
+            "percentage": 0.1
+        },
+        {
+            "id": 7,
+            "asset_id": 4,
+            "asset_class_id": 2,
+            "location_id": 2,
+            "percentage": 0.05
+        },
+        {
+            "id": 8,
+            "asset_id": 4,
+            "asset_class_id": 4,
+            "location_id": null,
+            "percentage": 0.05
+        },
+        {
+            "id": 9,
+            "asset_id": 5,
+            "asset_class_id": 2,
+            "location_id": 1,
+            "percentage": 1.0
+        }
+    ],
+    "constant": [
+        {
+            "id": 1,
+            "name": "decimal",
+            "amount": 10000
+        }
+    ],
+    "institution": [
+        {
+            "id": 1,
+            "name": "Rearguard Investments"
+        },
+        {
+            "id": 2,
+            "name": "Capital Two"
+        },
+        {
+            "id": 3,
+            "name": "Treasury Indirect"
+        }
+    ],
+    "location": [
+        {
+            "id": 1,
+            "name": "USA"
+        },
+        {
+            "id": 2,
+            "name": "International"
+        },
+        {
+            "id": 3,
+            "name": "World"
+        }
+    ],
+    "owner": [
+        {
+            "id": 1,
+            "name": "Bob",
+            "birthday": "1992-10-31"
+        },
+        {
+            "id": 2,
+            "name": "Anna",
+            "birthday": "1991-05-04"
+        }
+    ],
+    "price": [
+        {
+            "id": 1,
+            "asset_id": 1,
+            "price_date": "1776-07-04",
+            "amount": 1
+        },
+        {
+            "id": 2,
+            "asset_id": 2,
+            "price_date": "2020-01-01",
+            "amount": 4
+        },
+        {
+            "id": 3,
+            "asset_id": 2,
+            "price_date": "2022-01-01",
+            "amount": 2
+        },
+        {
+            "id": 4,
+            "asset_id": 3,
+            "price_date": "2021-01-01",
+            "amount": 30
+        },
+        {
+            "id": 5,
+            "asset_id": 3,
+            "price_date": "2022-01-01",
+            "amount": 50
+        },
+        {
+            "id": 6,
+            "asset_id": 3,
+            "price_date": "2022-12-01",
+            "amount": 40
+        },
+        {
+            "id": 7,
+            "asset_id": 4,
+            "price_date": "2021-01-01",
+            "amount": 60
+        },
+        {
+            "id": 8,
+            "asset_id": 4,
+            "price_date": "2022-01-01",
+            "amount": 80
+        },
+        {
+            "id": 9,
+            "asset_id": 5,
+            "price_date": "2021-12-15",
+            "amount": 1
+        }
+    ]
+}

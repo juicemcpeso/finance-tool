@@ -56,6 +56,11 @@ def execute_script(database, cmd):
     con.close()
 
 
+def execute_file(database, file_name):
+    with open(file_name, 'r') as sql_file:
+        execute_script(database, sql_file.read())
+
+
 # TODO - test
 def fetch_one(database, cmd, params=None):
     con = sqlite3.connect(database)
@@ -87,262 +92,6 @@ def column_names(database, cmd):
     con.close()
     return result
 
-
-# CREATE - tables
-create_table_account = """
-CREATE TABLE IF NOT EXISTS account (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    account_type_id INTEGER,
-    institution_id INTEGER,
-    owner_id INTEGER,
-    FOREIGN KEY(account_type_id) REFERENCES account_type(id),
-    FOREIGN KEY(owner_id) REFERENCES owner(id),
-    FOREIGN KEY(institution_id) REFERENCES institution(id)
-);"""
-
-create_table_account_type = """
-CREATE TABLE IF NOT EXISTS account_type (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    tax_in INTEGER,
-    tax_growth INTEGER,
-    tax_out INTEGER, 
-    
-    CHECK (tax_in IN (0, 1)
-        AND tax_growth IN (0, 1)
-        AND tax_out IN (0, 1))
-);"""
-
-create_table_allocation = """
-CREATE TABLE IF NOT EXISTS allocation (
-    id INTEGER PRIMARY KEY,
-    asset_class_id INTEGER,
-    location_id INTEGER,
-    percentage INTEGER NOT NULL,
-    FOREIGN KEY(asset_class_id) REFERENCES asset_class(id),
-    FOREIGN KEY(location_id) REFERENCES location(id)
-    
-    CHECK (percentage BETWEEN 0 AND 10000)
-);"""
-
-create_table_asset = """
-CREATE TABLE IF NOT EXISTS asset (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    symbol TEXT NOT NULL
-);"""
-
-create_table_asset_class = """
-CREATE TABLE IF NOT EXISTS asset_class (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL
-);"""
-
-create_table_balance = """
-CREATE TABLE IF NOT EXISTS balance (
-    id INTEGER PRIMARY KEY,
-    account_id INTEGER,
-    asset_id INTEGER,
-    balance_date TEXT NOT NULL,
-    quantity INT NOT NULL,
-    FOREIGN KEY(account_id) REFERENCES account(id),
-    FOREIGN KEY(asset_id) REFERENCES asset(id)
-    
-    CHECK (TYPEOF(balance_date) IS "text")
-    CHECK (balance_date IS strftime('%Y-%m-%d', balance_date))   
-    CHECK (TYPEOF(quantity) IS "integer" OR TYPEOF(quantity) IS "real")
-    CHECK (quantity >= 0)
-);"""
-
-create_table_component = """
-CREATE TABLE IF NOT EXISTS component (
-    id INTEGER PRIMARY KEY,
-    asset_id INTEGER,
-    asset_class_id INTEGER,
-    location_id INTEGER,
-    percentage INT,
-    FOREIGN KEY(asset_id) REFERENCES asset(id),
-    FOREIGN KEY(asset_class_id) REFERENCES asset_class(id),
-    FOREIGN KEY(location_id) REFERENCES location(id)
-    
-    CHECK (percentage BETWEEN 0 AND 10000)
-);"""
-
-create_table_institution = """
-CREATE TABLE IF NOT EXISTS institution(
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL
-);"""
-
-create_table_location = """
-CREATE TABLE IF NOT EXISTS location (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL
-);"""
-
-create_table_owner = """
-CREATE TABLE IF NOT EXISTS owner (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    birthday TEXT
-    
-    CHECK (TYPEOF(birthday) IS "text")
-    CHECK (birthday IS strftime('%Y-%m-%d', birthday))   
-);"""
-
-create_table_price = """
-CREATE TABLE IF NOT EXISTS price (
-    id INTEGER PRIMARY KEY,
-    asset_id INTEGER,
-    price_date TEXT,
-    amount INT,
-    FOREIGN KEY(asset_id) REFERENCES asset(id)
-    
-    CHECK (TYPEOF(price_date) IS "text")
-    CHECK (price_date IS strftime('%Y-%m-%d', price_date))   
-    CHECK (TYPEOF(amount) IS "integer" OR TYPEOF(amount) IS "real")
-);"""
-
-create_tables = create_table_account + \
-                create_table_account_type + \
-                create_table_allocation + \
-                create_table_asset + \
-                create_table_asset_class + \
-                create_table_balance + \
-                create_table_component + \
-                create_table_institution + \
-                create_table_location + \
-                create_table_owner + \
-                create_table_price
-
-# CREATE - views
-create_view_account_value_current_by_asset = """
-CREATE VIEW IF NOT EXISTS account_value_current_by_asset AS
-SELECT 
-    b.account_id, 
-    b.asset_id, 
-    MAX(b.balance_date) balance_date, 
-    b.quantity * p.amount / 10000 AS current_value
-FROM 
-    balance AS b
-JOIN
-    asset_price_newest AS p ON b.asset_id = p.asset_id
-GROUP BY 
-    b.account_id, b.asset_id
-;"""
-
-create_view_asset_price_newest = """
-CREATE VIEW IF NOT EXISTS asset_price_newest AS
-SELECT
-    asset_id, 
-    MAX(price_date) price_date, 
-    amount
-FROM
-    price
-GROUP BY
-    asset_id
-;"""
-
-create_view_asset_quantity_by_account_current = """
-CREATE VIEW IF NOT EXISTS asset_quantity_by_account_current AS
-SELECT
-    account_id,
-    asset_id,
-    MAX(balance_date) balance_date,
-    quantity
-FROM
-    balance
-GROUP BY
-    account_id, asset_id
-;"""
-
-create_view_asset_value_current = """
-CREATE VIEW IF NOT EXISTS asset_value_current AS
-SELECT
-    asset_id,
-    SUM(current_value) current_value
-FROM
-    account_value_current_by_asset
-GROUP BY
-    asset_id
-ORDER BY
-    asset_id
-;"""
-
-create_view_asset_class_value_by_location = """
-CREATE VIEW IF NOT EXISTS asset_class_value_by_location aS
-SELECT
-    asset_class_id, 
-    location_id,
-    SUM(current_value) current_value
-FROM
-    component_value
-GROUP BY
-    asset_class_id, location_id
-;"""
-
-create_view_component_value = """
-CREATE VIEW IF NOT EXISTS component_value AS
-SELECT
-    c.asset_id,
-    c.asset_class_id,
-    c.location_id,
-    c.percentage * v.current_value / 10000 as current_value
-FROM
-    component AS c
-JOIN
-    asset_value_current AS v ON c.asset_id = v.asset_id
-;"""
-
-create_views = create_view_account_value_current_by_asset + \
-               create_view_asset_price_newest + \
-               create_view_asset_quantity_by_account_current + \
-               create_view_asset_value_current + \
-               create_view_asset_class_value_by_location + \
-               create_view_component_value
-
-create_trigger_format_allocation = """
-CREATE TRIGGER IF NOT EXISTS format_allocation AFTER INSERT ON allocation
-BEGIN
-    UPDATE allocation SET percentage = ROUND(percentage * 10000) WHERE id = NEW.id;
-END
-;"""
-
-create_trigger_format_balance = """
-CREATE TRIGGER IF NOT EXISTS format_balance AFTER INSERT ON balance 
-BEGIN
-    UPDATE balance SET quantity = ROUND(quantity * 10000) WHERE id = NEW.id;
-    UPDATE balance SET balance_date = date(balance_date, '0 days') WHERE id = NEW.id;
-END
-;"""
-
-create_trigger_format_component = """
-CREATE TRIGGER IF NOT EXISTS format_component AFTER INSERT ON component 
-BEGIN
-    UPDATE component SET percentage = ROUND(percentage * 10000) WHERE id = NEW.id;
-END
-;"""
-
-create_trigger_format_owner = """
-CREATE TRIGGER IF NOT EXISTS format_owner AFTER INSERT ON owner 
-BEGIN
-    UPDATE owner SET birthday = date(birthday, '0 days') WHERE id = NEW.id;
-END
-;"""
-
-create_trigger_format_price = """
-CREATE TRIGGER IF NOT EXISTS format_price AFTER INSERT ON price
-BEGIN
-    UPDATE price SET amount = ROUND(amount * 10000) WHERE id = NEW.id;
-END
-;"""
-
-create_triggers = create_trigger_format_allocation + \
-                  create_trigger_format_balance + \
-                  create_trigger_format_component + \
-                  create_trigger_format_owner + \
-                  create_trigger_format_price
 
 # INSERT
 insert_account = """
@@ -380,6 +129,11 @@ INSERT INTO component(id, asset_id, asset_class_id, location_id, percentage)
 VALUES(:id, :asset_id, :asset_class_id, :location_id, :percentage)
 """
 
+insert_constant = """
+INSERT INTO constant(id, name, amount)
+VALUES(:id, :name, :amount)
+"""
+
 insert_institution = """
 INSERT INTO institution(id, name) 
 VALUES(:id, :name)
@@ -400,77 +154,198 @@ INSERT INTO price(id, asset_id, price_date, amount)
 VALUES(:id, :asset_id, :price_date, :amount)
 """
 
-# SELECT
-select_account = """
-SELECT * FROM account
-"""
-
-select_account_type = """
-SELECT * FROM account_type
-"""
-
-select_allocation = """
-SELECT * FROM allocation
-"""
-
-select_asset = """
-SELECT * FROM asset
-"""
-
-select_asset_class = """
-SELECT * FROM asset_class
-"""
-
-select_balance = """
-SELECT * FROM balance
-"""
-
-select_component = """
-SELECT * FROM component
-"""
-
-select_institution = """
-SELECT * FROM institution
-"""
-
-select_location = """
-SELECT * FROM location
-"""
-
-select_owner = """
-SELECT * FROM owner
-"""
-
-select_price = """
-SELECT * FROM price
-"""
-
 # Calculations
-# Allocation
-allocation_deviation = """
+# Where to contribute
+level = """
 SELECT
-    plan.asset_class_id,
-    plan.location_id,
-    current_values.current_value,
-    plan.percentage AS plan_percent,
-    plan.percentage * :net_worth / 10000 AS plan_value,
-    (10000 * current_values.current_value) / (plan.percentage * :net_worth / 10000) - 10000 as deviation,
-    0 AS contribution
-FROM 
-    allocation AS plan
-JOIN 
-    asset_class_value_by_location AS current_values ON 
-        current_values.asset_class_id == plan.asset_class_id AND 
-        current_values.location_id == plan.location_id 
+    MAX(deviation) AS deviation
+FROM
+    deviation_level_value,
+    decimal
 WHERE
-    deviation < 0
-ORDER BY
-    deviation ASC
+    level_value <= :contribution * decimal.constant
 """
 
-net_worth = """
-SELECT 
-    SUM(current_values.current_value) AS net_worth
+subset_percent = """
+WITH
+level AS (
+    SELECT
+        MAX(deviation) AS deviation
+    FROM
+        deviation_level_value,
+        decimal
+    WHERE
+        level_value <= :contribution * decimal.constant
+)
+SELECT
+    SUM(plan_percent) AS sum
 FROM
-    account_value_current_by_asset AS current_values
+    allocation_deviation,
+    level
+WHERE
+    allocation_deviation.deviation <= level.deviation
+"""
+
+fill_to_level = """
+WITH
+level AS (
+    SELECT
+        MAX(deviation) AS deviation
+    FROM
+        deviation_level_value,
+        decimal
+    WHERE
+        level_value <= :contribution * decimal.constant
+)
+SELECT
+    asset_class_id,
+    location_id,
+    value_difference AS contribution
+FROM
+    level,
+    allocation_deviation_all_levels 
+WHERE
+    next_deviation == level.deviation AND
+    value_difference >= 0 AND
+    :contribution > 0
+ORDER BY
+    contribution DESC
+"""
+
+remaining_amount = """
+SELECT
+    :contribution * decimal.constant - MAX(level_value) AS remainder
+FROM 
+    deviation_level_value, 
+    decimal
+WHERE
+    level_value <= :contribution * decimal.constant
+"""
+
+assign_remainder = """
+WITH 
+level AS (
+    SELECT
+        MAX(deviation) AS deviation
+    FROM
+        deviation_level_value,
+        decimal
+    WHERE
+        level_value <= :contribution * decimal.constant
+),
+remaining_amount AS (
+    SELECT
+        :contribution * decimal.constant - MAX(level_value) AS remainder
+    FROM 
+        deviation_level_value, 
+        decimal
+    WHERE
+        level_value <= :contribution * decimal.constant
+),
+subset_percent AS (
+    SELECT
+        SUM(plan_percent) AS sum
+    FROM
+        allocation_deviation,
+        level
+    WHERE
+        allocation_deviation.deviation <= level.deviation
+)
+SELECT
+    asset_class_id,
+    location_id,
+    remainder * plan_percent / subset_percent.sum AS contribution
+FROM
+    allocation_deviation,
+    level,
+    remaining_amount,
+    subset_percent
+WHERE
+    allocation_deviation.deviation <= level.deviation AND
+    :contribution > 0
+GROUP BY
+    asset_class_id,
+    location_id
+"""
+
+where_to_contribute = """
+WITH 
+level AS (
+    SELECT
+        MAX(deviation) AS deviation
+    FROM
+        deviation_level_value,
+        decimal
+    WHERE
+        level_value <= :contribution * decimal.constant
+),
+subset_percent AS (
+    SELECT
+        SUM(plan_percent) AS sum
+    FROM
+        allocation_deviation,
+        level
+    WHERE
+        allocation_deviation.deviation <= level.deviation
+),
+fill_to_level AS (
+    SELECT
+        asset_class_id,
+        location_id,
+        value_difference AS contribution
+    FROM
+        level,
+        allocation_deviation_all_levels 
+    WHERE
+        next_deviation == level.deviation AND
+        value_difference >= 0 AND
+        :contribution > 0
+    ORDER BY
+        contribution DESC
+),
+remaining_amount AS (
+    SELECT
+        :contribution * decimal.constant - MAX(level_value) AS remainder
+    FROM 
+        deviation_level_value, 
+        decimal
+    WHERE
+        level_value <= :contribution * decimal.constant
+),
+assign_remainder AS (
+    SELECT
+        asset_class_id,
+        location_id,
+        remainder * plan_percent / subset_percent.sum AS contribution
+    FROM
+        allocation_deviation,
+        level,
+        remaining_amount,
+        subset_percent
+    WHERE
+        allocation_deviation.deviation <= level.deviation AND
+        :contribution > 0
+    GROUP BY
+        asset_class_id,
+        location_id
+)
+
+SELECT
+    fill_to_level.asset_class_id,
+    fill_to_level.location_id,
+    fill_to_level.contribution + assign_remainder.contribution AS contribution 
+FROM
+    fill_to_level,
+    assign_remainder
+WHERE
+    fill_to_level.asset_class_id = assign_remainder.asset_class_id AND
+    fill_to_level.location_id == assign_remainder.location_id 
+"""
+
+# Net worth
+net_worth_formatted = """   
+SELECT
+    net_worth.net_worth / decimal.constant AS net_worth
+FROM
+    net_worth, decimal 
 """
