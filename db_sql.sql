@@ -154,7 +154,7 @@ SELECT
     allocation_deviation.plan_value,
     allocation_deviation.deviation,
     d.deviation AS next_deviation,
-    (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS level_value,
+    (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS value_at_next_deviation,
     ((d.deviation + decimal.constant) * allocation_deviation.plan_value /
         decimal.constant) - allocation_deviation.current_value AS value_difference
 FROM
@@ -162,7 +162,7 @@ FROM
 CROSS JOIN
      deviation_level AS d
 WHERE
-    allocation_deviation.deviation < next_deviation
+    allocation_deviation.deviation <= next_deviation
 ORDER BY
     allocation_deviation.deviation ASC,
     next_deviation ASC
@@ -235,6 +235,18 @@ CREATE VIEW IF NOT EXISTS decimal AS
 -- TODO: make sure this works with non distinct values
 CREATE VIEW IF NOT EXISTS deviation_level AS
     SELECT DISTINCT deviation FROM allocation_deviation
+;
+
+CREATE VIEW IF NOT EXISTS deviation_level_value AS
+    SELECT
+        next_deviation as deviation,
+        SUM(value_difference) AS level_value
+    FROM
+        allocation_deviation_all_levels
+    WHERE
+        value_difference >= 0
+    GROUP BY
+        next_deviation
 ;
 
 CREATE VIEW IF NOT EXISTS net_worth AS

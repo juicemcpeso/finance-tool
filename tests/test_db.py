@@ -29,6 +29,7 @@ view_names = {'account_value_current_by_asset',
               'component_value',
               'decimal',
               'deviation_level',
+              'deviation_level_value',
               'net_worth'}
 
 
@@ -205,14 +206,23 @@ def test_view_allocation_deviation(test_db_1):
     assert db.fetch_all(database=test_db_1, cmd=command) == expected
 
 
-def test_allocation_deviation_all_levels(test_db_1):
+def test_view_allocation_deviation_all_levels(test_db_1):
     expected = [{'asset_class_id': 1,
                  'location_id': 2,
                  'current_value': 140000000,
                  'plan_percent': 2000,
                  'plan_value': 200000000,
                  'deviation': -3000,
-                 'level_value': 160000000,
+                 'value_at_next_deviation': 140000000,
+                 'value_difference': 0,
+                 'next_deviation': -3000},
+                {'asset_class_id': 1,
+                 'location_id': 2,
+                 'current_value': 140000000,
+                 'plan_percent': 2000,
+                 'plan_value': 200000000,
+                 'deviation': -3000,
+                 'value_at_next_deviation': 160000000,
                  'value_difference': 20000000,
                  'next_deviation': -2000},
                 {'asset_class_id': 1,
@@ -221,7 +231,7 @@ def test_allocation_deviation_all_levels(test_db_1):
                  'plan_percent': 2000,
                  'plan_value': 200000000,
                  'deviation': -3000,
-                 'level_value': 170000000,
+                 'value_at_next_deviation': 170000000,
                  'value_difference': 30000000,
                  'next_deviation': -1500},
                 {'asset_class_id': 1,
@@ -230,7 +240,7 @@ def test_allocation_deviation_all_levels(test_db_1):
                  'plan_percent': 2000,
                  'plan_value': 200000000,
                  'deviation': -3000,
-                 'level_value': 272000000,
+                 'value_at_next_deviation': 272000000,
                  'value_difference': 132000000,
                  'next_deviation': 3600},
                 {'asset_class_id': 1,
@@ -239,7 +249,7 @@ def test_allocation_deviation_all_levels(test_db_1):
                  'plan_percent': 2000,
                  'plan_value': 200000000,
                  'deviation': -3000,
-                 'level_value': 280000000,
+                 'value_at_next_deviation': 280000000,
                  'value_difference': 140000000,
                  'next_deviation': 4000},
                 {'asset_class_id': 2,
@@ -248,7 +258,16 @@ def test_allocation_deviation_all_levels(test_db_1):
                  'plan_percent': 500,
                  'plan_value': 50000000,
                  'deviation': -2000,
-                 'level_value': 42500000,
+                 'value_at_next_deviation': 40000000,
+                 'value_difference': 0,
+                 'next_deviation': -2000},
+                {'asset_class_id': 2,
+                 'location_id': 2,
+                 'current_value': 40000000,
+                 'plan_percent': 500,
+                 'plan_value': 50000000,
+                 'deviation': -2000,
+                 'value_at_next_deviation': 42500000,
                  'value_difference': 2500000,
                  'next_deviation': -1500},
                 {'asset_class_id': 2,
@@ -257,7 +276,7 @@ def test_allocation_deviation_all_levels(test_db_1):
                  'plan_percent': 500,
                  'plan_value': 50000000,
                  'deviation': -2000,
-                 'level_value': 68000000,
+                 'value_at_next_deviation': 68000000,
                  'value_difference': 28000000,
                  'next_deviation': 3600},
                 {'asset_class_id': 2,
@@ -266,7 +285,7 @@ def test_allocation_deviation_all_levels(test_db_1):
                  'plan_percent': 500,
                  'plan_value': 50000000,
                  'deviation': -2000,
-                 'level_value': 70000000,
+                 'value_at_next_deviation': 70000000,
                  'value_difference': 30000000,
                  'next_deviation': 4000},
                 {'asset_class_id': 1,
@@ -275,7 +294,16 @@ def test_allocation_deviation_all_levels(test_db_1):
                  'plan_percent': 4000,
                  'plan_value': 400000000,
                  'deviation': -1500,
-                 'level_value': 544000000,
+                 'value_at_next_deviation': 340000000,
+                 'value_difference':0,
+                 'next_deviation': -1500},
+                {'asset_class_id': 1,
+                 'location_id': 1,
+                 'current_value': 340000000,
+                 'plan_percent': 4000,
+                 'plan_value': 400000000,
+                 'deviation': -1500,
+                 'value_at_next_deviation': 544000000,
                  'value_difference': 204000000,
                  'next_deviation': 3600},
                 {'asset_class_id': 1,
@@ -284,7 +312,7 @@ def test_allocation_deviation_all_levels(test_db_1):
                  'plan_percent': 4000,
                  'plan_value': 400000000,
                  'deviation': -1500,
-                 'level_value': 560000000,
+                 'value_at_next_deviation': 560000000,
                  'value_difference': 220000000,
                  'next_deviation': 4000},
                 {'asset_class_id': 2,
@@ -293,8 +321,26 @@ def test_allocation_deviation_all_levels(test_db_1):
                  'plan_percent': 2500,
                  'plan_value': 250000000,
                  'deviation': 3600,
-                 'level_value': 350000000,
+                 'value_at_next_deviation': 340000000,
+                 'value_difference': 0,
+                 'next_deviation': 3600},
+                {'asset_class_id': 2,
+                 'location_id': 1,
+                 'current_value': 340000000,
+                 'plan_percent': 2500,
+                 'plan_value': 250000000,
+                 'deviation': 3600,
+                 'value_at_next_deviation': 350000000,
                  'value_difference': 10000000,
+                 'next_deviation': 4000},
+                {'asset_class_id': 3,
+                 'location_id': 1,
+                 'current_value': 140000000,
+                 'plan_percent': 1000,
+                 'plan_value': 100000000,
+                 'deviation': 4000,
+                 'value_at_next_deviation': 140000000,
+                 'value_difference': 0,
                  'next_deviation': 4000}]
 
     command = "SELECT * FROM allocation_deviation_all_levels"
@@ -383,6 +429,17 @@ def test_view_deviation_level(test_db_1):
                 {'deviation': 4000}]
     command = "SELECT * FROM deviation_level"
     assert db.fetch_all(database=test_db_1, cmd=command) == expected
+
+
+def test_view_deviation_level_value(test_db_1):
+    expected = [{'deviation': -3000, 'level_value': 0},
+                {'deviation': -2000, 'level_value': 20000000},
+                {'deviation': -1500, 'level_value': 32500000},
+                {'deviation': 3600, 'level_value': 364000000},
+                {'deviation': 4000, 'level_value': 400000000}]
+
+    command = "SELECT * FROM deviation_level_value"
+    assert expected == db.fetch_all(database=test_db_1, cmd=command)
 
 
 def test_view_net_worth(test_db_2):
@@ -653,16 +710,6 @@ def test_value_at_each_deviation_level(test_db_1):
                  'next_deviation': 4000}]
 
     assert expected == db.fetch_all(database=test_db_1, cmd=db.value_at_each_deviation_level)
-
-
-def test_sum_value_difference_at_each_deviation_level(test_db_1):
-    expected = [{'deviation': -3000, 'total_difference': 0},
-                {'deviation': -2000, 'total_difference': 20000000},
-                {'deviation': -1500, 'total_difference': 32500000},
-                {'deviation': 3600, 'total_difference': 364000000},
-                {'deviation': 4000, 'total_difference': 400000000}]
-
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.sum_value_difference_at_each_deviation_level)
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, {'deviation': -3000}),
