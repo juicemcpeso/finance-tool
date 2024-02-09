@@ -693,80 +693,22 @@ where_to_contribute = """
 WITH assign_remainder AS (
     WITH 
     remaining_amount AS (
-        WITH deviation_checkpoint_values AS (
-            WITH value_difference_each_deviation_level  AS (
-            SELECT
-                allocation_deviation.asset_class_id,
-                allocation_deviation.location_id,
-                allocation_deviation.current_value,
-                allocation_deviation.plan_percent,
-                allocation_deviation.plan_value,
-                allocation_deviation.deviation,
-                d.deviation AS next_deviation,
-                (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS level_value,
-                ((d.deviation + decimal.constant) * allocation_deviation.plan_value / 
-                    decimal.constant) - allocation_deviation.current_value AS value_difference 
-            FROM 
-                allocation_deviation, decimal 
-            CROSS JOIN
-                (SELECT deviation FROM allocation_deviation) AS d 
-            ORDER BY
-                allocation_deviation.deviation ASC,
-                next_deviation ASC
-            )
-            SELECT
-                next_deviation AS deviation,
-                SUM(value_difference) AS total_difference 
-            FROM
-                value_difference_each_deviation_level 
-            WHERE
-                value_difference >= 0
-            GROUP BY
-                next_deviation
-        )
         SELECT
-            :contribution * decimal.constant - MAX(total_difference) AS remainder
+            :contribution * decimal.constant - MAX(level_value) AS remainder
         FROM 
-            deviation_checkpoint_values,
+            deviation_level_value, 
             decimal
         WHERE
-            total_difference <= :contribution * decimal.constant),
+            level_value <= :contribution * decimal.constant),
     accounts_receiving_funds AS (
-        WITH which_deviation_level AS (WITH value_difference_each_deviation_level  AS (
-        SELECT
-            allocation_deviation.asset_class_id,
-            allocation_deviation.location_id,
-            allocation_deviation.current_value,
-            allocation_deviation.plan_percent,
-            allocation_deviation.plan_value,
-            allocation_deviation.deviation,
-            d.deviation AS next_deviation,
-            (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS level_value,
-            ((d.deviation + decimal.constant) * allocation_deviation.plan_value / 
-                decimal.constant) - allocation_deviation.current_value AS value_difference 
-        FROM 
-            allocation_deviation, decimal 
-        CROSS JOIN
-            (SELECT deviation FROM allocation_deviation) AS d 
-        ORDER BY
-            allocation_deviation.deviation ASC,
-            next_deviation ASC
-        )
+        WITH which_deviation_level AS (
         SELECT
             MAX(deviation) AS deviation
-        FROM (
-            SELECT
-                next_deviation AS deviation,
-                SUM(value_difference) AS total_difference 
-            FROM
-                value_difference_each_deviation_level 
-            WHERE
-                value_difference >= 0
-            GROUP BY
-                next_deviation),
+        FROM
+            deviation_level_value,
             decimal
         WHERE
-            total_difference <= :contribution * decimal.constant
+            level_value <= :contribution * decimal.constant
         )
         SELECT
             asset_class_id,
@@ -792,26 +734,6 @@ WITH assign_remainder AS (
         asset_class_id,
         location_id),
 fill_to_checkpoint AS (
-    WITH value_difference_each_deviation_level  AS (
-    SELECT
-        allocation_deviation.asset_class_id,
-        allocation_deviation.location_id,
-        allocation_deviation.current_value,
-        allocation_deviation.plan_percent,
-        allocation_deviation.plan_value,
-        allocation_deviation.deviation,
-        d.deviation AS next_deviation,
-        (d.deviation + decimal.constant) * allocation_deviation.plan_value / decimal.constant AS level_value,
-        ((d.deviation + decimal.constant) * allocation_deviation.plan_value / 
-            decimal.constant) - allocation_deviation.current_value AS value_difference 
-    FROM 
-        allocation_deviation, decimal 
-    CROSS JOIN
-        (SELECT deviation FROM allocation_deviation) AS d 
-    ORDER BY
-        allocation_deviation.deviation ASC,
-        next_deviation ASC
-    )
     SELECT
         asset_class_id,
         location_id,
@@ -819,20 +741,12 @@ fill_to_checkpoint AS (
     FROM (
         SELECT
             MAX(deviation) AS deviation
-        FROM (
-            SELECT
-                next_deviation AS deviation,
-                SUM(value_difference) AS total_difference 
-            FROM
-                value_difference_each_deviation_level 
-            WHERE
-                value_difference >= 0
-            GROUP BY
-                next_deviation),
+        FROM
+            deviation_level_value,
             decimal
         WHERE
-            total_difference <= :contribution * decimal.constant) AS which_deviation_level,
-        value_difference_each_deviation_level
+            level_value <= :contribution * decimal.constant) AS which_deviation_level,
+        allocation_deviation_all_levels 
     WHERE
         next_deviation == which_deviation_level.deviation AND
         value_difference >= 0 AND
