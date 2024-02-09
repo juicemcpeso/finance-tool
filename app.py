@@ -36,14 +36,3 @@ class App:
 
     def __iter__(self):
         return self._lookup.keys()
-
-    # CSV
-    # TODO: convert to JSON
-    # def insert_from_csv_file(self, file_path, table_name):
-    #     with open(file_path) as csv_file:
-    #         csv_dict = csv.DictReader(csv_file)
-    #         db.execute_many(database=self.db, cmd=self['insert'][table_name], data_sequence=csv_dict)
-    #
-    # def insert_from_csv_directory(self, directory_path):
-    #     for file_name in os.listdir(directory_path):
-    #         self.insert_from_csv_file(file_path=directory_path + file_name, table_name=os.path.splitext(file_name)[0])

@@ -3,7 +3,11 @@
 # 2024-01-25
 # @juicemcpeso
 
+import csv
+import os
 import sqlite3
+
+
 
 
 def dict_factory(cursor, row):
@@ -91,6 +95,17 @@ def column_names(database, cmd):
     con.commit()
     con.close()
     return result
+
+
+def insert_from_csv_file(database, file_path, table_name):
+    with open(file_path) as csv_file:
+        csv_dict = csv.DictReader(csv_file)
+        execute_many(database=database, cmd=insert[table_name], data_sequence=csv_dict)
+
+
+def insert_from_csv_directory(database, directory_path):
+    for file_name in os.listdir(directory_path):
+        insert_from_csv_file(database=database, file_path=directory_path + file_name, table_name=os.path.splitext(file_name)[0])
 
 
 # INSERT
@@ -349,3 +364,16 @@ SELECT
 FROM
     net_worth, decimal 
 """
+
+insert = {'account': insert_account,
+          'account_type': insert_account_type,
+          'allocation': insert_allocation,
+          'asset': insert_asset,
+          'asset_class': insert_asset_class,
+          'balance': insert_balance,
+          'component': insert_component,
+          'constant': insert_constant,
+          'institution': insert_institution,
+          'location': insert_location,
+          'owner': insert_owner,
+          'price': insert_price}
