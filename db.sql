@@ -256,6 +256,14 @@ CREATE VIEW IF NOT EXISTS net_worth AS
         account_value_current_by_asset AS current_values
 ;
 
+CREATE VIEW IF NOT EXISTS net_worth_formatted AS
+    SELECT
+        net_worth.net_worth / decimal.constant AS net_worth
+    FROM
+        net_worth,
+        decimal
+;
+
 CREATE TRIGGER IF NOT EXISTS format_allocation AFTER INSERT ON allocation
 BEGIN
     UPDATE allocation SET percentage = ROUND(percentage * 10000) WHERE id = NEW.id;

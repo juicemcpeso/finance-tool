@@ -1,8 +1,19 @@
-import app
-import db
+import finance_tool
 import pytest
-import tests.test_lookup as test_lookup
 import json
+
+insert_dict = {'account': finance_tool.insert_account,
+               'account_type': finance_tool.insert_account_type,
+               'allocation': finance_tool.insert_allocation,
+               'asset': finance_tool.insert_asset,
+               'asset_class': finance_tool.insert_asset_class,
+               'balance': finance_tool.insert_balance,
+               'component': finance_tool.insert_component,
+               'constant': finance_tool.insert_constant,
+               'institution': finance_tool.insert_institution,
+               'location': finance_tool.insert_location,
+               'owner': finance_tool.insert_owner,
+               'price': finance_tool.insert_price}
 
 
 def json_loader(file_name):
@@ -13,7 +24,7 @@ def json_loader(file_name):
 @pytest.fixture
 def test_db_0(tmp_path):
     db_test = tmp_path / "test.db"
-    db.execute_file(db_test, '../db_sql.sql')
+    finance_tool.execute_file(db_test, '../db.sql')
     return db_test
 
 
@@ -21,10 +32,10 @@ def test_db_0(tmp_path):
 @pytest.fixture
 def test_db_1(tmp_path):
     db_test = tmp_path / "test_1.db"
-    db.execute_file(db_test, '../db_sql.sql')
+    finance_tool.execute_file(db_test, '../db.sql')
     data = json_loader('../tests/data/test_db_1.json')
     for table_name in data:
-        db.execute_many(database=db_test, cmd=test_lookup.insert_dict[table_name], data_sequence=data[table_name])
+        finance_tool.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=data[table_name])
 
     return db_test
 
@@ -33,24 +44,9 @@ def test_db_1(tmp_path):
 @pytest.fixture
 def test_db_2(tmp_path):
     db_test = tmp_path / "test_2.db"
-    db.execute_file(db_test, '../db_sql.sql')
+    finance_tool.execute_file(db_test, '../db.sql')
     data = json_loader('../tests/data/test_db_2.json')
     for table_name in data:
-        db.execute_many(database=db_test, cmd=test_lookup.insert_dict[table_name], data_sequence=data[table_name])
+        finance_tool.execute_many(database=db_test, cmd=insert_dict[table_name], data_sequence=data[table_name])
 
     return db_test
-
-
-@pytest.fixture
-def test_app_db_0(test_db_0):
-    return app.App(test_db_0)
-
-
-@pytest.fixture
-def test_app_db_1(test_db_1):
-    return app.App(test_db_1)
-
-
-@pytest.fixture
-def test_app_db_2(test_db_2):
-    return app.App(test_db_2)
