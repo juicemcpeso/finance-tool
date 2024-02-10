@@ -5,7 +5,6 @@
 import finance_tool
 import pytest
 
-
 # Test - insert
 insert_dict = {'account': finance_tool.insert_account,
                'account_type': finance_tool.insert_account_type,
@@ -182,8 +181,8 @@ def test_constraints(test_db_0, table_name, expected):
                                                     (10000, {'deviation': -1500}),
                                                     (100000, {'deviation': 4000})])
 def test_level(test_db_1, contribution, expected):
-    assert expected == finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.level,
-                                              params={'contribution': contribution})
+    assert finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.level,
+                                  params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
@@ -215,8 +214,8 @@ def test_level(test_db_1, contribution, expected):
                                                                'location_id': 1,
                                                                'contribution': 0}])])
 def test_fill_to_level(test_db_1, contribution, expected):
-    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.fill_to_level,
-                                              params={'contribution': contribution})
+    assert finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.fill_to_level,
+                                  params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, {'sum': 2000}),
@@ -224,8 +223,8 @@ def test_fill_to_level(test_db_1, contribution, expected):
                                                     (10000, {'sum': 6500}),
                                                     (100000, {'sum': 10000})])
 def test_subset_percent(test_db_1, contribution, expected):
-    assert expected == finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.subset_percent,
-                                              params={'contribution': contribution})
+    assert finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.subset_percent,
+                                  params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, {'remainder': 0}),
@@ -233,8 +232,8 @@ def test_subset_percent(test_db_1, contribution, expected):
                                                     (10000, {'remainder': 67500000}),
                                                     (100000, {'remainder': 600000000})])
 def test_remaining_amount(test_db_1, contribution, expected):
-    assert expected == finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.remaining_amount,
-                                              params={'contribution': contribution})
+    assert finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.remaining_amount,
+                                  params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
@@ -266,8 +265,8 @@ def test_remaining_amount(test_db_1, contribution, expected):
                                                                'location_id': 1,
                                                                'contribution': 60000000}])])
 def test_assign_remainder(test_db_1, contribution, expected):
-    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.assign_remainder,
-                                              params={'contribution': contribution})
+    assert finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.assign_remainder,
+                                  params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
@@ -299,8 +298,8 @@ def test_assign_remainder(test_db_1, contribution, expected):
                                                                'location_id': 1,
                                                                'contribution': 60000000}])])
 def test_where_to_contribute(test_db_1, contribution, expected):
-    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.where_to_contribute,
-                                              params={'contribution': contribution})
+    assert finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.where_to_contribute,
+                                  params={'contribution': contribution}) == expected
 
 
 csv_expected = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
