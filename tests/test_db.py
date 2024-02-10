@@ -77,23 +77,17 @@ def column_names(database, cmd):
                           ('owner', {'name', 'birthday', 'id'}),
                           ('price', {'asset_id', 'price_date', 'amount', 'id'})])
 def test_create_table_columns(test_db_0, table_name, column_name):
-    sql = f"SELECT * FROM {table_name}"
-
-    assert set(column_names(database=test_db_0, cmd=sql)) == column_name
+    assert set(column_names(database=test_db_0, cmd=f"SELECT * FROM {table_name}")) == column_name
 
 
 def test_create_tables(test_db_0):
-    sql = """SELECT * FROM sqlite_master WHERE type = 'table'"""
-
-    result_list = fetch_all(database=test_db_0, cmd=sql)
+    result_list = fetch_all(database=test_db_0, cmd="SELECT * FROM sqlite_master WHERE type = 'table'")
 
     assert set(line['name'] for line in result_list) == table_names
 
 
 def test_create_views(test_db_0):
-    sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
-
-    result_list = fetch_all(database=test_db_0, cmd=sql)
+    result_list = fetch_all(database=test_db_0, cmd="SELECT * FROM sqlite_master WHERE type = 'view'")
 
     assert set(line['name'] for line in result_list) == view_names
 
@@ -106,9 +100,7 @@ def test_view_account_value_current_by_asset(test_db_2):
                 {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 20000000},
                 {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 200000000}]
 
-    command = "SELECT * FROM account_value_current_by_asset"
-
-    assert expected == fetch_all(database=test_db_2, cmd=command)
+    assert fetch_all(database=test_db_2, cmd="SELECT * FROM account_value_current_by_asset") == expected
 
 
 def test_view_allocation_deviation(test_db_1):
@@ -143,9 +135,7 @@ def test_view_allocation_deviation(test_db_1):
                  'plan_value': 100000000,
                  'deviation': 4000}]
 
-    command = "SELECT * FROM allocation_deviation"
-
-    assert fetch_all(database=test_db_1, cmd=command) == expected
+    assert fetch_all(database=test_db_1, cmd="SELECT * FROM allocation_deviation") == expected
 
 
 def test_view_allocation_deviation_all_levels(test_db_1):
@@ -237,7 +227,7 @@ def test_view_allocation_deviation_all_levels(test_db_1):
                  'plan_value': 400000000,
                  'deviation': -1500,
                  'value_at_next_deviation': 340000000,
-                 'value_difference':0,
+                 'value_difference': 0,
                  'next_deviation': -1500},
                 {'asset_class_id': 1,
                  'location_id': 1,
@@ -285,8 +275,7 @@ def test_view_allocation_deviation_all_levels(test_db_1):
                  'value_difference': 0,
                  'next_deviation': 4000}]
 
-    command = "SELECT * FROM allocation_deviation_all_levels"
-    assert expected == fetch_all(database=test_db_1, cmd=command)
+    assert fetch_all(database=test_db_1, cmd="SELECT * FROM allocation_deviation_all_levels") == expected
 
 
 def test_view_asset_value_current(test_db_2):
@@ -296,9 +285,7 @@ def test_view_asset_value_current(test_db_2):
                 {'asset_id': 4, 'current_value': 40000000},
                 {'asset_id': 5, 'current_value': 100000000}]
 
-    command = "SELECT * FROM asset_value_current"
-
-    assert expected == fetch_all(database=test_db_2, cmd=command)
+    assert fetch_all(database=test_db_2, cmd="SELECT * FROM asset_value_current") == expected
 
 
 def test_view_asset_price_newest(test_db_2):
@@ -308,9 +295,7 @@ def test_view_asset_price_newest(test_db_2):
                 {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 800000},
                 {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 10000}]
 
-    command = "SELECT * FROM asset_price_newest"
-
-    assert expected == fetch_all(database=test_db_2, cmd=command)
+    assert fetch_all(database=test_db_2, cmd="SELECT * FROM asset_price_newest") == expected
 
 
 def test_view_asset_quantity_by_account_current(test_db_2):
@@ -321,9 +306,7 @@ def test_view_asset_quantity_by_account_current(test_db_2):
                 {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 500000},
                 {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 200000000}]
 
-    command = "SELECT * FROM asset_quantity_by_account_current"
-
-    assert expected == fetch_all(database=test_db_2, cmd=command)
+    assert fetch_all(database=test_db_2, cmd="SELECT * FROM asset_quantity_by_account_current") == expected
 
 
 def test_view_asset_class_value_by_location(test_db_2):
@@ -334,9 +317,7 @@ def test_view_asset_class_value_by_location(test_db_2):
                 {'asset_class_id': 3, 'location_id': 1, 'current_value': 200000000},
                 {'asset_class_id': 4, 'location_id': None, 'current_value': 2000000}]
 
-    command = "SELECT * FROM asset_class_value_by_location"
-
-    assert expected == fetch_all(database=test_db_2, cmd=command)
+    assert fetch_all(database=test_db_2, cmd="SELECT * FROM asset_class_value_by_location") == expected
 
 
 def test_view_component_value(test_db_2):
@@ -350,17 +331,11 @@ def test_view_component_value(test_db_2):
                 {'asset_id': 4, 'asset_class_id': 4, 'location_id': None, 'current_value': 2000000},
                 {'asset_id': 5, 'asset_class_id': 2, 'location_id': 1, 'current_value': 100000000}]
 
-    command = "SELECT * FROM component_value"
-
-    assert expected == fetch_all(database=test_db_2, cmd=command)
+    assert fetch_all(database=test_db_2, cmd="SELECT * FROM component_value") == expected
 
 
 def test_view_decimal(test_db_2):
-    expected = {'constant': 10000}
-
-    command = "SELECT * FROM decimal"
-
-    assert expected == fetch_one(database=test_db_2, cmd=command)
+    assert fetch_one(database=test_db_2, cmd="SELECT * FROM decimal") == {'constant': 10000}
 
 
 def test_view_deviation_level(test_db_1):
@@ -369,8 +344,8 @@ def test_view_deviation_level(test_db_1):
                 {'deviation': -1500},
                 {'deviation': 3600},
                 {'deviation': 4000}]
-    command = "SELECT * FROM deviation_level"
-    assert fetch_all(database=test_db_1, cmd=command) == expected
+
+    assert fetch_all(database=test_db_1, cmd="SELECT * FROM deviation_level") == expected
 
 
 def test_view_deviation_level_value(test_db_1):
@@ -380,16 +355,11 @@ def test_view_deviation_level_value(test_db_1):
                 {'deviation': 3600, 'level_value': 364000000},
                 {'deviation': 4000, 'level_value': 400000000}]
 
-    command = "SELECT * FROM deviation_level_value"
-    assert expected == fetch_all(database=test_db_1, cmd=command)
+    assert fetch_all(database=test_db_1, cmd="SELECT * FROM deviation_level_value") == expected
 
 
 def test_view_net_worth(test_db_2):
-    expected = {'net_worth': 500000000}
-
-    command = "SELECT * FROM net_worth"
-
-    assert expected == fetch_one(database=test_db_2, cmd=command)
+    assert fetch_one(database=test_db_2, cmd="SELECT * FROM net_worth") == {'net_worth': 500000000}
 
 
 # Test calculations
