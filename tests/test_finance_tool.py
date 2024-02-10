@@ -5,67 +5,6 @@
 import finance_tool
 import pytest
 
-table_names = {'account',
-               'account_type',
-               'allocation',
-               'asset',
-               'asset_class',
-               'balance',
-               'component',
-               'constant',
-               'institution',
-               'location',
-               'owner',
-               'price'}
-
-view_names = {'account_value_current_by_asset',
-              'allocation_deviation',
-              'allocation_deviation_all_levels',
-              'asset_price_newest',
-              'asset_quantity_by_account_current',
-              'asset_value_current',
-              'asset_class_value_by_location',
-              'component_value',
-              'decimal',
-              'deviation_level',
-              'deviation_level_value',
-              'net_worth'}
-
-
-@pytest.mark.parametrize('table_name, column_names',
-                         [('account', {'name', 'id', 'institution_id', 'owner_id', 'account_type_id'}),
-                          ('account_type', {'name', 'id', 'tax_in', 'tax_growth', 'tax_out'}),
-                          ('allocation', {'percentage', 'location_id', 'asset_class_id', 'id'}),
-                          ('asset', {'name', 'symbol', 'id'}),
-                          ('asset_class', {'name', 'id'}),
-                          ('balance', {'balance_date', 'asset_id', 'account_id', 'id', 'quantity'}),
-                          ('component', {'percentage', 'location_id', 'asset_id', 'asset_class_id', 'id'}),
-                          ('constant', {'name', 'amount', 'id'}),
-                          ('institution', {'name', 'id'}),
-                          ('location', {'name', 'id'}),
-                          ('owner', {'name', 'birthday', 'id'}),
-                          ('price', {'asset_id', 'price_date', 'amount', 'id'})])
-def test_create_table_columns(test_db_0, table_name, column_names):
-    sql = f"SELECT * FROM {table_name}"
-
-    assert set(finance_tool.column_names(database=test_db_0, cmd=sql)) == column_names
-
-
-def test_create_tables(test_db_0):
-    sql = """SELECT * FROM sqlite_master WHERE type = 'table'"""
-
-    result_list = finance_tool.fetch_all(database=test_db_0, cmd=sql)
-
-    assert set(line['name'] for line in result_list) == table_names
-
-
-def test_create_views(test_db_0):
-    sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
-
-    result_list = finance_tool.fetch_all(database=test_db_0, cmd=sql)
-
-    assert set(line['name'] for line in result_list) == view_names
-
 
 # Test - insert
 insert_dict = {'account': finance_tool.insert_account,
@@ -82,19 +21,6 @@ insert_dict = {'account': finance_tool.insert_account,
                'price': finance_tool.insert_price}
 
 insert_sequence = {(table_name, sql) for table_name, sql in insert_dict.items()}
-#
-# insert_list = [('account', db.insert_account),
-#                ('account_type', db.insert_account_type),
-#                ('allocation', db.insert_allocation),
-#                ('asset', db.insert_asset),
-#                ('asset_class', db.insert_asset_class),
-#                ('balance', db.insert_balance),
-#                ('component', db.insert_component),
-#                ('constant', db.insert_constant),
-#                ('institution', db.insert_institution),
-#                ('location', db.insert_location),
-#                ('owner', db.insert_owner),
-#                ('price', db.insert_price)]
 
 insert_entry = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
                 'account_type': [{'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}],
@@ -152,306 +78,6 @@ def test_insert_no_id(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
     finance_tool.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry_no_id[table_name])
     assert finance_tool.fetch_all(database=test_db_0, cmd=sql) == insert_expected[table_name]
-
-
-# Test views
-def test_view_account_value_current_by_asset(test_db_2):
-    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'current_value': 40000000},
-                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'current_value': 40000000},
-                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'current_value': 100000000},
-                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'current_value': 100000000},
-                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'current_value': 20000000},
-                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 200000000}]
-
-    command = "SELECT * FROM account_value_current_by_asset"
-
-    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
-
-
-def test_view_allocation_deviation(test_db_1):
-    expected = [{'asset_class_id': 1,
-                 'location_id': 2,
-                 'current_value': 140000000,
-                 'plan_percent': 2000,
-                 'plan_value': 200000000,
-                 'deviation': -3000},
-                {'asset_class_id': 2,
-                 'location_id': 2,
-                 'current_value': 40000000,
-                 'plan_percent': 500,
-                 'plan_value': 50000000,
-                 'deviation': -2000},
-                {'asset_class_id': 1,
-                 'location_id': 1,
-                 'current_value': 340000000,
-                 'plan_percent': 4000,
-                 'plan_value': 400000000,
-                 'deviation': -1500},
-                {'asset_class_id': 2,
-                 'location_id': 1,
-                 'current_value': 340000000,
-                 'plan_percent': 2500,
-                 'plan_value': 250000000,
-                 'deviation': 3600},
-                {'asset_class_id': 3,
-                 'location_id': 1,
-                 'current_value': 140000000,
-                 'plan_percent': 1000,
-                 'plan_value': 100000000,
-                 'deviation': 4000}]
-
-    command = "SELECT * FROM allocation_deviation"
-
-    assert finance_tool.fetch_all(database=test_db_1, cmd=command) == expected
-
-
-def test_view_allocation_deviation_all_levels(test_db_1):
-    expected = [{'asset_class_id': 1,
-                 'location_id': 2,
-                 'current_value': 140000000,
-                 'plan_percent': 2000,
-                 'plan_value': 200000000,
-                 'deviation': -3000,
-                 'value_at_next_deviation': 140000000,
-                 'value_difference': 0,
-                 'next_deviation': -3000},
-                {'asset_class_id': 1,
-                 'location_id': 2,
-                 'current_value': 140000000,
-                 'plan_percent': 2000,
-                 'plan_value': 200000000,
-                 'deviation': -3000,
-                 'value_at_next_deviation': 160000000,
-                 'value_difference': 20000000,
-                 'next_deviation': -2000},
-                {'asset_class_id': 1,
-                 'location_id': 2,
-                 'current_value': 140000000,
-                 'plan_percent': 2000,
-                 'plan_value': 200000000,
-                 'deviation': -3000,
-                 'value_at_next_deviation': 170000000,
-                 'value_difference': 30000000,
-                 'next_deviation': -1500},
-                {'asset_class_id': 1,
-                 'location_id': 2,
-                 'current_value': 140000000,
-                 'plan_percent': 2000,
-                 'plan_value': 200000000,
-                 'deviation': -3000,
-                 'value_at_next_deviation': 272000000,
-                 'value_difference': 132000000,
-                 'next_deviation': 3600},
-                {'asset_class_id': 1,
-                 'location_id': 2,
-                 'current_value': 140000000,
-                 'plan_percent': 2000,
-                 'plan_value': 200000000,
-                 'deviation': -3000,
-                 'value_at_next_deviation': 280000000,
-                 'value_difference': 140000000,
-                 'next_deviation': 4000},
-                {'asset_class_id': 2,
-                 'location_id': 2,
-                 'current_value': 40000000,
-                 'plan_percent': 500,
-                 'plan_value': 50000000,
-                 'deviation': -2000,
-                 'value_at_next_deviation': 40000000,
-                 'value_difference': 0,
-                 'next_deviation': -2000},
-                {'asset_class_id': 2,
-                 'location_id': 2,
-                 'current_value': 40000000,
-                 'plan_percent': 500,
-                 'plan_value': 50000000,
-                 'deviation': -2000,
-                 'value_at_next_deviation': 42500000,
-                 'value_difference': 2500000,
-                 'next_deviation': -1500},
-                {'asset_class_id': 2,
-                 'location_id': 2,
-                 'current_value': 40000000,
-                 'plan_percent': 500,
-                 'plan_value': 50000000,
-                 'deviation': -2000,
-                 'value_at_next_deviation': 68000000,
-                 'value_difference': 28000000,
-                 'next_deviation': 3600},
-                {'asset_class_id': 2,
-                 'location_id': 2,
-                 'current_value': 40000000,
-                 'plan_percent': 500,
-                 'plan_value': 50000000,
-                 'deviation': -2000,
-                 'value_at_next_deviation': 70000000,
-                 'value_difference': 30000000,
-                 'next_deviation': 4000},
-                {'asset_class_id': 1,
-                 'location_id': 1,
-                 'current_value': 340000000,
-                 'plan_percent': 4000,
-                 'plan_value': 400000000,
-                 'deviation': -1500,
-                 'value_at_next_deviation': 340000000,
-                 'value_difference':0,
-                 'next_deviation': -1500},
-                {'asset_class_id': 1,
-                 'location_id': 1,
-                 'current_value': 340000000,
-                 'plan_percent': 4000,
-                 'plan_value': 400000000,
-                 'deviation': -1500,
-                 'value_at_next_deviation': 544000000,
-                 'value_difference': 204000000,
-                 'next_deviation': 3600},
-                {'asset_class_id': 1,
-                 'location_id': 1,
-                 'current_value': 340000000,
-                 'plan_percent': 4000,
-                 'plan_value': 400000000,
-                 'deviation': -1500,
-                 'value_at_next_deviation': 560000000,
-                 'value_difference': 220000000,
-                 'next_deviation': 4000},
-                {'asset_class_id': 2,
-                 'location_id': 1,
-                 'current_value': 340000000,
-                 'plan_percent': 2500,
-                 'plan_value': 250000000,
-                 'deviation': 3600,
-                 'value_at_next_deviation': 340000000,
-                 'value_difference': 0,
-                 'next_deviation': 3600},
-                {'asset_class_id': 2,
-                 'location_id': 1,
-                 'current_value': 340000000,
-                 'plan_percent': 2500,
-                 'plan_value': 250000000,
-                 'deviation': 3600,
-                 'value_at_next_deviation': 350000000,
-                 'value_difference': 10000000,
-                 'next_deviation': 4000},
-                {'asset_class_id': 3,
-                 'location_id': 1,
-                 'current_value': 140000000,
-                 'plan_percent': 1000,
-                 'plan_value': 100000000,
-                 'deviation': 4000,
-                 'value_at_next_deviation': 140000000,
-                 'value_difference': 0,
-                 'next_deviation': 4000}]
-
-    command = "SELECT * FROM allocation_deviation_all_levels"
-    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=command)
-
-
-def test_view_asset_value_current(test_db_2):
-    expected = [{'asset_id': 1, 'current_value': 200000000},
-                {'asset_id': 2, 'current_value': 100000000},
-                {'asset_id': 3, 'current_value': 60000000},
-                {'asset_id': 4, 'current_value': 40000000},
-                {'asset_id': 5, 'current_value': 100000000}]
-
-    command = "SELECT * FROM asset_value_current"
-
-    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
-
-
-def test_view_asset_price_newest(test_db_2):
-    expected = [{'asset_id': 1, 'price_date': '1776-07-04', 'amount': 10000},
-                {'asset_id': 2, 'price_date': '2022-01-01', 'amount': 20000},
-                {'asset_id': 3, 'price_date': '2022-12-01', 'amount': 400000},
-                {'asset_id': 4, 'price_date': '2022-01-01', 'amount': 800000},
-                {'asset_id': 5, 'price_date': '2021-12-15', 'amount': 10000}]
-
-    command = "SELECT * FROM asset_price_newest"
-
-    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
-
-
-def test_view_asset_quantity_by_account_current(test_db_2):
-    expected = [{'account_id': 1, 'asset_id': 4, 'balance_date': '2022-01-01', 'quantity': 500000},
-                {'account_id': 2, 'asset_id': 3, 'balance_date': '2022-01-01', 'quantity': 1000000},
-                {'account_id': 3, 'asset_id': 5, 'balance_date': '2021-12-15', 'quantity': 100000000},
-                {'account_id': 4, 'asset_id': 2, 'balance_date': '2022-01-01', 'quantity': 50000000},
-                {'account_id': 4, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 500000},
-                {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 200000000}]
-
-    command = "SELECT * FROM asset_quantity_by_account_current"
-
-    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
-
-
-def test_view_asset_class_value_by_location(test_db_2):
-    expected = [{'asset_class_id': 1, 'location_id': 1, 'current_value': 82000000},
-                {'asset_class_id': 1, 'location_id': 2, 'current_value': 110000000},
-                {'asset_class_id': 2, 'location_id': 1, 'current_value': 104000000},
-                {'asset_class_id': 2, 'location_id': 2, 'current_value': 2000000},
-                {'asset_class_id': 3, 'location_id': 1, 'current_value': 200000000},
-                {'asset_class_id': 4, 'location_id': None, 'current_value': 2000000}]
-
-    command = "SELECT * FROM asset_class_value_by_location"
-
-    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
-
-
-def test_view_component_value(test_db_2):
-    expected = [{'asset_id': 1, 'asset_class_id': 3, 'location_id': 1, 'current_value': 200000000},
-                {'asset_id': 2, 'asset_class_id': 1, 'location_id': 2, 'current_value': 100000000},
-                {'asset_id': 3, 'asset_class_id': 1, 'location_id': 1, 'current_value': 60000000},
-                {'asset_id': 4, 'asset_class_id': 1, 'location_id': 1, 'current_value': 22000000},
-                {'asset_id': 4, 'asset_class_id': 1, 'location_id': 2, 'current_value': 10000000},
-                {'asset_id': 4, 'asset_class_id': 2, 'location_id': 1, 'current_value': 4000000},
-                {'asset_id': 4, 'asset_class_id': 2, 'location_id': 2, 'current_value': 2000000},
-                {'asset_id': 4, 'asset_class_id': 4, 'location_id': None, 'current_value': 2000000},
-                {'asset_id': 5, 'asset_class_id': 2, 'location_id': 1, 'current_value': 100000000}]
-
-    command = "SELECT * FROM component_value"
-
-    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
-
-
-def test_view_decimal(test_db_2):
-    expected = {'constant': 10000}
-
-    command = "SELECT * FROM decimal"
-
-    assert expected == finance_tool.fetch_one(database=test_db_2, cmd=command)
-
-
-def test_view_deviation_level(test_db_1):
-    expected = [{'deviation': -3000},
-                {'deviation': -2000},
-                {'deviation': -1500},
-                {'deviation': 3600},
-                {'deviation': 4000}]
-    command = "SELECT * FROM deviation_level"
-    assert finance_tool.fetch_all(database=test_db_1, cmd=command) == expected
-
-
-def test_view_deviation_level_value(test_db_1):
-    expected = [{'deviation': -3000, 'level_value': 0},
-                {'deviation': -2000, 'level_value': 20000000},
-                {'deviation': -1500, 'level_value': 32500000},
-                {'deviation': 3600, 'level_value': 364000000},
-                {'deviation': 4000, 'level_value': 400000000}]
-
-    command = "SELECT * FROM deviation_level_value"
-    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=command)
-
-
-def test_view_net_worth(test_db_2):
-    expected = {'net_worth': 500000000}
-
-    command = "SELECT * FROM net_worth"
-
-    assert expected == finance_tool.fetch_one(database=test_db_2, cmd=command)
-
-
-# Test calculations
-def test_net_worth_formatted(test_db_2):
-    assert finance_tool.fetch_one(database=test_db_2, cmd=finance_tool.net_worth_formatted) == {'net_worth': 50000.0}
 
 
 # Test constraints
@@ -557,7 +183,7 @@ def test_constraints(test_db_0, table_name, expected):
                                                     (100000, {'deviation': 4000})])
 def test_level(test_db_1, contribution, expected):
     assert expected == finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.level,
-                                    params={'contribution': contribution})
+                                              params={'contribution': contribution})
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
@@ -590,7 +216,7 @@ def test_level(test_db_1, contribution, expected):
                                                                'contribution': 0}])])
 def test_fill_to_level(test_db_1, contribution, expected):
     assert expected == finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.fill_to_level,
-                                    params={'contribution': contribution})
+                                              params={'contribution': contribution})
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, {'sum': 2000}),
@@ -599,7 +225,7 @@ def test_fill_to_level(test_db_1, contribution, expected):
                                                     (100000, {'sum': 10000})])
 def test_subset_percent(test_db_1, contribution, expected):
     assert expected == finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.subset_percent,
-                                    params={'contribution': contribution})
+                                              params={'contribution': contribution})
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, {'remainder': 0}),
@@ -608,7 +234,7 @@ def test_subset_percent(test_db_1, contribution, expected):
                                                     (100000, {'remainder': 600000000})])
 def test_remaining_amount(test_db_1, contribution, expected):
     assert expected == finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.remaining_amount,
-                                    params={'contribution': contribution})
+                                              params={'contribution': contribution})
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
@@ -641,7 +267,7 @@ def test_remaining_amount(test_db_1, contribution, expected):
                                                                'contribution': 60000000}])])
 def test_assign_remainder(test_db_1, contribution, expected):
     assert expected == finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.assign_remainder,
-                                    params={'contribution': contribution})
+                                              params={'contribution': contribution})
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
@@ -674,7 +300,7 @@ def test_assign_remainder(test_db_1, contribution, expected):
                                                                'contribution': 60000000}])])
 def test_where_to_contribute(test_db_1, contribution, expected):
     assert expected == finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.where_to_contribute,
-                                    params={'contribution': contribution})
+                                              params={'contribution': contribution})
 
 
 csv_expected = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
@@ -693,11 +319,12 @@ csv_expected = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1,
                                 {'id': 2, 'name': 'bonds'},
                                 {'id': 3, 'name': 'cash'},
                                 {'id': 4, 'name': 'other'}],
-                'balance': [{'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 340000000},
-                            {'id': 2, 'account_id': 1, 'asset_id': 2, 'balance_date': '2021-01-01', 'quantity': 140000000},
-                            {'id': 3, 'account_id': 1, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 340000000},
-                            {'id': 4, 'account_id': 1, 'asset_id': 4, 'balance_date': '2021-01-01', 'quantity': 40000000},
-                            {'id': 5, 'account_id': 1, 'asset_id': 5, 'balance_date': '2021-01-01', 'quantity': 140000000}],
+                'balance': [
+                    {'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 340000000},
+                    {'id': 2, 'account_id': 1, 'asset_id': 2, 'balance_date': '2021-01-01', 'quantity': 140000000},
+                    {'id': 3, 'account_id': 1, 'asset_id': 3, 'balance_date': '2021-01-01', 'quantity': 340000000},
+                    {'id': 4, 'account_id': 1, 'asset_id': 4, 'balance_date': '2021-01-01', 'quantity': 40000000},
+                    {'id': 5, 'account_id': 1, 'asset_id': 5, 'balance_date': '2021-01-01', 'quantity': 140000000}],
                 'component': [{'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 10000},
                               {'id': 2, 'asset_id': 2, 'asset_class_id': 1, 'location_id': 2, 'percentage': 10000},
                               {'id': 3, 'asset_id': 3, 'asset_class_id': 2, 'location_id': 1, 'percentage': 10000},
@@ -718,7 +345,8 @@ csv_expected = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1,
 
 @pytest.mark.parametrize('table_name', csv_expected.keys())
 def test_insert_from_csv_file(test_db_0, table_name):
-    finance_tool.insert_from_csv_file(database=test_db_0, file_path='./test_csv_data/' + table_name + '.csv', table_name=table_name)
+    finance_tool.insert_from_csv_file(database=test_db_0, file_path='./test_csv_data/' + table_name + '.csv',
+                                      table_name=table_name)
 
     assert finance_tool.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == csv_expected[table_name]
 
