@@ -357,14 +357,6 @@ WHERE
     fill_to_level.location_id == assign_remainder.location_id 
 """
 
-# Net worth
-net_worth_formatted = """   
-SELECT
-    net_worth.net_worth / decimal.constant AS net_worth
-FROM
-    net_worth, decimal 
-"""
-
 insert = {'account': insert_account,
           'account_type': insert_account_type,
           'allocation': insert_allocation,

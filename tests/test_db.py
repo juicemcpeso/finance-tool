@@ -25,7 +25,8 @@ view_names = {'account_value_current_by_asset',
               'decimal',
               'deviation_level',
               'deviation_level_value',
-              'net_worth'}
+              'net_worth',
+              'net_worth_formatted'}
 
 
 def dict_factory(cursor, row):
@@ -392,6 +393,5 @@ def test_view_net_worth(test_db_2):
 
 
 # Test calculations
-@pytest.mark.skip(reason="change net worth formatted to a view")
 def test_net_worth_formatted(test_db_2):
-    assert fetch_one(database=test_db_2, cmd=finance_tool.net_worth_formatted) == {'net_worth': 50000.0}
+    assert fetch_one(database=test_db_2, cmd="SELECT * FROM net_worth_formatted") == {'net_worth': 50000.00}
