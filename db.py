@@ -377,3 +377,6 @@ insert = {'account': insert_account,
           'location': insert_location,
           'owner': insert_owner,
           'price': insert_price}
+
+if __name__ == "__main__":
+    pass
