@@ -1,5 +1,4 @@
-import app
-import finance_tool 
+import finance_tool
 import pytest
 import tests.test_lookup as test_lookup
 import json
@@ -39,18 +38,3 @@ def test_db_2(tmp_path):
         finance_tool.execute_many(database=db_test, cmd=test_lookup.insert_dict[table_name], data_sequence=data[table_name])
 
     return db_test
-
-
-@pytest.fixture
-def test_app_db_0(test_db_0):
-    return app.App(test_db_0)
-
-
-@pytest.fixture
-def test_app_db_1(test_db_1):
-    return app.App(test_db_1)
-
-
-@pytest.fixture
-def test_app_db_2(test_db_2):
-    return app.App(test_db_2)
