@@ -1,5 +1,46 @@
+import json
 import pytest
 import sqlite3
+
+
+def create_test_db_from_json(tmp_path, data_file_name=None):
+    db_test = tmp_path / "test.db"
+    execute_file(db_test, '../db.sql')
+
+    if data_file_name is not None:
+        json_data = json_loader(data_file_name)
+
+        for table_name in json_data:
+            keys = ', '.join(json_data[table_name][0].keys())
+            q_marks = ', '.join(['?' for _ in json_data[table_name][0]])
+            command = f"INSERT INTO {table_name} ({keys}) VALUES ({q_marks})"
+            values = [tuple(line.values()) for line in json_data[table_name]]
+            execute_many(db_test, cmd=command, data_sequence=values)
+
+    return db_test
+
+
+def json_loader(file_name):
+    with open(file_name, "r") as read_file:
+        return json.load(read_file)
+
+
+@pytest.fixture
+def test_db_0(tmp_path):
+    return create_test_db_from_json(tmp_path)
+
+
+# Use for simplified allocation data
+@pytest.fixture
+def test_db_1(tmp_path):
+    return create_test_db_from_json(tmp_path, '../tests/data/test_db_1.json')
+
+
+# Use for general testing (has multiple of each item)
+@pytest.fixture
+def test_db_2(tmp_path):
+    return create_test_db_from_json(tmp_path, '../tests/data/test_db_2.json')
+
 
 table_names = {'account',
                'account_type',
@@ -32,6 +73,26 @@ view_names = {'account_value_current_by_asset',
 def dict_factory(cursor, row):
     fields = [column[0] for column in cursor.description]
     return {key: value for key, value in zip(fields, row)}
+
+
+def execute_file(database, file_name):
+    with open(file_name, 'r') as sql_file:
+        con = sqlite3.connect(database)
+        cur = con.cursor()
+        cur.executescript(sql_file.read())
+        con.commit()
+        con.close()
+
+
+def execute_many(database, cmd, data_sequence):
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    try:
+        cur.executemany(cmd, data_sequence)
+    except sqlite3.IntegrityError:
+        pass
+    con.commit()
+    con.close()
 
 
 def fetch_one(database, cmd, params=None):

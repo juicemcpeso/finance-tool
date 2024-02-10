@@ -3,7 +3,37 @@
 # @juicemcpeso
 
 import finance_tool
+import json
 import pytest
+
+
+def json_loader(file_name):
+    with open(file_name, "r") as read_file:
+        return json.load(read_file)
+
+
+def create_test_ft_from_json(tmp_path, json_file_name=None):
+    test_ft = finance_tool.FinanceTool(tmp_path / "test.db")
+
+    if json_file_name is not None:
+        data = json_loader(json_file_name)
+        for table_name in data:
+            test_ft.execute_many(cmd=insert_dict[table_name], data_sequence=data[table_name])
+
+    return test_ft
+
+
+# Finance tool with empty database
+@pytest.fixture
+def test_ft_0(tmp_path):
+    return create_test_ft_from_json(tmp_path)
+
+
+# # Use for simplified allocation data
+@pytest.fixture
+def test_ft_1(tmp_path):
+    return create_test_ft_from_json(tmp_path, '../tests/data/test_db_1.json')
+
 
 # Test - insert
 insert_dict = {'account': finance_tool.insert_account,
@@ -50,11 +80,9 @@ insert_expected = {
 
 
 @pytest.mark.parametrize('table_name, command', insert_sequence)
-def test_insert(test_db_0, table_name, command):
-    sql = f"""SELECT * FROM {table_name}"""
-
-    finance_tool.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry[table_name])
-    assert finance_tool.fetch_all(database=test_db_0, cmd=sql) == insert_expected[table_name]
+def test_insert(test_ft_0, table_name, command):
+    test_ft_0.execute_many(cmd=command, data_sequence=insert_entry[table_name])
+    assert test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}") == insert_expected[table_name]
 
 
 insert_entry_no_id = {
@@ -73,10 +101,9 @@ insert_entry_no_id = {
 
 
 @pytest.mark.parametrize('table_name, command', insert_sequence)
-def test_insert_no_id(test_db_0, table_name, command):
-    sql = f"""SELECT * FROM {table_name}"""
-    finance_tool.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry_no_id[table_name])
-    assert finance_tool.fetch_all(database=test_db_0, cmd=sql) == insert_expected[table_name]
+def test_insert_no_id(test_ft_0, table_name, command):
+    test_ft_0.execute_many(cmd=command, data_sequence=insert_entry_no_id[table_name])
+    assert test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}") == insert_expected[table_name]
 
 
 # Test constraints
@@ -171,18 +198,17 @@ formatted_expected_constraints = [(line['table'], line['expected']) for line in 
 
 
 @pytest.mark.parametrize('table_name, expected', formatted_expected_constraints)
-def test_constraints(test_db_0, table_name, expected):
-    finance_tool.execute(database=test_db_0, cmd=insert_dict[table_name], params=expected)
-    assert finance_tool.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == []
+def test_constraints(test_ft_0, table_name, expected):
+    test_ft_0.execute(cmd=insert_dict[table_name], params=expected)
+    assert test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}") == []
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, {'deviation': -3000}),
                                                     (1000, {'deviation': -3000}),
                                                     (10000, {'deviation': -1500}),
                                                     (100000, {'deviation': 4000})])
-def test_level(test_db_1, contribution, expected):
-    assert finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.level,
-                                  params={'contribution': contribution}) == expected
+def test_level(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_one(cmd=finance_tool.level, params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
@@ -213,27 +239,24 @@ def test_level(test_db_1, contribution, expected):
                                                               {'asset_class_id': 3,
                                                                'location_id': 1,
                                                                'contribution': 0}])])
-def test_fill_to_level(test_db_1, contribution, expected):
-    assert finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.fill_to_level,
-                                  params={'contribution': contribution}) == expected
+def test_fill_to_level(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_all(cmd=finance_tool.fill_to_level, params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, {'sum': 2000}),
                                                     (1000, {'sum': 2000}),
                                                     (10000, {'sum': 6500}),
                                                     (100000, {'sum': 10000})])
-def test_subset_percent(test_db_1, contribution, expected):
-    assert finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.subset_percent,
-                                  params={'contribution': contribution}) == expected
+def test_subset_percent(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_one(cmd=finance_tool.subset_percent, params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, {'remainder': 0}),
                                                     (1000, {'remainder': 10000000}),
                                                     (10000, {'remainder': 67500000}),
                                                     (100000, {'remainder': 600000000})])
-def test_remaining_amount(test_db_1, contribution, expected):
-    assert finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.remaining_amount,
-                                  params={'contribution': contribution}) == expected
+def test_remaining_amount(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_one(cmd=finance_tool.remaining_amount, params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
@@ -264,9 +287,8 @@ def test_remaining_amount(test_db_1, contribution, expected):
                                                               {'asset_class_id': 3,
                                                                'location_id': 1,
                                                                'contribution': 60000000}])])
-def test_assign_remainder(test_db_1, contribution, expected):
-    assert finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.assign_remainder,
-                                  params={'contribution': contribution}) == expected
+def test_assign_remainder(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_all(cmd=finance_tool.assign_remainder, params={'contribution': contribution}) == expected
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
@@ -297,9 +319,8 @@ def test_assign_remainder(test_db_1, contribution, expected):
                                                               {'asset_class_id': 3,
                                                                'location_id': 1,
                                                                'contribution': 60000000}])])
-def test_where_to_contribute(test_db_1, contribution, expected):
-    assert finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.where_to_contribute,
-                                  params={'contribution': contribution}) == expected
+def test_where_to_contribute(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_all(cmd=finance_tool.where_to_contribute, params={'contribution': contribution}) == expected
 
 
 csv_expected = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
@@ -343,19 +364,18 @@ csv_expected = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1,
 
 
 @pytest.mark.parametrize('table_name', csv_expected.keys())
-def test_insert_from_csv_file(test_db_0, table_name):
-    finance_tool.insert_from_csv_file(database=test_db_0, file_path='./test_csv_data/' + table_name + '.csv',
-                                      table_name=table_name)
+def test_insert_from_csv_file(test_ft_0, table_name):
+    test_ft_0.insert_from_csv_file(file_path='./test_csv_data/' + table_name + '.csv', table_name=table_name)
 
-    assert finance_tool.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == csv_expected[table_name]
+    assert test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}") == csv_expected[table_name]
 
 
-def test_insert_from_csv_directory(test_db_0):
-    finance_tool.insert_from_csv_directory(database=test_db_0, directory_path='./test_csv_data/')
+def test_insert_from_csv_directory(test_ft_0):
+    test_ft_0.insert_from_csv_directory(directory_path='./test_csv_data/')
     results_dict = {}
 
     for table_name in csv_expected.keys():
-        result = finance_tool.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}")
+        result = test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}")
         results_dict.update({table_name: result})
 
     assert results_dict == csv_expected

@@ -8,104 +8,152 @@ import os
 import sqlite3
 
 
-
-
 def dict_factory(cursor, row):
     fields = [column[0] for column in cursor.description]
     return {key: value for key, value in zip(fields, row)}
 
 
-# TODO - figure out the best way to write these
-# def execute(database, cmd, params=None):
-#     with sqlite3.connect(database) as con:
-#         cur = con.cursor()
-#         cur.execute(cmd, params) if params is not None else cur.execute(cmd)
-#     con.close()
+class FinanceTool:
+    def __init__(self, db_path=None):
+        self.db = db_path
+        self.execute_file('../db.sql')
 
+    # TODO: test
+    def execute(self, cmd, params=None):
+        con = sqlite3.connect(self.db)
+        cur = con.cursor()
+        try:
+            cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+        except sqlite3.IntegrityError:
+            pass
 
-# TODO - test?
-def execute(database, cmd, params=None):
-    """Execute a single command"""
-    con = sqlite3.connect(database)
-    cur = con.cursor()
-    try:
-        cur.execute(cmd, params) if params is not None else cur.execute(cmd)
-    except sqlite3.IntegrityError:
-        pass
+        con.commit()
+        con.close()
 
-    con.commit()
-    con.close()
+    # TODO - test?
+    def execute_many(self, cmd, data_sequence):
+        con = sqlite3.connect(self.db)
+        cur = con.cursor()
+        try:
+            cur.executemany(cmd, data_sequence)
+        except sqlite3.IntegrityError:
+            pass
+        con.commit()
+        con.close()
 
+    # TODO - test?
+    def execute_script(self, cmd):
+        con = sqlite3.connect(self.db)
+        cur = con.cursor()
+        cur.executescript(cmd)
+        con.commit()
+        con.close()
 
-# TODO - test?
-def execute_many(database, cmd, data_sequence):
-    """Execute a single command multiple times with different data"""
-    con = sqlite3.connect(database)
-    cur = con.cursor()
-    try:
-        cur.executemany(cmd, data_sequence)
-    except sqlite3.IntegrityError:
-        pass
-    con.commit()
-    con.close()
+    # TODO: test?
+    def execute_file(self, file_name):
+        with open(file_name, 'r') as sql_file:
+            self.execute_script(sql_file.read())
 
+    # TODO: test
+    def fetch_one(self, cmd, params=None):
+        con = sqlite3.connect(self.db)
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        result = cur.execute(cmd, params).fetchone() if params is not None else cur.execute(cmd).fetchone()
+        con.commit()
+        con.close()
+        return result
 
-# TODO - test?
-def execute_script(database, cmd):
-    """Execute script of commands"""
-    con = sqlite3.connect(database)
-    cur = con.cursor()
-    cur.executescript(cmd)
-    con.commit()
-    con.close()
+    # TODO: test?
+    def fetch_all(self, cmd, params=None):
+        con = sqlite3.connect(self.db)
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        result = cur.execute(cmd, params).fetchall() if params is not None else cur.execute(cmd).fetchall()
+        con.commit()
+        con.close()
+        return result
 
+    # # TODO - test?
+    # def execute(database, cmd, params=None):
+    #     """Execute a single command"""
+    #     con = sqlite3.connect(database)
+    #     cur = con.cursor()
+    #     try:
+    #         cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+    #     except sqlite3.IntegrityError:
+    #         pass
+    #
+    #     con.commit()
+    #     con.close()
 
-def execute_file(database, file_name):
-    with open(file_name, 'r') as sql_file:
-        execute_script(database, sql_file.read())
+    # # TODO - test?
+    # def execute_many(database, cmd, data_sequence):
+    #     """Execute a single command multiple times with different data"""
+    #     con = sqlite3.connect(database)
+    #     cur = con.cursor()
+    #     try:
+    #         cur.executemany(cmd, data_sequence)
+    #     except sqlite3.IntegrityError:
+    #         pass
+    #     con.commit()
+    #     con.close()
+    #
+    #
+    # # TODO - test?
+    # def execute_script(database, cmd):
+    #     """Execute script of commands"""
+    #     con = sqlite3.connect(database)
+    #     cur = con.cursor()
+    #     cur.executescript(cmd)
+    #     con.commit()
+    #     con.close()
+    #
+    #
+    # def execute_file(database, file_name):
+    #     with open(file_name, 'r') as sql_file:
+    #         execute_script(database, sql_file.read())
+    #
+    #
+    # # TODO - test
+    # def fetch_one(database, cmd, params=None):
+    #     con = sqlite3.connect(database)
+    #     con.row_factory = dict_factory
+    #     cur = con.cursor()
+    #     result = cur.execute(cmd, params).fetchone() if params is not None else cur.execute(cmd).fetchone()
+    #     con.commit()
+    #     con.close()
+    #     return result
+    #
+    #
+    # # TODO - test
+    # def fetch_all(database, cmd, params=None):
+    #     con = sqlite3.connect(database)
+    #     con.row_factory = dict_factory
+    #     cur = con.cursor()
+    #     result = cur.execute(cmd, params).fetchall() if params is not None else cur.execute(cmd).fetchall()
+    #     con.commit()
+    #     con.close()
+    #     return result
 
+    #
+    # # TODO - test
+    # def column_names(database, cmd):
+    #     con = sqlite3.connect(database)
+    #     cur = con.execute(cmd)
+    #     result = [description[0] for description in cur.description]
+    #     con.commit()
+    #     con.close()
+    #     return result
 
-# TODO - test
-def fetch_one(database, cmd, params=None):
-    con = sqlite3.connect(database)
-    con.row_factory = dict_factory
-    cur = con.cursor()
-    result = cur.execute(cmd, params).fetchone() if params is not None else cur.execute(cmd).fetchone()
-    con.commit()
-    con.close()
-    return result
+    def insert_from_csv_file(self, file_path, table_name):
+        with open(file_path) as csv_file:
+            csv_dict = csv.DictReader(csv_file)
+            self.execute_many(cmd=insert[table_name], data_sequence=csv_dict)
 
-
-# TODO - test
-def fetch_all(database, cmd, params=None):
-    con = sqlite3.connect(database)
-    con.row_factory = dict_factory
-    cur = con.cursor()
-    result = cur.execute(cmd, params).fetchall() if params is not None else cur.execute(cmd).fetchall()
-    con.commit()
-    con.close()
-    return result
-
-
-# TODO - test
-def column_names(database, cmd):
-    con = sqlite3.connect(database)
-    cur = con.execute(cmd)
-    result = [description[0] for description in cur.description]
-    con.commit()
-    con.close()
-    return result
-
-
-def insert_from_csv_file(database, file_path, table_name):
-    with open(file_path) as csv_file:
-        csv_dict = csv.DictReader(csv_file)
-        execute_many(database=database, cmd=insert[table_name], data_sequence=csv_dict)
-
-
-def insert_from_csv_directory(database, directory_path):
-    for file_name in os.listdir(directory_path):
-        insert_from_csv_file(database=database, file_path=directory_path + file_name, table_name=os.path.splitext(file_name)[0])
+    def insert_from_csv_directory(self, directory_path):
+        for file_name in os.listdir(directory_path):
+            self.insert_from_csv_file(file_path=directory_path + file_name, table_name=os.path.splitext(file_name)[0])
 
 
 # INSERT
