@@ -1,4 +1,4 @@
-# db.py
+# finance_tool.py
 # SQL statements for the portfolio logic
 # 2024-01-25
 # @juicemcpeso

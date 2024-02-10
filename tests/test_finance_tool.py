@@ -1,9 +1,8 @@
-# test_db.py
-# Tests for db.py
+# Tests for finance_tool.py
 # 2024-01-25
 # @juicemcpeso
 
-import db
+import finance_tool
 import pytest
 
 table_names = {'account',
@@ -49,13 +48,13 @@ view_names = {'account_value_current_by_asset',
 def test_create_table_columns(test_db_0, table_name, column_names):
     sql = f"SELECT * FROM {table_name}"
 
-    assert set(db.column_names(database=test_db_0, cmd=sql)) == column_names
+    assert set(finance_tool.column_names(database=test_db_0, cmd=sql)) == column_names
 
 
 def test_create_tables(test_db_0):
     sql = """SELECT * FROM sqlite_master WHERE type = 'table'"""
 
-    result_list = db.fetch_all(database=test_db_0, cmd=sql)
+    result_list = finance_tool.fetch_all(database=test_db_0, cmd=sql)
 
     assert set(line['name'] for line in result_list) == table_names
 
@@ -63,24 +62,24 @@ def test_create_tables(test_db_0):
 def test_create_views(test_db_0):
     sql = """SELECT * FROM sqlite_master WHERE type = 'view'"""
 
-    result_list = db.fetch_all(database=test_db_0, cmd=sql)
+    result_list = finance_tool.fetch_all(database=test_db_0, cmd=sql)
 
     assert set(line['name'] for line in result_list) == view_names
 
 
 # Test - insert
-insert_dict = {'account': db.insert_account,
-               'account_type': db.insert_account_type,
-               'allocation': db.insert_allocation,
-               'asset': db.insert_asset,
-               'asset_class': db.insert_asset_class,
-               'balance': db.insert_balance,
-               'component': db.insert_component,
-               'constant': db.insert_constant,
-               'institution': db.insert_institution,
-               'location': db.insert_location,
-               'owner': db.insert_owner,
-               'price': db.insert_price}
+insert_dict = {'account': finance_tool.insert_account,
+               'account_type': finance_tool.insert_account_type,
+               'allocation': finance_tool.insert_allocation,
+               'asset': finance_tool.insert_asset,
+               'asset_class': finance_tool.insert_asset_class,
+               'balance': finance_tool.insert_balance,
+               'component': finance_tool.insert_component,
+               'constant': finance_tool.insert_constant,
+               'institution': finance_tool.insert_institution,
+               'location': finance_tool.insert_location,
+               'owner': finance_tool.insert_owner,
+               'price': finance_tool.insert_price}
 
 insert_sequence = {(table_name, sql) for table_name, sql in insert_dict.items()}
 #
@@ -129,8 +128,8 @@ insert_expected = {
 def test_insert(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
 
-    db.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry[table_name])
-    assert db.fetch_all(database=test_db_0, cmd=sql) == insert_expected[table_name]
+    finance_tool.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry[table_name])
+    assert finance_tool.fetch_all(database=test_db_0, cmd=sql) == insert_expected[table_name]
 
 
 insert_entry_no_id = {
@@ -151,8 +150,8 @@ insert_entry_no_id = {
 @pytest.mark.parametrize('table_name, command', insert_sequence)
 def test_insert_no_id(test_db_0, table_name, command):
     sql = f"""SELECT * FROM {table_name}"""
-    db.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry_no_id[table_name])
-    assert db.fetch_all(database=test_db_0, cmd=sql) == insert_expected[table_name]
+    finance_tool.execute_many(database=test_db_0, cmd=command, data_sequence=insert_entry_no_id[table_name])
+    assert finance_tool.fetch_all(database=test_db_0, cmd=sql) == insert_expected[table_name]
 
 
 # Test views
@@ -166,7 +165,7 @@ def test_view_account_value_current_by_asset(test_db_2):
 
     command = "SELECT * FROM account_value_current_by_asset"
 
-    assert expected == db.fetch_all(database=test_db_2, cmd=command)
+    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
 
 
 def test_view_allocation_deviation(test_db_1):
@@ -203,7 +202,7 @@ def test_view_allocation_deviation(test_db_1):
 
     command = "SELECT * FROM allocation_deviation"
 
-    assert db.fetch_all(database=test_db_1, cmd=command) == expected
+    assert finance_tool.fetch_all(database=test_db_1, cmd=command) == expected
 
 
 def test_view_allocation_deviation_all_levels(test_db_1):
@@ -344,7 +343,7 @@ def test_view_allocation_deviation_all_levels(test_db_1):
                  'next_deviation': 4000}]
 
     command = "SELECT * FROM allocation_deviation_all_levels"
-    assert expected == db.fetch_all(database=test_db_1, cmd=command)
+    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=command)
 
 
 def test_view_asset_value_current(test_db_2):
@@ -356,7 +355,7 @@ def test_view_asset_value_current(test_db_2):
 
     command = "SELECT * FROM asset_value_current"
 
-    assert expected == db.fetch_all(database=test_db_2, cmd=command)
+    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
 
 
 def test_view_asset_price_newest(test_db_2):
@@ -368,7 +367,7 @@ def test_view_asset_price_newest(test_db_2):
 
     command = "SELECT * FROM asset_price_newest"
 
-    assert expected == db.fetch_all(database=test_db_2, cmd=command)
+    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
 
 
 def test_view_asset_quantity_by_account_current(test_db_2):
@@ -381,7 +380,7 @@ def test_view_asset_quantity_by_account_current(test_db_2):
 
     command = "SELECT * FROM asset_quantity_by_account_current"
 
-    assert expected == db.fetch_all(database=test_db_2, cmd=command)
+    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
 
 
 def test_view_asset_class_value_by_location(test_db_2):
@@ -394,7 +393,7 @@ def test_view_asset_class_value_by_location(test_db_2):
 
     command = "SELECT * FROM asset_class_value_by_location"
 
-    assert expected == db.fetch_all(database=test_db_2, cmd=command)
+    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
 
 
 def test_view_component_value(test_db_2):
@@ -410,7 +409,7 @@ def test_view_component_value(test_db_2):
 
     command = "SELECT * FROM component_value"
 
-    assert expected == db.fetch_all(database=test_db_2, cmd=command)
+    assert expected == finance_tool.fetch_all(database=test_db_2, cmd=command)
 
 
 def test_view_decimal(test_db_2):
@@ -418,7 +417,7 @@ def test_view_decimal(test_db_2):
 
     command = "SELECT * FROM decimal"
 
-    assert expected == db.fetch_one(database=test_db_2, cmd=command)
+    assert expected == finance_tool.fetch_one(database=test_db_2, cmd=command)
 
 
 def test_view_deviation_level(test_db_1):
@@ -428,7 +427,7 @@ def test_view_deviation_level(test_db_1):
                 {'deviation': 3600},
                 {'deviation': 4000}]
     command = "SELECT * FROM deviation_level"
-    assert db.fetch_all(database=test_db_1, cmd=command) == expected
+    assert finance_tool.fetch_all(database=test_db_1, cmd=command) == expected
 
 
 def test_view_deviation_level_value(test_db_1):
@@ -439,7 +438,7 @@ def test_view_deviation_level_value(test_db_1):
                 {'deviation': 4000, 'level_value': 400000000}]
 
     command = "SELECT * FROM deviation_level_value"
-    assert expected == db.fetch_all(database=test_db_1, cmd=command)
+    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=command)
 
 
 def test_view_net_worth(test_db_2):
@@ -447,12 +446,12 @@ def test_view_net_worth(test_db_2):
 
     command = "SELECT * FROM net_worth"
 
-    assert expected == db.fetch_one(database=test_db_2, cmd=command)
+    assert expected == finance_tool.fetch_one(database=test_db_2, cmd=command)
 
 
 # Test calculations
 def test_net_worth_formatted(test_db_2):
-    assert db.fetch_one(database=test_db_2, cmd=db.net_worth_formatted) == {'net_worth': 50000.0}
+    assert finance_tool.fetch_one(database=test_db_2, cmd=finance_tool.net_worth_formatted) == {'net_worth': 50000.0}
 
 
 # Test constraints
@@ -548,8 +547,8 @@ formatted_expected_constraints = [(line['table'], line['expected']) for line in 
 
 @pytest.mark.parametrize('table_name, expected', formatted_expected_constraints)
 def test_constraints(test_db_0, table_name, expected):
-    db.execute(database=test_db_0, cmd=insert_dict[table_name], params=expected)
-    assert db.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == []
+    finance_tool.execute(database=test_db_0, cmd=insert_dict[table_name], params=expected)
+    assert finance_tool.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == []
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, {'deviation': -3000}),
@@ -557,7 +556,7 @@ def test_constraints(test_db_0, table_name, expected):
                                                     (10000, {'deviation': -1500}),
                                                     (100000, {'deviation': 4000})])
 def test_level(test_db_1, contribution, expected):
-    assert expected == db.fetch_one(database=test_db_1, cmd=db.level,
+    assert expected == finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.level,
                                     params={'contribution': contribution})
 
 
@@ -590,7 +589,7 @@ def test_level(test_db_1, contribution, expected):
                                                                'location_id': 1,
                                                                'contribution': 0}])])
 def test_fill_to_level(test_db_1, contribution, expected):
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.fill_to_level,
+    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.fill_to_level,
                                     params={'contribution': contribution})
 
 
@@ -599,7 +598,7 @@ def test_fill_to_level(test_db_1, contribution, expected):
                                                     (10000, {'sum': 6500}),
                                                     (100000, {'sum': 10000})])
 def test_subset_percent(test_db_1, contribution, expected):
-    assert expected == db.fetch_one(database=test_db_1, cmd=db.subset_percent,
+    assert expected == finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.subset_percent,
                                     params={'contribution': contribution})
 
 
@@ -608,7 +607,7 @@ def test_subset_percent(test_db_1, contribution, expected):
                                                     (10000, {'remainder': 67500000}),
                                                     (100000, {'remainder': 600000000})])
 def test_remaining_amount(test_db_1, contribution, expected):
-    assert expected == db.fetch_one(database=test_db_1, cmd=db.remaining_amount,
+    assert expected == finance_tool.fetch_one(database=test_db_1, cmd=finance_tool.remaining_amount,
                                     params={'contribution': contribution})
 
 
@@ -641,7 +640,7 @@ def test_remaining_amount(test_db_1, contribution, expected):
                                                                'location_id': 1,
                                                                'contribution': 60000000}])])
 def test_assign_remainder(test_db_1, contribution, expected):
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.assign_remainder,
+    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.assign_remainder,
                                     params={'contribution': contribution})
 
 
@@ -674,7 +673,7 @@ def test_assign_remainder(test_db_1, contribution, expected):
                                                                'location_id': 1,
                                                                'contribution': 60000000}])])
 def test_where_to_contribute(test_db_1, contribution, expected):
-    assert expected == db.fetch_all(database=test_db_1, cmd=db.where_to_contribute,
+    assert expected == finance_tool.fetch_all(database=test_db_1, cmd=finance_tool.where_to_contribute,
                                     params={'contribution': contribution})
 
 
@@ -719,17 +718,17 @@ csv_expected = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1,
 
 @pytest.mark.parametrize('table_name', csv_expected.keys())
 def test_insert_from_csv_file(test_db_0, table_name):
-    db.insert_from_csv_file(database=test_db_0, file_path='./test_csv_data/' + table_name + '.csv', table_name=table_name)
+    finance_tool.insert_from_csv_file(database=test_db_0, file_path='./test_csv_data/' + table_name + '.csv', table_name=table_name)
 
-    assert db.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == csv_expected[table_name]
+    assert finance_tool.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}") == csv_expected[table_name]
 
 
 def test_insert_from_csv_directory(test_db_0):
-    db.insert_from_csv_directory(database=test_db_0, directory_path='./test_csv_data/')
+    finance_tool.insert_from_csv_directory(database=test_db_0, directory_path='./test_csv_data/')
     results_dict = {}
 
     for table_name in csv_expected.keys():
-        result = db.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}")
+        result = finance_tool.fetch_all(database=test_db_0, cmd=f"SELECT * FROM {table_name}")
         results_dict.update({table_name: result})
 
     assert results_dict == csv_expected

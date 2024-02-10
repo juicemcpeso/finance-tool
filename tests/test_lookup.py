@@ -3,19 +3,19 @@
 # 2024-02-02
 # @juicemcpeso
 
-import db
+import finance_tool
 
-insert_dict = {'account': db.insert_account,
-               'account_type': db.insert_account_type,
-               'allocation': db.insert_allocation,
-               'asset': db.insert_asset,
-               'asset_class': db.insert_asset_class,
-               'balance': db.insert_balance,
-               'component': db.insert_component,
-               'constant': db.insert_constant,
-               'institution': db.insert_institution,
-               'location': db.insert_location,
-               'owner': db.insert_owner,
-               'price': db.insert_price}
+insert_dict = {'account': finance_tool.insert_account,
+               'account_type': finance_tool.insert_account_type,
+               'allocation': finance_tool.insert_allocation,
+               'asset': finance_tool.insert_asset,
+               'asset_class': finance_tool.insert_asset_class,
+               'balance': finance_tool.insert_balance,
+               'component': finance_tool.insert_component,
+               'constant': finance_tool.insert_constant,
+               'institution': finance_tool.insert_institution,
+               'location': finance_tool.insert_location,
+               'owner': finance_tool.insert_owner,
+               'price': finance_tool.insert_price}
 
 insert_sequence = {(table_name, sql) for table_name, sql in insert_dict.items()}
