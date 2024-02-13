@@ -15,8 +15,8 @@ def dict_factory(cursor, row):
 
 
 # JSON
-def json_loader(file_name):
-    with open(file_name, "r") as read_file:
+def json_loader(file_path):
+    with open(file_path, "r") as read_file:
         return json.load(read_file)
 
 
