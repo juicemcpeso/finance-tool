@@ -3,23 +3,14 @@
 # @juicemcpeso
 
 import finance_tool
-import json
 import pytest
 
 
-def json_loader(file_name):
-    with open(file_name, "r") as read_file:
-        return json.load(read_file)
-
-
-# TODO: add this to the finance tool
 def create_test_ft_from_json(tmp_path, json_file_name=None):
     test_ft = finance_tool.FinanceTool(tmp_path / "test.db")
 
     if json_file_name is not None:
-        data = json_loader(json_file_name)
-        for table_name in data:
-            test_ft.execute_many(cmd=insert_dict[table_name], data_sequence=data[table_name])
+        test_ft.insert_from_json(json_file_name)
 
     return test_ft
 
@@ -384,3 +375,14 @@ def test_insert_from_csv_directory(test_ft_0):
         results_dict.update({table_name: result})
 
     assert results_dict == csv_expected
+
+
+def test_insert_from_json(test_ft_0):
+    test_ft_0.insert_from_json(file_path='./data/test_db_1.json')
+    results_dict = {}
+
+    for table_name in csv_expected.keys():
+        result = test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}")
+        results_dict.update({table_name: result})
+
+    assert csv_expected == results_dict

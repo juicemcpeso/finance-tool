@@ -4,6 +4,7 @@
 # @juicemcpeso
 
 import csv
+import json
 import os
 import sqlite3
 
@@ -11,6 +12,12 @@ import sqlite3
 def dict_factory(cursor, row):
     fields = [column[0] for column in cursor.description]
     return {key: value for key, value in zip(fields, row)}
+
+
+# JSON
+def json_loader(file_name):
+    with open(file_name, "r") as read_file:
+        return json.load(read_file)
 
 
 class FinanceTool:
@@ -97,6 +104,12 @@ class FinanceTool:
     def insert_from_csv_directory(self, directory_path):
         for file_name in os.listdir(directory_path):
             self.insert_from_csv_file(file_path=directory_path + file_name, table_name=os.path.splitext(file_name)[0])
+
+    def insert_from_json(self, file_path):
+        json_data = json_loader(file_path)
+        for table_name in json_data:
+            for line in json_data[table_name]:
+                self.insert[table_name](**line)
 
     # INSERT
     def insert_account(self, name, account_type_id, institution_id, owner_id, id=None):
@@ -261,6 +274,8 @@ class FinanceTool:
                 'amount': amount})
 
 
+
+# SQL
 sql_insert_account = """
 INSERT INTO account(id, name, account_type_id, institution_id, owner_id)
 VALUES(:id, :name, :account_type_id, :institution_id, :owner_id)
