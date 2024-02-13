@@ -12,6 +12,7 @@ def json_loader(file_name):
         return json.load(read_file)
 
 
+# TODO: add this to the finance tool
 def create_test_ft_from_json(tmp_path, json_file_name=None):
     test_ft = finance_tool.FinanceTool(tmp_path / "test.db")
 
@@ -35,171 +36,175 @@ def test_ft_1(tmp_path):
     return create_test_ft_from_json(tmp_path, '../tests/data/test_db_1.json')
 
 
+table_names = {'account',
+               'account_type',
+               'allocation',
+               'asset',
+               'asset_class',
+               'balance',
+               'component',
+               'constant',
+               'institution',
+               'location',
+               'owner',
+               'price'}
+
 # Test - insert
-insert_dict = {'account': finance_tool.insert_account,
-               'account_type': finance_tool.insert_account_type,
-               'allocation': finance_tool.insert_allocation,
-               'asset': finance_tool.insert_asset,
-               'asset_class': finance_tool.insert_asset_class,
-               'balance': finance_tool.insert_balance,
-               'component': finance_tool.insert_component,
-               'constant': finance_tool.insert_constant,
-               'institution': finance_tool.insert_institution,
-               'location': finance_tool.insert_location,
-               'owner': finance_tool.insert_owner,
-               'price': finance_tool.insert_price}
+# TODO: remove this once JSON is added to finance tool
+insert_dict = {'account': finance_tool.sql_insert_account,
+               'account_type': finance_tool.sql_insert_account_type,
+               'allocation': finance_tool.sql_insert_allocation,
+               'asset': finance_tool.sql_insert_asset,
+               'asset_class': finance_tool.sql_insert_asset_class,
+               'balance': finance_tool.sql_insert_balance,
+               'component': finance_tool.sql_insert_component,
+               'constant': finance_tool.sql_insert_constant,
+               'institution': finance_tool.sql_insert_institution,
+               'location': finance_tool.sql_insert_location,
+               'owner': finance_tool.sql_insert_owner,
+               'price': finance_tool.sql_insert_price}
 
-insert_sequence = {(table_name, sql) for table_name, sql in insert_dict.items()}
+insert_function_entry = {
+    'account': {'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
+    'account_type': {'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1},
+    'allocation': {'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000},
+    'asset': {'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
+    'asset_class': {'id': 1, 'name': 'stocks'},
+    'balance': {'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000},
+    'component': {'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000},
+    'constant': {'id': 1, 'name': 'decimal', 'amount': 10000},
+    'institution': {'id': 1, 'name': 'Rearguard Investments'},
+    'location': {'id': 1, 'name': 'USA'},
+    'owner': {'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'},
+    'price': {'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}}
 
-insert_entry = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
-                'account_type': [{'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}],
-                'allocation': [{'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000}],
-                'asset': [{'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'}],
-                'asset_class': [{'id': 1, 'name': 'stocks'}],
-                'balance': [{'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000}],
-                'component': [{'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000}],
-                'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
-                'institution': [{'id': 1, 'name': 'Rearguard Investments'}],
-                'location': [{'id': 1, 'name': 'USA'}],
-                'owner': [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'}],
-                'price': [{'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}]}
-
-insert_expected = {
-    'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
-    'account_type': [{'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}],
-    'allocation': [{'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 4000}],
-    'asset': [{'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'}],
-    'asset_class': [{'id': 1, 'name': 'stocks'}],
-    'balance': [{'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 340000000}],
-    'component': [{'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 10000}],
-    'constant': [{'id': 1, 'name': 'decimal', 'amount': 10000}],
-    'institution': [{'id': 1, 'name': 'Rearguard Investments'}],
-    'location': [{'id': 1, 'name': 'USA'}],
-    'owner': [{'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'}],
-    'price': [{'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 10000}]}
-
-
-@pytest.mark.parametrize('table_name, command', insert_sequence)
-def test_insert(test_ft_0, table_name, command):
-    test_ft_0.execute_many(cmd=command, data_sequence=insert_entry[table_name])
-    assert test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}") == insert_expected[table_name]
+insert_function_expected = {
+    'account': {'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
+    'account_type': {'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1},
+    'allocation': {'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 4000},
+    'asset': {'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
+    'asset_class': {'id': 1, 'name': 'stocks'},
+    'balance': {'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 340000000},
+    'component': {'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 10000},
+    'constant': {'id': 1, 'name': 'decimal', 'amount': 10000},
+    'institution': {'id': 1, 'name': 'Rearguard Investments'},
+    'location': {'id': 1, 'name': 'USA'},
+    'owner': {'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'},
+    'price': {'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 10000}}
 
 
-insert_entry_no_id = {
-    'account': [{'id': None, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1}],
-    'account_type': [{'id': None, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1}],
-    'allocation': [{'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000}],
-    'asset': [{'id': None, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'}],
-    'asset_class': [{'id': None, 'name': 'stocks'}],
-    'balance': [{'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000}],
-    'component': [{'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000}],
-    'constant': [{'id': None, 'name': 'decimal', 'amount': 10000}],
-    'institution': [{'id': None, 'name': 'Rearguard Investments'}],
-    'location': [{'id': None, 'name': 'USA'}],
-    'owner': [{'id': None, 'name': 'Bob', 'birthday': '1992-10-31'}],
-    'price': [{'id': None, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}]}
+@pytest.mark.parametrize('table_name', table_names)
+def test_insert_function(test_ft_0, table_name):
+    test_ft_0.insert[table_name](**insert_function_entry[table_name])
+    assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == insert_function_expected[table_name]
 
 
-@pytest.mark.parametrize('table_name, command', insert_sequence)
-def test_insert_no_id(test_ft_0, table_name, command):
-    test_ft_0.execute_many(cmd=command, data_sequence=insert_entry_no_id[table_name])
-    assert test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}") == insert_expected[table_name]
+insert_function_entry_no_id = {
+    'account': {'id': None, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
+    'account_type': {'id': None, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1},
+    'allocation': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000},
+    'asset': {'id': None, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
+    'asset_class': {'id': None, 'name': 'stocks'},
+    'balance': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000},
+    'component': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000},
+    'constant': {'id': None, 'name': 'decimal', 'amount': 10000},
+    'institution': {'id': None, 'name': 'Rearguard Investments'},
+    'location': {'id': None, 'name': 'USA'},
+    'owner': {'id': None, 'name': 'Bob', 'birthday': '1992-10-31'},
+    'price': {'id': None, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}}
+
+
+@pytest.mark.parametrize('table_name', table_names)
+def test_insert_function_no_id(test_ft_0, table_name):
+    test_ft_0.insert[table_name](**insert_function_entry_no_id[table_name])
+    assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == insert_function_expected[table_name]
 
 
 # Test constraints
-expected_constraints = [{'table': 'account',
-                         'expected': {'id': None, 'name': None, 'account_type_id': 0, 'institution_id': 0,
-                                      'owner_id': 0}},
-                        {'table': 'account_type',
-                         'expected': {'id': None, 'name': 'test', 'tax_in': 1, 'tax_growth': 4, 'tax_out': 0}},
-                        {'table': 'account_type',
-                         'expected': {'id': None, 'name': None, 'tax_in': 1, 'tax_growth': 0, 'tax_out': 0}},
-                        {'table': 'allocation',
-                         'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 3}},
-                        {'table': 'allocation',
-                         'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 'test'}},
-                        {'table': 'allocation',
-                         'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': None}},
-                        {'table': 'asset',
-                         'expected': {'id': None, 'name': 'test', 'symbol': None}},
-                        {'table': 'asset',
-                         'expected': {'id': None, 'name': None, 'symbol': 'TEST'}},
-                        {'table': 'asset_class',
-                         'expected': {'id': None, 'name': None}},
-                        {'table': 'balance',
-                         'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 6, 'quantity': 1}},
-                        {'table': 'balance',
-                         'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'test',
-                                      'quantity': 1}},
-                        {'table': 'balance',
-                         'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'April 16, 2023',
-                                      'quantity': 1}},
-                        {'table': 'balance',
-                         'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2024-15-43',
-                                      'quantity': 1}},
-                        {'table': 'balance',
-                         'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': None, 'quantity': 1}},
-                        {'table': 'balance',
-                         'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01',
-                                      'quantity': None}},
-                        {'table': 'balance',
-                         'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01',
-                                      'quantity': 'test'}},
-                        {'table': 'balance',
-                         'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01',
-                                      'quantity': ''}},
-                        {'table': 'balance',
-                         'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01',
-                                      'quantity': -123}},
-                        {'table': 'component',
-                         'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1,
-                                      'percentage': 1.01}},
-                        {'table': 'component',
-                         'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1,
-                                      'percentage': -0.01}},
-                        {'table': 'institution',
-                         'expected': {'id': None, 'name': None}},
-                        {'table': 'location',
-                         'expected': {'id': None, 'name': None}},
-                        {'table': 'owner',
-                         'expected': {'id': None, 'name': None, 'birthday': '2021-01-01'}},
-                        {'table': 'owner',
-                         'expected': {'id': None, 'name': 'test', 'birthday': 'test'}},
-                        {'table': 'owner',
-                         'expected': {'id': None, 'name': 'test', 'birthday': ''}},
-                        {'table': 'owner',
-                         'expected': {'id': None, 'name': 'test', 'birthday': '2024-15-43'}},
-                        {'table': 'owner',
-                         'expected': {'id': None, 'name': 'test', 'birthday': 'April 16, 2023'}},
-                        {'table': 'owner',
-                         'expected': {'id': None, 'name': 'test', 'birthday': None}},
-                        {'table': 'owner',
-                         'expected': {'id': None, 'name': 'test', 'birthday': 6}},
-                        {'table': 'price',
-                         'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': ''}},
-                        {'table': 'price',
-                         'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': None}},
-                        {'table': 'price',
-                         'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': 'six'}},
-                        {'table': 'price',
-                         'expected': {'id': None, 'asset_id': 1, 'price_date': '2024-51-51', 'amount': 1}},
-                        {'table': 'price',
-                         'expected': {'id': None, 'asset_id': 1, 'price_date': 'test', 'amount': 1}},
-                        {'table': 'price',
-                         'expected': {'id': None, 'asset_id': 1, 'price_date': None, 'amount': 1}},
-                        {'table': 'price',
-                         'expected': {'id': None, 'asset_id': 1, 'price_date': 'April 16, 2023', 'amount': 1}},
-                        {'table': 'price',
-                         'expected': {'id': None, 'asset_id': 1, 'price_date': 6, 'amount': 1}},
-                        {'table': 'price',
-                         'expected': {'id': None, 'asset_id': 1, 'price_date': '', 'amount': 1}}]
+expected_constraints = [
+    {'table': 'account',
+     'expected': {'id': None, 'name': None, 'account_type_id': 0, 'institution_id': 0, 'owner_id': 0}},
+    {'table': 'account_type',
+     'expected': {'id': None, 'name': 'test', 'tax_in': 1, 'tax_growth': 4, 'tax_out': 0}},
+    {'table': 'account_type',
+     'expected': {'id': None, 'name': None, 'tax_in': 1, 'tax_growth': 0, 'tax_out': 0}},
+    {'table': 'allocation',
+     'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 3}},
+    {'table': 'allocation',
+     'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 'test'}},
+    {'table': 'allocation',
+     'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': None}},
+    {'table': 'asset',
+     'expected': {'id': None, 'name': 'test', 'symbol': None}},
+    {'table': 'asset',
+     'expected': {'id': None, 'name': None, 'symbol': 'TEST'}},
+    {'table': 'asset_class',
+     'expected': {'id': None, 'name': None}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 6, 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'test', 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'April 16, 2023', 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2024-15-43', 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': None, 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': None}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 'test'}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': ''}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': -123}},
+    {'table': 'component',
+     'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.01}},
+    {'table': 'component',
+     'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': -0.01}},
+    {'table': 'institution',
+     'expected': {'id': None, 'name': None}},
+    {'table': 'location',
+     'expected': {'id': None, 'name': None}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': None, 'birthday': '2021-01-01'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': 'test'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': ''}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': '2024-15-43'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': 'April 16, 2023'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': None}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': 6}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': ''}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': None}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': 'six'}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2024-51-51', 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': 'test', 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': None, 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': 'April 16, 2023', 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': 6, 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '', 'amount': 1}}]
 
 formatted_expected_constraints = [(line['table'], line['expected']) for line in expected_constraints]
 
 
 @pytest.mark.parametrize('table_name, expected', formatted_expected_constraints)
 def test_constraints(test_ft_0, table_name, expected):
-    test_ft_0.execute(cmd=insert_dict[table_name], params=expected)
+    test_ft_0.insert[table_name](**expected)
     assert test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}") == []
 
 

@@ -18,6 +18,19 @@ class FinanceTool:
         self.db = db_path
         self.execute_file('../db.sql')
 
+        self.insert = {'account': self.insert_account,
+                       'account_type': self.insert_account_type,
+                       'allocation': self.insert_allocation,
+                       'asset': self.insert_asset,
+                       'asset_class': self.insert_asset_class,
+                       'balance': self.insert_balance,
+                       'component': self.insert_component,
+                       'constant': self.insert_constant,
+                       'institution': self.insert_institution,
+                       'location': self.insert_location,
+                       'owner': self.insert_owner,
+                       'price': self.insert_price}
+
     # TODO: test
     def execute(self, cmd, params=None):
         con = sqlite3.connect(self.db)
@@ -74,73 +87,236 @@ class FinanceTool:
         con.close()
         return result
 
+    # TODO: rewrite this to use execute many
     def insert_from_csv_file(self, file_path, table_name):
         with open(file_path) as csv_file:
             csv_dict = csv.DictReader(csv_file)
-            self.execute_many(cmd=insert[table_name], data_sequence=csv_dict)
+            for line in csv_dict:
+                self.insert[table_name](**line)
 
     def insert_from_csv_directory(self, directory_path):
         for file_name in os.listdir(directory_path):
             self.insert_from_csv_file(file_path=directory_path + file_name, table_name=os.path.splitext(file_name)[0])
 
+    # INSERT
+    def insert_account(self, name, account_type_id, institution_id, owner_id, id=None):
+        self.execute(sql_insert_account, {
+            'id': id,
+            'name': name,
+            'account_type_id': account_type_id,
+            'institution_id': institution_id,
+            'owner_id': owner_id})
 
-# INSERT
-insert_account = """
-INSERT INTO account(id, name, account_type_id, institution_id, owner_id) 
+    def insert_account_type(
+            self,
+            name: str,
+            tax_in: bool,
+            tax_growth: bool,
+            tax_out: bool,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_account_type,
+            params={
+                'id': id,
+                'name': name,
+                'tax_in': tax_in,
+                'tax_growth': tax_growth,
+                'tax_out': tax_out})
+
+    def insert_allocation(
+            self,
+            asset_class_id: int,
+            location_id: int,
+            percentage: float,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_allocation,
+            params={
+                'id': id,
+                'asset_class_id': asset_class_id,
+                'location_id': location_id,
+                'percentage': percentage})
+
+    def insert_asset(
+            self,
+            name: str,
+            symbol: str,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_asset,
+            params={
+                'id': id,
+                'name': name,
+                'symbol': symbol})
+
+    def insert_asset_class(
+            self,
+            name: str,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_asset_class,
+            params={
+                'id': id,
+                'name': name})
+
+    def insert_balance(
+            self,
+            account_id: int,
+            asset_id: int,
+            balance_date: str,
+            quantity: float,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_balance,
+            params={
+                'id': id,
+                'account_id': account_id,
+                'asset_id': asset_id,
+                'balance_date': balance_date,
+                'quantity': quantity})
+
+    def insert_component(
+            self,
+            asset_id: int,
+            asset_class_id: int,
+            location_id: int,
+            percentage: float,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_component,
+            params={
+                'id': id,
+                'asset_id': asset_id,
+                'asset_class_id': asset_class_id,
+                'location_id': location_id,
+                'percentage': percentage})
+
+    def insert_constant(
+            self,
+            amount: float,
+            name: str,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_constant,
+            params={
+                'id': id,
+                'amount': amount,
+                'name': name})
+
+    def insert_institution(
+            self,
+            name: str,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_institution,
+            params={
+                'id': id,
+                'name': name})
+
+    def insert_location(
+            self,
+            name: str,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_location,
+            params={
+                'id': id,
+                'name': name})
+
+    def insert_owner(
+            self,
+            name: str,
+            birthday: str,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_owner,
+            params={
+                'id': id,
+                'birthday': birthday,
+                'name': name})
+
+    def insert_price(
+            self,
+            asset_id: int,
+            price_date: str,
+            amount: float,
+            id: int = None):
+
+        self.execute(
+            cmd=sql_insert_price,
+            params={
+                'id': id,
+                'asset_id': asset_id,
+                'price_date': price_date,
+                'amount': amount})
+
+
+sql_insert_account = """
+INSERT INTO account(id, name, account_type_id, institution_id, owner_id)
 VALUES(:id, :name, :account_type_id, :institution_id, :owner_id)
 """
 
-insert_account_type = """
+sql_insert_account_type = """
 INSERT INTO account_type(id, name, tax_in, tax_growth, tax_out) 
 VALUES(:id, :name, :tax_in, :tax_growth, :tax_out)
 """
 
-insert_allocation = """
+sql_insert_allocation = """
 INSERT INTO allocation(id, asset_class_id, location_id, percentage) 
 VALUES(:id, :asset_class_id, :location_id, :percentage)
 """
 
-insert_asset = """
+sql_insert_asset = """
 INSERT INTO asset(id, name, symbol)
 VALUES(:id, :name, :symbol)
 """
 
-insert_asset_class = """
+sql_insert_asset_class = """
 INSERT INTO asset_class(id, name) 
 VALUES(:id, :name)
 """
 
-insert_balance = """
+sql_insert_balance = """
 INSERT INTO balance(id, account_id, asset_id, balance_date, quantity) 
 VALUES(:id, :account_id, :asset_id, :balance_date, :quantity)
 """
 
-insert_component = """
+sql_insert_component = """
 INSERT INTO component(id, asset_id, asset_class_id, location_id, percentage) 
 VALUES(:id, :asset_id, :asset_class_id, :location_id, :percentage)
 """
 
-insert_constant = """
+sql_insert_constant = """
 INSERT INTO constant(id, name, amount)
 VALUES(:id, :name, :amount)
 """
 
-insert_institution = """
+sql_insert_institution = """
 INSERT INTO institution(id, name) 
 VALUES(:id, :name)
 """
 
-insert_location = """
+sql_insert_location = """
 INSERT INTO location(id, name) 
 VALUES(:id, :name)
 """
 
-insert_owner = """
+sql_insert_owner = """
 INSERT INTO owner(id, name, birthday) 
 VALUES(:id, :name, :birthday)
 """
 
-insert_price = """
+sql_insert_price = """
 INSERT INTO price(id, asset_id, price_date, amount) 
 VALUES(:id, :asset_id, :price_date, :amount)
 """
@@ -332,19 +508,6 @@ WHERE
     fill_to_level.asset_class_id = assign_remainder.asset_class_id AND
     fill_to_level.location_id == assign_remainder.location_id 
 """
-
-insert = {'account': insert_account,
-          'account_type': insert_account_type,
-          'allocation': insert_allocation,
-          'asset': insert_asset,
-          'asset_class': insert_asset_class,
-          'balance': insert_balance,
-          'component': insert_component,
-          'constant': insert_constant,
-          'institution': insert_institution,
-          'location': insert_location,
-          'owner': insert_owner,
-          'price': insert_price}
 
 if __name__ == "__main__":
     pass
