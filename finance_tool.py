@@ -66,17 +66,6 @@ class FinanceTool:
         con.close()
 
     # TODO - test?
-    def execute_many(self, cmd, data_sequence):
-        con = sqlite3.connect(self.db)
-        cur = con.cursor()
-        try:
-            cur.executemany(cmd, data_sequence)
-        except sqlite3.IntegrityError:
-            pass
-        con.commit()
-        con.close()
-
-    # TODO - test?
     def execute_script(self, cmd):
         con = sqlite3.connect(self.db)
         cur = con.cursor()
