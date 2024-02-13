@@ -121,7 +121,14 @@ class FinanceTool:
                 self.insert[table_name](**line)
 
     # INSERT
-    def insert_account(self, name, account_type_id, institution_id, owner_id, id=None):
+    def insert_account(
+            self,
+            name,
+            account_type_id,
+            institution_id,
+            owner_id,
+            id=None):
+
         self.execute(sql_insert_account, {
             'id': id,
             'name': name,
@@ -281,7 +288,6 @@ class FinanceTool:
                 'asset_id': asset_id,
                 'price_date': price_date,
                 'amount': amount})
-
 
 
 # SQL
