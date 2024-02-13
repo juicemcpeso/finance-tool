@@ -14,6 +14,21 @@ def dict_factory(cursor, row):
     return {key: value for key, value in zip(fields, row)}
 
 
+# CSV
+def csv_loader(file_path):
+    with open(file_path) as csv_file:
+        return list(csv.DictReader(csv_file))
+
+
+def csv_directory_to_dict(directory_path):
+    csv_dict = {}
+    for file_name in os.listdir(directory_path):
+        file_path = directory_path + file_name
+        table_name = os.path.splitext(file_name)[0]
+        csv_dict.update({table_name: csv_loader(file_path)})
+    return csv_dict
+
+
 # JSON
 def json_loader(file_path):
     with open(file_path, "r") as read_file:
@@ -94,21 +109,15 @@ class FinanceTool:
         con.close()
         return result
 
-    # TODO: rewrite this to use execute many
-    def insert_from_csv_file(self, file_path, table_name):
-        with open(file_path) as csv_file:
-            csv_dict = csv.DictReader(csv_file)
-            for line in csv_dict:
-                self.insert[table_name](**line)
-
     def insert_from_csv_directory(self, directory_path):
-        for file_name in os.listdir(directory_path):
-            self.insert_from_csv_file(file_path=directory_path + file_name, table_name=os.path.splitext(file_name)[0])
+        self.insert_from_dict(csv_directory_to_dict(directory_path))
 
     def insert_from_json(self, file_path):
-        json_data = json_loader(file_path)
-        for table_name in json_data:
-            for line in json_data[table_name]:
+        self.insert_from_dict(json_loader(file_path))
+
+    def insert_from_dict(self, insert_dict):
+        for table_name in insert_dict:
+            for line in insert_dict[table_name]:
                 self.insert[table_name](**line)
 
     # INSERT
