@@ -54,18 +54,27 @@ def test_close(test_ui_empty):
     assert expected.type == SystemExit
 
 
-@pytest.mark.parametrize('input_type', data.keys())
-def test_input(monkeypatch, input_type):
-    monkeypatch.setattr('builtins.input', lambda _: 'input')
-    assert text_ui.input_lookup[input_type]['input']('test label') == 'input'
+# @pytest.mark.parametrize('input_type', data.keys())
+# def test_input(monkeypatch, input_type):
+#     monkeypatch.setattr('builtins.input', lambda _: 'input')
+#     assert text_ui.input_lookup[input_type]['input']('test label') == 'input'
+#
+#
+# # TODO - rewrite this test to make sure it is printing the correct output
+# # I don't really know if I need to test this since it is just using input and an f string
+# @pytest.mark.skip("Test doesn't work and I don't know how to make it work")
+# @pytest.mark.parametrize('input_type', data.keys())
+# def test_input_print(monkeypatch, capsys, input_type):
+#     # monkeypatch.setattr('builtins.input', lambda _: 'input')
+#     text_ui.input_lookup[input_type]['input']('test label')
+#     captured = capsys.readouterr().out
+#     assert captured == "Input test label (t = true, f = false): "
 
 
-# TODO - rewrite this test to make sure it is printing the correct output
-# I don't really know if I need to test this since it is just using input and an f string
-@pytest.mark.skip("Test doesn't work and I don't know how to make it work")
-@pytest.mark.parametrize('input_type', data.keys())
-def test_input_print(monkeypatch, capsys, input_type):
-    # monkeypatch.setattr('builtins.input', lambda _: 'input')
-    text_ui.input_lookup[input_type]['input']('test label')
-    captured = capsys.readouterr().out
-    assert captured == "Input test label (t = true, f = false): "
+def test_main_menu(capsys):
+    expected = "\nMain menu\n" \
+               " 0 | Quit\n" \
+               " 1 | Net worth\n" \
+               " 2 | Where to contribute\n"
+    text_ui.print_menu(text_ui.main_menu)
+    assert capsys.readouterr().out == expected

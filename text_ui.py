@@ -27,7 +27,6 @@ class TextUI:
         menu(menu_dict)
 
     def close(self):
-        self.app.active = False
         print('bye')
         sys.exit()
 
@@ -46,7 +45,7 @@ def menu(menu_dict):
 def print_menu(menu_dict):
     print('\n' + menu_dict['label'])
     for i, option in enumerate(menu_dict['options']):
-        print(f"{i} | {option['label']}")
+        print(f"{i:>2} | {option['label']}")
 
 
 # User - input
@@ -98,3 +97,23 @@ def user_selection(option_list):
 
 input_lookup = {'bool': {'input': input_bool},
                 'date': {'input': input_date}}
+
+#
+# class MenuOption:
+#     def __init__(self, label, function):
+#         self.label = label
+#         self.function = function
+#
+#     def __call__(self):
+#         self.function()
+
+
+def close():
+    print('bye')
+    sys.exit()
+
+
+main_menu = {'label': 'Main menu',
+             'options': [{'label': 'Quit', 'function': close},
+                         {'label': 'Net worth', 'function': None},
+                         {'label': 'Where to contribute', 'function': None}]}
