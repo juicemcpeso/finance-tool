@@ -284,7 +284,7 @@ class FinanceTool:
 
     def read_where_to_contribute(self, contribution):
         return self.fetch_all(
-            cmd=sql_where_to_contribute,
+            cmd=sql_where_to_contribute_formatted,
             params={'contribution': contribution})
 
 
@@ -444,4 +444,20 @@ FROM
 WHERE
     fill_to_level.asset_class_id = assign_remainder.asset_class_id AND
     fill_to_level.location_id == assign_remainder.location_id 
+"""
+
+sql_where_to_contribute_formatted = f"""
+WITH where_to_contribute AS ({sql_where_to_contribute})
+
+SELECT
+    asset_class.name AS asset_class,
+    location.name AS location,
+    contribution
+FROM
+    asset_class,
+    location,
+    where_to_contribute
+WHERE
+    asset_class.id == where_to_contribute.asset_class_id AND
+    location.id == where_to_contribute.location_id
 """
