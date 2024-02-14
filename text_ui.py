@@ -105,7 +105,6 @@ input_lookup = {'bool': {'input': input_bool},
 
 
 def close():
-    print('bye')
     sys.exit()
 
 
