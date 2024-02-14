@@ -199,6 +199,94 @@ def test_constraints(test_ft_0, table_name, expected):
     assert test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}") == []
 
 
+@pytest.mark.parametrize('contribution, expected', [(0, {'deviation': -3000}),
+                                                    (1000, {'deviation': -3000}),
+                                                    (10000, {'deviation': -1500}),
+                                                    (100000, {'deviation': 4000})])
+def test_level(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_one(cmd=finance_tool.sql_level, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class_id': 1,
+                                                             'location_id': 2,
+                                                             'contribution': 0}]),
+                                                    (10000, [{'asset_class_id': 1,
+                                                              'location_id': 2,
+                                                              'contribution': 30000000},
+                                                             {'asset_class_id': 2,
+                                                              'location_id': 2,
+                                                              'contribution': 2500000},
+                                                             {'asset_class_id': 1,
+                                                              'location_id': 1,
+                                                              'contribution': 0}]),
+                                                    (100000, [{'asset_class_id': 1,
+                                                               'location_id': 1,
+                                                               'contribution': 220000000},
+                                                              {'asset_class_id': 1,
+                                                               'location_id': 2,
+                                                               'contribution': 140000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 2,
+                                                               'contribution': 30000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 1,
+                                                               'contribution': 10000000},
+                                                              {'asset_class_id': 3,
+                                                               'location_id': 1,
+                                                               'contribution': 0}])])
+def test_fill_to_level(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_all(cmd=finance_tool.sql_fill_to_level, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, {'sum': 2000}),
+                                                    (1000, {'sum': 2000}),
+                                                    (10000, {'sum': 6500}),
+                                                    (100000, {'sum': 10000})])
+def test_subset_percent(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_one(cmd=finance_tool.sql_subset_percent, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, {'remainder': 0}),
+                                                    (1000, {'remainder': 10000000}),
+                                                    (10000, {'remainder': 67500000}),
+                                                    (100000, {'remainder': 600000000})])
+def test_remaining_amount(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_one(cmd=finance_tool.sql_remaining_amount, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class_id': 1,
+                                                             'location_id': 2,
+                                                             'contribution': 10000000}]),
+                                                    (10000, [{'asset_class_id': 1,
+                                                              'location_id': 1,
+                                                              'contribution': 41538461},
+                                                             {'asset_class_id': 1,
+                                                              'location_id': 2,
+                                                              'contribution': 20769230},
+                                                             {'asset_class_id': 2,
+                                                              'location_id': 2,
+                                                              'contribution': 5192307}]),
+                                                    (100000, [{'asset_class_id': 1,
+                                                               'location_id': 1,
+                                                               'contribution': 240000000},
+                                                              {'asset_class_id': 1,
+                                                               'location_id': 2,
+                                                               'contribution': 120000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 1,
+                                                               'contribution': 150000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 2,
+                                                               'contribution': 30000000},
+                                                              {'asset_class_id': 3,
+                                                               'location_id': 1,
+                                                               'contribution': 60000000}])])
+def test_assign_remainder(test_ft_1, contribution, expected):
+    assert test_ft_1.fetch_all(cmd=finance_tool.sql_assign_remainder, params={'contribution': contribution}) == expected
+
+
 @pytest.mark.parametrize('contribution, expected', [(0, []),
                                                     (1000, [{'asset_class_id': 1,
                                                              'location_id': 2,
@@ -228,7 +316,40 @@ def test_constraints(test_ft_0, table_name, expected):
                                                                'location_id': 1,
                                                                'contribution': 60000000}])])
 def test_where_to_contribute(test_ft_1, contribution, expected):
-    assert test_ft_1.fetch_all(cmd=finance_tool.where_to_contribute, params={'contribution': contribution}) == expected
+    assert test_ft_1.fetch_all(cmd=finance_tool.sql_where_to_contribute, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.xfail(reason="Code currently does not work")
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class': 'stocks',
+                                                             'location': 'international',
+                                                             'contribution': 10000000}]),
+                                                    (10000, [{'asset_class': 'stocks',
+                                                              'location': 'USA',
+                                                              'contribution': 41538461},
+                                                             {'asset_class': 'stocks',
+                                                              'location': 'international',
+                                                              'contribution': 50769230},
+                                                             {'asset_class': 'bonds',
+                                                              'location': 'international',
+                                                              'contribution': 7692307}]),
+                                                    (100000, [{'asset_class': 'stocks',
+                                                               'location': 'USA',
+                                                               'contribution': 460000000},
+                                                              {'asset_class': 'stocks',
+                                                               'location': 'international',
+                                                               'contribution': 260000000},
+                                                              {'asset_class': 'bonds',
+                                                               'location': 'USA',
+                                                               'contribution': 160000000},
+                                                              {'asset_class': 'bonds',
+                                                               'location': 'international',
+                                                               'contribution': 60000000},
+                                                              {'asset_class_name': 'cash',
+                                                               'location': 'USA',
+                                                               'contribution': 60000000}])])
+def test_read_where_to_contribute(test_ft_1, contribution, expected):
+    assert test_ft_1.read_where_to_contribute(contribution) == expected
 
 
 data_strings = {'account':

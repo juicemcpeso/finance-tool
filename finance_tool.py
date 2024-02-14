@@ -282,6 +282,11 @@ class FinanceTool:
     def read_net_worth(self):
         return self.fetch_one("SELECT * FROM net_worth_formatted")
 
+    def read_where_to_contribute(self, contribution):
+        return self.fetch_all(
+            cmd=sql_where_to_contribute,
+            params={'contribution': contribution})
+
 
 # SQL
 sql_insert_account = """
@@ -345,68 +350,90 @@ VALUES(:id, :asset_id, :price_date, :amount)
 """
 
 # Calculations
-where_to_contribute = """
-WITH 
-level AS (
-    SELECT
-        MAX(deviation) AS deviation
-    FROM
-        deviation_level_value,
-        decimal
-    WHERE
-        level_value <= :contribution * decimal.constant
-),
-subset_percent AS (
-    SELECT
-        SUM(plan_percent) AS sum
-    FROM
-        allocation_deviation,
-        level
-    WHERE
-        allocation_deviation.deviation <= level.deviation
-),
-fill_to_level AS (
-    SELECT
-        asset_class_id,
-        location_id,
-        value_difference AS contribution
-    FROM
-        level,
-        allocation_deviation_all_levels 
-    WHERE
-        next_deviation == level.deviation AND
-        value_difference >= 0 AND
-        :contribution > 0
-    ORDER BY
-        contribution DESC
-),
-remaining_amount AS (
-    SELECT
-        :contribution * decimal.constant - MAX(level_value) AS remainder
-    FROM 
-        deviation_level_value, 
-        decimal
-    WHERE
-        level_value <= :contribution * decimal.constant
-),
-assign_remainder AS (
-    SELECT
-        asset_class_id,
-        location_id,
-        remainder * plan_percent / subset_percent.sum AS contribution
-    FROM
-        allocation_deviation,
-        level,
-        remaining_amount,
-        subset_percent
-    WHERE
-        allocation_deviation.deviation <= level.deviation AND
-        :contribution > 0
-    GROUP BY
-        asset_class_id,
-        location_id
-)
+# Where to contribute
+sql_level = """
+SELECT
+    MAX(deviation) AS deviation
+FROM
+    deviation_level_value,
+    decimal
+WHERE
+    level_value <= :contribution * decimal.constant
+"""
 
+sql_subset_percent = f"""
+WITH
+level AS ({sql_level})
+
+SELECT
+    SUM(plan_percent) AS sum
+FROM
+    allocation_deviation,
+    level
+WHERE
+    allocation_deviation.deviation <= level.deviation
+"""
+
+sql_fill_to_level = f"""
+WITH
+level AS ({sql_level})
+
+SELECT
+    asset_class_id,
+    location_id,
+    value_difference AS contribution
+FROM
+    level,
+    allocation_deviation_all_levels 
+WHERE
+    next_deviation == level.deviation AND
+    value_difference >= 0 AND
+    :contribution > 0
+ORDER BY
+    contribution DESC
+"""
+
+sql_remaining_amount = """
+SELECT
+    :contribution * decimal.constant - MAX(level_value) AS remainder
+FROM 
+    deviation_level_value, 
+    decimal
+WHERE
+    level_value <= :contribution * decimal.constant
+"""
+
+sql_assign_remainder = f"""
+WITH 
+level AS ({sql_level}),
+remaining_amount AS ({sql_remaining_amount}),
+subset_percent AS ({sql_subset_percent})
+
+SELECT
+    asset_class_id,
+    location_id,
+    remainder * plan_percent / subset_percent.sum AS contribution
+FROM
+    allocation_deviation,
+    level,
+    remaining_amount,
+    subset_percent
+WHERE
+    allocation_deviation.deviation <= level.deviation AND
+    :contribution > 0
+GROUP BY
+    asset_class_id,
+    location_id
+"""
+
+sql_where_to_contribute = f"""
+WITH 
+    level AS ({sql_level}),
+    subset_percent AS ({sql_subset_percent}),
+    fill_to_level AS ({sql_fill_to_level}),
+    remaining_amount AS ({sql_remaining_amount}),
+    assign_remainder AS ({sql_assign_remainder})
+    
 SELECT
     fill_to_level.asset_class_id,
     fill_to_level.location_id,
