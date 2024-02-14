@@ -70,13 +70,13 @@ def test_close():
 #     assert captured == "Input test label (t = true, f = false): "
 
 
-def test_main_menu(capsys):
+def test_display_main_menu(capsys):
     expected = "\n" \
                "Main menu\n" \
                " 0 | Quit\n" \
                " 1 | Net worth\n" \
                " 2 | Where to contribute\n"
-    text_ui.print_menu(text_ui.main_menu)
+    text_ui.main_menu()
     assert capsys.readouterr().out == expected
 
 

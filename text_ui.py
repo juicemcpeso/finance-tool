@@ -94,25 +94,55 @@ def user_selection(option_list):
 input_lookup = {'bool': {'input': input_bool},
                 'date': {'input': input_date}}
 
-#
-# class MenuOption:
-#     def __init__(self, label, function):
-#         self.label = label
-#         self.function = function
-#
-#     def __call__(self):
-#         self.function()
+
+class Window:
+    def __init__(self, label):
+        self.label = label
+
+    def __call__(self):
+        self.display()
+
+    def display(self):
+        pass
+
+
+class Menu(Window):
+    def __init__(self, label, options):
+        super().__init__(label)
+
+        self.options = options
+
+    def display(self):
+        print('\n' + self.label)
+        for i, option in enumerate(self.options):
+            print(f"{i:>2} | {option.label}")
+
+
+class MenuOption:
+    def __init__(self, label, function):
+        self.label = label
+        self.function = function
+
+    def __call__(self):
+        self.function()
 
 
 def close():
     sys.exit()
 
 
-main_menu = {'label': 'Main menu',
-             'options': [{'label': 'Quit', 'function': close},
-                         {'label': 'Net worth', 'function': None},
-                         {'label': 'Where to contribute', 'function': None}]}
-
-
 def print_net_worth(net_worth_dict):
     print(f"Net worth: ${net_worth_dict['net_worth']:.2f}")
+
+
+#
+# main_menu = {'label': 'Main menu',
+#              'options': [{'label': 'Quit', 'function': close},
+#                          {'label': 'Net worth', 'function': print_net_worth},
+#                          {'label': 'Where to contribute', 'function': None}]}
+
+main_menu = Menu(
+    label='Main menu',
+    options=[MenuOption(label='Quit', function=close),
+             MenuOption(label='Net worth', function=print_net_worth),
+             MenuOption(label='Where to contribute', function=None)])
