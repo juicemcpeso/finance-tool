@@ -40,98 +40,7 @@ table_names = {'account',
                'owner',
                'price'}
 
-# Test - insert
-insert_function_entry = {
-    'account': {'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
-    'account_type': {'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1},
-    'allocation': {'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000},
-    'asset': {'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
-    'asset_class': {'id': 1, 'name': 'stocks'},
-    'balance': {'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000},
-    'component': {'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000},
-    'constant': {'id': 1, 'name': 'decimal', 'amount': 10000},
-    'institution': {'id': 1, 'name': 'Rearguard Investments'},
-    'location': {'id': 1, 'name': 'USA'},
-    'owner': {'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'},
-    'price': {'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}}
-
-insert_function_expected = {
-    'account': {'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
-    'account_type': {'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1},
-    'allocation': {'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 4000},
-    'asset': {'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
-    'asset_class': {'id': 1, 'name': 'stocks'},
-    'balance': {'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 340000000},
-    'component': {'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 10000},
-    'constant': {'id': 1, 'name': 'decimal', 'amount': 10000},
-    'institution': {'id': 1, 'name': 'Rearguard Investments'},
-    'location': {'id': 1, 'name': 'USA'},
-    'owner': {'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'},
-    'price': {'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 10000}}
-
-
-@pytest.mark.parametrize('table_name', table_names)
-def test_create_function(test_ft_0, table_name):
-    test_ft_0.create[table_name](**insert_function_entry[table_name])
-    assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == insert_function_expected[table_name]
-
-
-insert_function_entry_no_id = {
-    'account': {'id': None, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
-    'account_type': {'id': None, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1},
-    'allocation': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000},
-    'asset': {'id': None, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
-    'asset_class': {'id': None, 'name': 'stocks'},
-    'balance': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000},
-    'component': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000},
-    'constant': {'id': None, 'name': 'decimal', 'amount': 10000},
-    'institution': {'id': None, 'name': 'Rearguard Investments'},
-    'location': {'id': None, 'name': 'USA'},
-    'owner': {'id': None, 'name': 'Bob', 'birthday': '1992-10-31'},
-    'price': {'id': None, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}}
-
-
-@pytest.mark.parametrize('table_name', table_names)
-def test_create_function_no_id(test_ft_0, table_name):
-    test_ft_0.create[table_name](**insert_function_entry_no_id[table_name])
-    assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == insert_function_expected[table_name]
-
-
-
-
-
-@pytest.mark.parametrize('contribution, expected', [(0, []),
-                                                    (1000, [{'asset_class': 'stocks',
-                                                             'location': 'International',
-                                                             'contribution': 10000000}]),
-                                                    (10000, [{'asset_class': 'stocks',
-                                                              'location': 'USA',
-                                                              'contribution': 41538461},
-                                                             {'asset_class': 'stocks',
-                                                              'location': 'International',
-                                                              'contribution': 50769230},
-                                                             {'asset_class': 'bonds',
-                                                              'location': 'International',
-                                                              'contribution': 7692307}]),
-                                                    (100000, [{'asset_class': 'stocks',
-                                                               'location': 'USA',
-                                                               'contribution': 460000000},
-                                                              {'asset_class': 'stocks',
-                                                               'location': 'International',
-                                                               'contribution': 260000000},
-                                                              {'asset_class': 'bonds',
-                                                               'location': 'USA',
-                                                               'contribution': 160000000},
-                                                              {'asset_class': 'bonds',
-                                                               'location': 'International',
-                                                               'contribution': 60000000},
-                                                              {'asset_class': 'cash',
-                                                               'location': 'USA',
-                                                               'contribution': 60000000}])])
-def test_read_where_to_contribute(test_ft_1, contribution, expected):
-    assert test_ft_1.read_where_to_contribute(contribution) == expected
-
-
+# Tests CSV and JSON
 data_strings = {'account':
                     [{'id': '1', 'name': 'Work 401k', 'account_type_id': '1', 'institution_id': '1', 'owner_id': '1'}],
                 'account_type':
@@ -238,6 +147,94 @@ def test_insert_from_json(test_ft_0):
 
     assert data_formatted == results_dict
 
+# Test CREATE
+create_function_entry = {
+    'account': {'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
+    'account_type': {'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1},
+    'allocation': {'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000},
+    'asset': {'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
+    'asset_class': {'id': 1, 'name': 'stocks'},
+    'balance': {'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000},
+    'component': {'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000},
+    'constant': {'id': 1, 'name': 'decimal', 'amount': 10000},
+    'institution': {'id': 1, 'name': 'Rearguard Investments'},
+    'location': {'id': 1, 'name': 'USA'},
+    'owner': {'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'},
+    'price': {'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}}
 
+create_function_expected = {
+    'account': {'id': 1, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
+    'account_type': {'id': 1, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1},
+    'allocation': {'id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 4000},
+    'asset': {'id': 1, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
+    'asset_class': {'id': 1, 'name': 'stocks'},
+    'balance': {'id': 1, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 340000000},
+    'component': {'id': 1, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 10000},
+    'constant': {'id': 1, 'name': 'decimal', 'amount': 10000},
+    'institution': {'id': 1, 'name': 'Rearguard Investments'},
+    'location': {'id': 1, 'name': 'USA'},
+    'owner': {'id': 1, 'name': 'Bob', 'birthday': '1992-10-31'},
+    'price': {'id': 1, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 10000}}
+
+
+@pytest.mark.parametrize('table_name', table_names)
+def test_create_function(test_ft_0, table_name):
+    test_ft_0.create[table_name](**create_function_entry[table_name])
+    assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == create_function_expected[table_name]
+
+
+insert_function_entry_no_id = {
+    'account': {'id': None, 'name': 'Work 401k', 'account_type_id': 1, 'institution_id': 1, 'owner_id': 1},
+    'account_type': {'id': None, 'name': '401k', 'tax_in': 0, 'tax_growth': 0, 'tax_out': 1},
+    'allocation': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': .4000},
+    'asset': {'id': None, 'name': 'Rearguard Total Stock Market Index Fund', 'symbol': 'RSUSA'},
+    'asset_class': {'id': None, 'name': 'stocks'},
+    'balance': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2021-01-01', 'quantity': 34000},
+    'component': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.0000},
+    'constant': {'id': None, 'name': 'decimal', 'amount': 10000},
+    'institution': {'id': None, 'name': 'Rearguard Investments'},
+    'location': {'id': None, 'name': 'USA'},
+    'owner': {'id': None, 'name': 'Bob', 'birthday': '1992-10-31'},
+    'price': {'id': None, 'asset_id': 1, 'price_date': '2020-01-01', 'amount': 1}}
+
+
+@pytest.mark.parametrize('table_name', table_names)
+def test_create_function_no_id(test_ft_0, table_name):
+    test_ft_0.create[table_name](**insert_function_entry_no_id[table_name])
+    assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == create_function_expected[table_name]
+
+# Test READ
 def test_read_net_worth(test_ft_1):
     assert test_ft_1.read_net_worth() == {'net_worth': 100000}
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class': 'stocks',
+                                                             'location': 'International',
+                                                             'contribution': 10000000}]),
+                                                    (10000, [{'asset_class': 'stocks',
+                                                              'location': 'USA',
+                                                              'contribution': 41538461},
+                                                             {'asset_class': 'stocks',
+                                                              'location': 'International',
+                                                              'contribution': 50769230},
+                                                             {'asset_class': 'bonds',
+                                                              'location': 'International',
+                                                              'contribution': 7692307}]),
+                                                    (100000, [{'asset_class': 'stocks',
+                                                               'location': 'USA',
+                                                               'contribution': 460000000},
+                                                              {'asset_class': 'stocks',
+                                                               'location': 'International',
+                                                               'contribution': 260000000},
+                                                              {'asset_class': 'bonds',
+                                                               'location': 'USA',
+                                                               'contribution': 160000000},
+                                                              {'asset_class': 'bonds',
+                                                               'location': 'International',
+                                                               'contribution': 60000000},
+                                                              {'asset_class': 'cash',
+                                                               'location': 'USA',
+                                                               'contribution': 60000000}])])
+def test_read_where_to_contribute(test_ft_1, contribution, expected):
+    assert test_ft_1.read_where_to_contribute(contribution) == expected

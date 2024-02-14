@@ -143,6 +143,7 @@ def column_names(database, cmd):
     return result
 
 
+# Test create tables
 @pytest.mark.parametrize('table_name, column_name',
                          [('account', {'name', 'id', 'institution_id', 'owner_id', 'account_type_id'}),
                           ('account_type', {'name', 'id', 'tax_in', 'tax_growth', 'tax_out'}),
@@ -166,6 +167,7 @@ def test_create_tables(test_db_0):
     assert set(line['name'] for line in result_list) == table_names
 
 
+# Test create views
 def test_create_views(test_db_0):
     result_list = fetch_all(database=test_db_0, cmd="SELECT * FROM sqlite_master WHERE type = 'view'")
 
