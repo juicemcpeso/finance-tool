@@ -336,3 +336,7 @@ def test_insert_from_json(test_ft_0):
         results_dict.update({table_name: result})
 
     assert data_formatted == results_dict
+
+
+def test_read_net_worth(test_ft_1):
+    assert test_ft_1.read_net_worth() == {'net_worth': 100000}

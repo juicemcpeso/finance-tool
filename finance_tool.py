@@ -278,6 +278,10 @@ class FinanceTool:
                 'price_date': price_date,
                 'amount': amount})
 
+    # READ
+    def read_net_worth(self):
+        return self.fetch_one("SELECT * FROM net_worth_formatted")
+
 
 # SQL
 sql_insert_account = """
