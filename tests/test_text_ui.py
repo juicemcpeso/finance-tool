@@ -31,3 +31,14 @@ def test_display_main_menu(capsys, test_ui_1):
 def test_net_worth_string():
     assert text_ui.net_worth_string({'net_worth': 1000.00}) == "Net worth: $1000.00"
 
+
+def test_input_string_bool():
+    assert text_ui.input_string_bool('tax_in') == "Input tax in (t = true, f = false): "
+
+
+def test_input_string_date():
+    assert text_ui.input_string_date('balance_date') == "Input balance date in YYYY-MM-DD format: "
+
+
+def test_input_string_text():
+    assert text_ui.input_string_text('owner_name') == "Input owner name: "

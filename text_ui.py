@@ -55,17 +55,7 @@ def user_input(input_type, label):
     return response
 
 
-def input_bool(label):
-    return input(f"Input {label} (t = true, f = false): ")
 
-
-def input_date(label):
-    return input(f"Input {label} in YYYY-MM-DD format: ")
-
-
-# TODO - test
-def input_text(label):
-    return input(f"Input {label}: ")
 
 
 # User - selection
@@ -79,10 +69,6 @@ def user_selection(option_list):
         else:
             if option_number in range(len(option_list)):
                 return option_list[option_number]
-
-
-input_lookup = {'bool': {'input': input_bool},
-                'date': {'input': input_date}}
 
 
 class Window:
@@ -127,3 +113,15 @@ def close():
 
 def net_worth_string(net_worth_dict):
     return f"Net worth: ${net_worth_dict['net_worth']:.2f}"
+
+
+def input_string_bool(column_name):
+    return f"Input {column_name.replace('_', ' ')} (t = true, f = false): "
+
+
+def input_string_date(column_name):
+    return f"Input {column_name.replace('_', ' ')} in YYYY-MM-DD format: "
+
+
+def input_string_text(column_name):
+    return f"Input {column_name.replace('_', ' ')}: "
