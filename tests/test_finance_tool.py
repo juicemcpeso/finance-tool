@@ -85,8 +85,8 @@ insert_function_expected = {
 
 
 @pytest.mark.parametrize('table_name', table_names)
-def test_insert_function(test_ft_0, table_name):
-    test_ft_0.insert[table_name](**insert_function_entry[table_name])
+def test_create_function(test_ft_0, table_name):
+    test_ft_0.create[table_name](**insert_function_entry[table_name])
     assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == insert_function_expected[table_name]
 
 
@@ -106,8 +106,8 @@ insert_function_entry_no_id = {
 
 
 @pytest.mark.parametrize('table_name', table_names)
-def test_insert_function_no_id(test_ft_0, table_name):
-    test_ft_0.insert[table_name](**insert_function_entry_no_id[table_name])
+def test_create_function_no_id(test_ft_0, table_name):
+    test_ft_0.create[table_name](**insert_function_entry_no_id[table_name])
     assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == insert_function_expected[table_name]
 
 
@@ -195,7 +195,7 @@ formatted_expected_constraints = [(line['table'], line['expected']) for line in 
 
 @pytest.mark.parametrize('table_name, expected', formatted_expected_constraints)
 def test_constraints(test_ft_0, table_name, expected):
-    test_ft_0.insert[table_name](**expected)
+    test_ft_0.create[table_name](**expected)
     assert test_ft_0.fetch_all(cmd=f"SELECT * FROM {table_name}") == []
 
 

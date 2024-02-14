@@ -40,18 +40,18 @@ class FinanceTool:
         self.db = db_path
         self.execute_file('../db.sql')
 
-        self.insert = {'account': self.insert_account,
-                       'account_type': self.insert_account_type,
-                       'allocation': self.insert_allocation,
-                       'asset': self.insert_asset,
-                       'asset_class': self.insert_asset_class,
-                       'balance': self.insert_balance,
-                       'component': self.insert_component,
-                       'constant': self.insert_constant,
-                       'institution': self.insert_institution,
-                       'location': self.insert_location,
-                       'owner': self.insert_owner,
-                       'price': self.insert_price}
+        self.create = {'account': self.create_account,
+                       'account_type': self.create_account_type,
+                       'allocation': self.create_allocation,
+                       'asset': self.create_asset,
+                       'asset_class': self.create_asset_class,
+                       'balance': self.create_balance,
+                       'component': self.create_component,
+                       'constant': self.create_constant,
+                       'institution': self.create_institution,
+                       'location': self.create_location,
+                       'owner': self.create_owner,
+                       'price': self.create_price}
 
     # TODO: test
     def execute(self, cmd, params=None):
@@ -107,10 +107,10 @@ class FinanceTool:
     def insert_from_dict(self, insert_dict):
         for table_name in insert_dict:
             for line in insert_dict[table_name]:
-                self.insert[table_name](**line)
+                self.create[table_name](**line)
 
-    # INSERT
-    def insert_account(
+    # CREATE
+    def create_account(
             self,
             name,
             account_type_id,
@@ -125,7 +125,7 @@ class FinanceTool:
             'institution_id': institution_id,
             'owner_id': owner_id})
 
-    def insert_account_type(
+    def create_account_type(
             self,
             name: str,
             tax_in: bool,
@@ -142,7 +142,7 @@ class FinanceTool:
                 'tax_growth': tax_growth,
                 'tax_out': tax_out})
 
-    def insert_allocation(
+    def create_allocation(
             self,
             asset_class_id: int,
             location_id: int,
@@ -157,7 +157,7 @@ class FinanceTool:
                 'location_id': location_id,
                 'percentage': percentage})
 
-    def insert_asset(
+    def create_asset(
             self,
             name: str,
             symbol: str,
@@ -170,7 +170,7 @@ class FinanceTool:
                 'name': name,
                 'symbol': symbol})
 
-    def insert_asset_class(
+    def create_asset_class(
             self,
             name: str,
             id: int = None):
@@ -181,7 +181,7 @@ class FinanceTool:
                 'id': id,
                 'name': name})
 
-    def insert_balance(
+    def create_balance(
             self,
             account_id: int,
             asset_id: int,
@@ -198,7 +198,7 @@ class FinanceTool:
                 'balance_date': balance_date,
                 'quantity': quantity})
 
-    def insert_component(
+    def create_component(
             self,
             asset_id: int,
             asset_class_id: int,
@@ -215,7 +215,7 @@ class FinanceTool:
                 'location_id': location_id,
                 'percentage': percentage})
 
-    def insert_constant(
+    def create_constant(
             self,
             amount: float,
             name: str,
@@ -228,7 +228,7 @@ class FinanceTool:
                 'amount': amount,
                 'name': name})
 
-    def insert_institution(
+    def create_institution(
             self,
             name: str,
             id: int = None):
@@ -239,7 +239,7 @@ class FinanceTool:
                 'id': id,
                 'name': name})
 
-    def insert_location(
+    def create_location(
             self,
             name: str,
             id: int = None):
@@ -250,7 +250,7 @@ class FinanceTool:
                 'id': id,
                 'name': name})
 
-    def insert_owner(
+    def create_owner(
             self,
             name: str,
             birthday: str,
@@ -263,7 +263,7 @@ class FinanceTool:
                 'birthday': birthday,
                 'name': name})
 
-    def insert_price(
+    def create_price(
             self,
             asset_id: int,
             price_date: str,
