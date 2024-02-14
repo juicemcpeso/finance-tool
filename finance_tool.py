@@ -58,7 +58,11 @@ class FinanceTool:
     def execute(self, cmd, params=None):
         con = sqlite3.connect(self.db)
         cur = con.cursor()
-        cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+        try:
+            cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+        except sqlite3.IntegrityError:
+            raise DatabaseException
+
         con.commit()
         con.close()
 
@@ -285,3 +289,7 @@ class FinanceTool:
         return self.fetch_all(
             cmd=sql.where_to_contribute_formatted,
             params={'contribution': contribution})
+
+
+class DatabaseException(sqlite3.IntegrityError):
+    pass
