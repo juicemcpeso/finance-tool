@@ -527,6 +527,3 @@ WHERE
     fill_to_level.asset_class_id = assign_remainder.asset_class_id AND
     fill_to_level.location_id == assign_remainder.location_id 
 """
-
-if __name__ == "__main__":
-    pass
