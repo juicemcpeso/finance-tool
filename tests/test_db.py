@@ -98,6 +98,14 @@ def execute_file(database, file_name):
         con.close()
 
 
+def execute(database, cmd, params):
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+    con.commit()
+    con.close()
+
+
 def execute_many(database, cmd, data_sequence):
     con = sqlite3.connect(database)
     cur = con.cursor()
@@ -528,3 +536,91 @@ def test_remaining_amount(test_db_1, contribution, expected):
                                                                'contribution': 60000000}])])
 def test_assign_remainder(test_db_1, contribution, expected):
     assert fetch_all(database=test_db_1, cmd=sql.assign_remainder, params={'contribution': contribution}) == expected
+
+
+# Test constraints
+expected_constraints = [
+    {'table': 'account',
+     'expected': {'id': None, 'name': None, 'account_type_id': 0, 'institution_id': 0, 'owner_id': 0}},
+    {'table': 'account_type',
+     'expected': {'id': None, 'name': 'test', 'tax_in': 1, 'tax_growth': 4, 'tax_out': 0}},
+    {'table': 'account_type',
+     'expected': {'id': None, 'name': None, 'tax_in': 1, 'tax_growth': 0, 'tax_out': 0}},
+    {'table': 'allocation',
+     'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 3}},
+    {'table': 'allocation',
+     'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 'test'}},
+    {'table': 'allocation',
+     'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': None}},
+    {'table': 'asset',
+     'expected': {'id': None, 'name': 'test', 'symbol': None}},
+    {'table': 'asset',
+     'expected': {'id': None, 'name': None, 'symbol': 'TEST'}},
+    {'table': 'asset_class',
+     'expected': {'id': None, 'name': None}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 6, 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'test', 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'April 16, 2023', 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2024-15-43', 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': None, 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': None}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 'test'}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': ''}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': -123}},
+    {'table': 'component',
+     'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.01}},
+    {'table': 'component',
+     'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': -0.01}},
+    {'table': 'institution',
+     'expected': {'id': None, 'name': None}},
+    {'table': 'location',
+     'expected': {'id': None, 'name': None}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': None, 'birthday': '2021-01-01'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': 'test'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': ''}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': '2024-15-43'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': 'April 16, 2023'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': None}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': 6}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': ''}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': None}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': 'six'}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2024-51-51', 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': 'test', 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': None, 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': 'April 16, 2023', 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': 6, 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '', 'amount': 1}}]
+
+formatted_expected_constraints = [(line['table'], line['expected']) for line in expected_constraints]
+
+
+@pytest.mark.parametrize('table_name, expected', formatted_expected_constraints)
+def test_constraints(test_db_0, table_name, expected):
+    with pytest.raises(sqlite3.IntegrityError):
+        execute(database=test_db_0, cmd=insert_dict[table_name], params=expected)
