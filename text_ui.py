@@ -34,31 +34,6 @@ class TextUI:
         self.menus['main']
 
 
-    # # Menus
-    # # TODO - test
-    # def menu_main(self):
-    #     menu_dict = {'label': 'Main menu',
-    #                  'options': [{'label': 'Quit', 'function': self.close}]}
-    #     menu(menu_dict)
-
-
-# TODO - test
-def menu(menu_dict):
-    print_menu(menu_dict)
-    while True:
-        selected_option = user_selection(menu_dict['options'])
-
-        if selected_option is not None:
-            selected_option['function']()
-
-
-# TODO - test
-def print_menu(menu_dict):
-    print('\n' + menu_dict['label'])
-    for i, option in enumerate(menu_dict['options']):
-        print(f"{i:>2} | {option['label']}")
-
-
 # User - input
 # TODO - test
 def user_input_loop(input_type):
