@@ -113,3 +113,7 @@ main_menu = {'label': 'Main menu',
              'options': [{'label': 'Quit', 'function': close},
                          {'label': 'Net worth', 'function': None},
                          {'label': 'Where to contribute', 'function': None}]}
+
+
+def print_net_worth(net_worth_dict):
+    print(f"Net worth: ${net_worth_dict['net_worth']:.2f}")

@@ -71,9 +71,18 @@ def test_close():
 
 
 def test_main_menu(capsys):
-    expected = "\nMain menu\n" \
+    expected = "\n" \
+               "Main menu\n" \
                " 0 | Quit\n" \
                " 1 | Net worth\n" \
                " 2 | Where to contribute\n"
     text_ui.print_menu(text_ui.main_menu)
     assert capsys.readouterr().out == expected
+
+
+def test_print_net_worth(capsys):
+    expected = "Net worth: $1000.00\n"
+    text_ui.print_net_worth({'net_worth': 1000.00})
+
+    assert capsys.readouterr().out == expected
+
