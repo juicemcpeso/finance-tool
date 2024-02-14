@@ -3,22 +3,18 @@
 # 2024-01-22
 # @juicemcpeso
 
-import datetime
-import os
+import finance_tool
 import sys
 
 
 class TextUI:
-    def __init__(self, _app=None):
-        self.app = _app
+    def __init__(self, _finance_tool=None):
+        self.ft = _finance_tool
 
         self.menu_main_options = []
 
     def __repr__(self):
-        return f"TextUI({self.app})"
-
-    def __str__(self):
-        return f"{self.app.name} TextUI"
+        return f"TextUI({self.ft})"
 
     def __call__(self):
         self.menu_main()
