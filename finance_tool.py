@@ -6,6 +6,7 @@
 import csv
 import json
 import os
+import sql
 import sqlite3
 
 
@@ -118,12 +119,14 @@ class FinanceTool:
             owner_id,
             id=None):
 
-        self.execute(sql_insert_account, {
-            'id': id,
-            'name': name,
-            'account_type_id': account_type_id,
-            'institution_id': institution_id,
-            'owner_id': owner_id})
+        self.execute(
+            cmd=sql.insert_account,
+            params={
+                'id': id,
+                'name': name,
+                'account_type_id': account_type_id,
+                'institution_id': institution_id,
+                'owner_id': owner_id})
 
     def create_account_type(
             self,
@@ -134,7 +137,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_account_type,
+            cmd=sql.insert_account_type,
             params={
                 'id': id,
                 'name': name,
@@ -150,7 +153,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_allocation,
+            cmd=sql.insert_allocation,
             params={
                 'id': id,
                 'asset_class_id': asset_class_id,
@@ -164,7 +167,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_asset,
+            cmd=sql.insert_asset,
             params={
                 'id': id,
                 'name': name,
@@ -176,7 +179,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_asset_class,
+            cmd=sql.insert_asset_class,
             params={
                 'id': id,
                 'name': name})
@@ -190,7 +193,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_balance,
+            cmd=sql.insert_balance,
             params={
                 'id': id,
                 'account_id': account_id,
@@ -207,7 +210,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_component,
+            cmd=sql.insert_component,
             params={
                 'id': id,
                 'asset_id': asset_id,
@@ -222,7 +225,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_constant,
+            cmd=sql.insert_constant,
             params={
                 'id': id,
                 'amount': amount,
@@ -234,7 +237,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_institution,
+            cmd=sql.insert_institution,
             params={
                 'id': id,
                 'name': name})
@@ -245,7 +248,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_location,
+            cmd=sql.insert_location,
             params={
                 'id': id,
                 'name': name})
@@ -257,7 +260,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_owner,
+            cmd=sql.insert_owner,
             params={
                 'id': id,
                 'birthday': birthday,
@@ -271,7 +274,7 @@ class FinanceTool:
             id: int = None):
 
         self.execute(
-            cmd=sql_insert_price,
+            cmd=sql.insert_price,
             params={
                 'id': id,
                 'asset_id': asset_id,
@@ -284,180 +287,5 @@ class FinanceTool:
 
     def read_where_to_contribute(self, contribution):
         return self.fetch_all(
-            cmd=sql_where_to_contribute_formatted,
+            cmd=sql.where_to_contribute_formatted,
             params={'contribution': contribution})
-
-
-# SQL
-sql_insert_account = """
-INSERT INTO account(id, name, account_type_id, institution_id, owner_id)
-VALUES(:id, :name, :account_type_id, :institution_id, :owner_id)
-"""
-
-sql_insert_account_type = """
-INSERT INTO account_type(id, name, tax_in, tax_growth, tax_out) 
-VALUES(:id, :name, :tax_in, :tax_growth, :tax_out)
-"""
-
-sql_insert_allocation = """
-INSERT INTO allocation(id, asset_class_id, location_id, percentage) 
-VALUES(:id, :asset_class_id, :location_id, :percentage)
-"""
-
-sql_insert_asset = """
-INSERT INTO asset(id, name, symbol)
-VALUES(:id, :name, :symbol)
-"""
-
-sql_insert_asset_class = """
-INSERT INTO asset_class(id, name) 
-VALUES(:id, :name)
-"""
-
-sql_insert_balance = """
-INSERT INTO balance(id, account_id, asset_id, balance_date, quantity) 
-VALUES(:id, :account_id, :asset_id, :balance_date, :quantity)
-"""
-
-sql_insert_component = """
-INSERT INTO component(id, asset_id, asset_class_id, location_id, percentage) 
-VALUES(:id, :asset_id, :asset_class_id, :location_id, :percentage)
-"""
-
-sql_insert_constant = """
-INSERT INTO constant(id, name, amount)
-VALUES(:id, :name, :amount)
-"""
-
-sql_insert_institution = """
-INSERT INTO institution(id, name) 
-VALUES(:id, :name)
-"""
-
-sql_insert_location = """
-INSERT INTO location(id, name) 
-VALUES(:id, :name)
-"""
-
-sql_insert_owner = """
-INSERT INTO owner(id, name, birthday) 
-VALUES(:id, :name, :birthday)
-"""
-
-sql_insert_price = """
-INSERT INTO price(id, asset_id, price_date, amount) 
-VALUES(:id, :asset_id, :price_date, :amount)
-"""
-
-# Calculations
-# Where to contribute
-sql_level = """
-SELECT
-    MAX(deviation) AS deviation
-FROM
-    deviation_level_value,
-    decimal
-WHERE
-    level_value <= :contribution * decimal.constant
-"""
-
-sql_subset_percent = f"""
-WITH
-level AS ({sql_level})
-
-SELECT
-    SUM(plan_percent) AS sum
-FROM
-    allocation_deviation,
-    level
-WHERE
-    allocation_deviation.deviation <= level.deviation
-"""
-
-sql_fill_to_level = f"""
-WITH
-level AS ({sql_level})
-
-SELECT
-    asset_class_id,
-    location_id,
-    value_difference AS contribution
-FROM
-    level,
-    allocation_deviation_all_levels 
-WHERE
-    next_deviation == level.deviation AND
-    value_difference >= 0 AND
-    :contribution > 0
-ORDER BY
-    contribution DESC
-"""
-
-sql_remaining_amount = """
-SELECT
-    :contribution * decimal.constant - MAX(level_value) AS remainder
-FROM 
-    deviation_level_value, 
-    decimal
-WHERE
-    level_value <= :contribution * decimal.constant
-"""
-
-sql_assign_remainder = f"""
-WITH 
-level AS ({sql_level}),
-remaining_amount AS ({sql_remaining_amount}),
-subset_percent AS ({sql_subset_percent})
-
-SELECT
-    asset_class_id,
-    location_id,
-    remainder * plan_percent / subset_percent.sum AS contribution
-FROM
-    allocation_deviation,
-    level,
-    remaining_amount,
-    subset_percent
-WHERE
-    allocation_deviation.deviation <= level.deviation AND
-    :contribution > 0
-GROUP BY
-    asset_class_id,
-    location_id
-"""
-
-sql_where_to_contribute = f"""
-WITH 
-    level AS ({sql_level}),
-    subset_percent AS ({sql_subset_percent}),
-    fill_to_level AS ({sql_fill_to_level}),
-    remaining_amount AS ({sql_remaining_amount}),
-    assign_remainder AS ({sql_assign_remainder})
-    
-SELECT
-    fill_to_level.asset_class_id,
-    fill_to_level.location_id,
-    fill_to_level.contribution + assign_remainder.contribution AS contribution 
-FROM
-    fill_to_level,
-    assign_remainder
-WHERE
-    fill_to_level.asset_class_id = assign_remainder.asset_class_id AND
-    fill_to_level.location_id == assign_remainder.location_id 
-"""
-
-sql_where_to_contribute_formatted = f"""
-WITH where_to_contribute AS ({sql_where_to_contribute})
-
-SELECT
-    asset_class.name AS asset_class,
-    location.name AS location,
-    contribution
-FROM
-    asset_class,
-    location,
-    where_to_contribute
-WHERE
-    asset_class.id == where_to_contribute.asset_class_id AND
-    location.id == where_to_contribute.location_id
-"""

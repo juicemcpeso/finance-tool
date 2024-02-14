@@ -1,6 +1,7 @@
 import json
 import pytest
 import sqlite3
+import sql
 
 
 def create_test_db_from_json(tmp_path, data_file_name=None):
@@ -68,6 +69,19 @@ view_names = {'account_value_current_by_asset',
               'deviation_level_value',
               'net_worth',
               'net_worth_formatted'}
+
+insert_dict = {'account': sql.insert_account,
+               'account_type': sql.insert_account_type,
+               'allocation': sql.insert_allocation,
+               'asset': sql.insert_asset,
+               'asset_class': sql.insert_asset_class,
+               'balance': sql.insert_balance,
+               'component': sql.insert_component,
+               'constant': sql.insert_constant,
+               'institution': sql.insert_institution,
+               'location': sql.insert_location,
+               'owner': sql.insert_owner,
+               'price': sql.insert_price}
 
 
 def dict_factory(cursor, row):
@@ -426,3 +440,91 @@ def test_view_net_worth(test_db_2):
 # Test calculations
 def test_net_worth_formatted(test_db_2):
     assert fetch_one(database=test_db_2, cmd="SELECT * FROM net_worth_formatted") == {'net_worth': 50000.00}
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, {'deviation': -3000}),
+                                                    (1000, {'deviation': -3000}),
+                                                    (10000, {'deviation': -1500}),
+                                                    (100000, {'deviation': 4000})])
+def test_level(test_db_1, contribution, expected):
+    assert fetch_one(database=test_db_1, cmd=sql.level, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class_id': 1,
+                                                             'location_id': 2,
+                                                             'contribution': 0}]),
+                                                    (10000, [{'asset_class_id': 1,
+                                                              'location_id': 2,
+                                                              'contribution': 30000000},
+                                                             {'asset_class_id': 2,
+                                                              'location_id': 2,
+                                                              'contribution': 2500000},
+                                                             {'asset_class_id': 1,
+                                                              'location_id': 1,
+                                                              'contribution': 0}]),
+                                                    (100000, [{'asset_class_id': 1,
+                                                               'location_id': 1,
+                                                               'contribution': 220000000},
+                                                              {'asset_class_id': 1,
+                                                               'location_id': 2,
+                                                               'contribution': 140000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 2,
+                                                               'contribution': 30000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 1,
+                                                               'contribution': 10000000},
+                                                              {'asset_class_id': 3,
+                                                               'location_id': 1,
+                                                               'contribution': 0}])])
+def test_fill_to_level(test_db_1, contribution, expected):
+    assert fetch_all(database=test_db_1, cmd=sql.fill_to_level, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, {'sum': 2000}),
+                                                    (1000, {'sum': 2000}),
+                                                    (10000, {'sum': 6500}),
+                                                    (100000, {'sum': 10000})])
+def test_subset_percent(test_db_1, contribution, expected):
+    assert fetch_one(database=test_db_1, cmd=sql.subset_percent, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, {'remainder': 0}),
+                                                    (1000, {'remainder': 10000000}),
+                                                    (10000, {'remainder': 67500000}),
+                                                    (100000, {'remainder': 600000000})])
+def test_remaining_amount(test_db_1, contribution, expected):
+    assert fetch_one(database=test_db_1, cmd=sql.remaining_amount, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class_id': 1,
+                                                             'location_id': 2,
+                                                             'contribution': 10000000}]),
+                                                    (10000, [{'asset_class_id': 1,
+                                                              'location_id': 1,
+                                                              'contribution': 41538461},
+                                                             {'asset_class_id': 1,
+                                                              'location_id': 2,
+                                                              'contribution': 20769230},
+                                                             {'asset_class_id': 2,
+                                                              'location_id': 2,
+                                                              'contribution': 5192307}]),
+                                                    (100000, [{'asset_class_id': 1,
+                                                               'location_id': 1,
+                                                               'contribution': 240000000},
+                                                              {'asset_class_id': 1,
+                                                               'location_id': 2,
+                                                               'contribution': 120000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 1,
+                                                               'contribution': 150000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 2,
+                                                               'contribution': 30000000},
+                                                              {'asset_class_id': 3,
+                                                               'location_id': 1,
+                                                               'contribution': 60000000}])])
+def test_assign_remainder(test_db_1, contribution, expected):
+    assert fetch_all(database=test_db_1, cmd=sql.assign_remainder, params={'contribution': contribution}) == expected
