@@ -7,6 +7,12 @@ import subprocess
 import text_ui
 import pytest
 
+
+@pytest.fixture
+def test_ui_1(test_ft_1):
+    return text_ui.TextUI(test_ft_1)
+
+
 bool_date = [{'input': 'T', 'format': True, 'verify': True, 'response': True},
              {'input': 't', 'format': True, 'verify': True, 'response': True},
              {'input': 'F', 'format': False, 'verify': True, 'response': False},
@@ -70,19 +76,15 @@ def test_close():
 #     assert captured == "Input test label (t = true, f = false): "
 
 
-def test_display_main_menu(capsys):
-    expected = "\n" \
-               "Main menu\n" \
+def test_display_main_menu(capsys, test_ui_1):
+    expected = "Main menu\n" \
                " 0 | Quit\n" \
                " 1 | Net worth\n" \
                " 2 | Where to contribute\n"
-    text_ui.main_menu()
+    test_ui_1.menus['main']()
     assert capsys.readouterr().out == expected
 
 
-def test_print_net_worth(capsys):
-    expected = "Net worth: $1000.00\n"
-    text_ui.print_net_worth({'net_worth': 1000.00})
-
-    assert capsys.readouterr().out == expected
+def test_net_worth_string():
+    assert text_ui.net_worth_string({'net_worth': 1000.00}) == "Net worth: $1000.00"
 

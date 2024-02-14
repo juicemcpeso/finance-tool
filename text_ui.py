@@ -13,18 +13,33 @@ class TextUI:
 
         self.menu_main_options = []
 
+        self.windows = {
+            'net worth': Window(
+                title='Net worth',
+                content=net_worth_string(self.ft.read_net_worth()))
+        }
+
+        self.menus = {
+            'main': Menu(
+                title='Main menu',
+                options=[MenuOption(label='Quit', function=close),
+                         MenuOption(label='Net worth', function=self.windows['net worth']),
+                         MenuOption(label='Where to contribute', function=None)])
+        }
+
     def __repr__(self):
         return f"TextUI({self.ft})"
 
     def __call__(self):
-        self.menu_main()
+        self.menus['main']
 
-    # Menus
-    # TODO - test
-    def menu_main(self):
-        menu_dict = {'label': 'Main menu',
-                     'options': [{'label': 'Quit', 'function': self.close}]}
-        menu(menu_dict)
+
+    # # Menus
+    # # TODO - test
+    # def menu_main(self):
+    #     menu_dict = {'label': 'Main menu',
+    #                  'options': [{'label': 'Quit', 'function': self.close}]}
+    #     menu(menu_dict)
 
 
 # TODO - test
@@ -96,24 +111,28 @@ input_lookup = {'bool': {'input': input_bool},
 
 
 class Window:
-    def __init__(self, label):
-        self.label = label
+    def __init__(self, title, content=None):
+        self.title = title
+        self.content = content
 
     def __call__(self):
-        self.display()
+        self.print_title()
+        self.print_content()
 
-    def display(self):
-        pass
+    def print_title(self):
+        print(self.title)
+
+    def print_content(self):
+        print(self.content)
 
 
 class Menu(Window):
-    def __init__(self, label, options):
-        super().__init__(label)
+    def __init__(self, title, options):
+        super().__init__(title)
 
         self.options = options
 
-    def display(self):
-        print('\n' + self.label)
+    def print_content(self):
         for i, option in enumerate(self.options):
             print(f"{i:>2} | {option.label}")
 
@@ -131,18 +150,5 @@ def close():
     sys.exit()
 
 
-def print_net_worth(net_worth_dict):
-    print(f"Net worth: ${net_worth_dict['net_worth']:.2f}")
-
-
-#
-# main_menu = {'label': 'Main menu',
-#              'options': [{'label': 'Quit', 'function': close},
-#                          {'label': 'Net worth', 'function': print_net_worth},
-#                          {'label': 'Where to contribute', 'function': None}]}
-
-main_menu = Menu(
-    label='Main menu',
-    options=[MenuOption(label='Quit', function=close),
-             MenuOption(label='Net worth', function=print_net_worth),
-             MenuOption(label='Where to contribute', function=None)])
+def net_worth_string(net_worth_dict):
+    return f"Net worth: ${net_worth_dict['net_worth']:.2f}"
