@@ -58,11 +58,7 @@ class FinanceTool:
     def execute(self, cmd, params=None):
         con = sqlite3.connect(self.db)
         cur = con.cursor()
-        try:
-            cur.execute(cmd, params) if params is not None else cur.execute(cmd)
-        except sqlite3.IntegrityError:
-            pass
-
+        cur.execute(cmd, params) if params is not None else cur.execute(cmd)
         con.commit()
         con.close()
 

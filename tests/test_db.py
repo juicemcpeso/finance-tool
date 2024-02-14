@@ -109,10 +109,7 @@ def execute(database, cmd, params):
 def execute_many(database, cmd, data_sequence):
     con = sqlite3.connect(database)
     cur = con.cursor()
-    try:
-        cur.executemany(cmd, data_sequence)
-    except sqlite3.IntegrityError:
-        pass
+    cur.executemany(cmd, data_sequence)
     con.commit()
     con.close()
 
