@@ -26,10 +26,6 @@ class TextUI:
                      'options': [{'label': 'Quit', 'function': self.close}]}
         menu(menu_dict)
 
-    def close(self):
-        print('bye')
-        sys.exit()
-
 
 # TODO - test
 def menu(menu_dict):

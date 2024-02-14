@@ -46,10 +46,9 @@ for input_type in data:
             verify_params.append((input_type, td['input'], td['verify']))
 
 
-@pytest.mark.xfail(reason="UI is not yet updated to new format")
-def test_close(test_ui_empty):
+def test_close():
     with pytest.raises(SystemExit) as expected:
-        test_ui_empty.close()
+        text_ui.close()
 
     assert expected.type == SystemExit
 
