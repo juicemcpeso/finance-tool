@@ -286,7 +286,7 @@ class FinanceTool:
         return self.fetch_all("SELECT * FROM allocation_dashboard")
 
     def read_net_worth(self):
-        return self.fetch_one("SELECT * FROM net_worth_formatted")
+        return self.fetch_one("SELECT * FROM net_worth_formatted")['net_worth']
 
     def read_where_to_contribute(self, contribution):
         return self.fetch_all(

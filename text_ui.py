@@ -20,15 +20,16 @@ class TextUI:
         print(markdown_table(self.ft.read_allocation_dashboard()))
 
     def print_net_worth(self):
-        print(net_worth_string(self.ft.read_net_worth()))
+        print("## Net worth")
+        print(format_currency(self.ft.read_net_worth()))
 
 
 def close():
     sys.exit()
 
 
-def net_worth_string(net_worth_dict):
-    return f"Net worth: ${net_worth_dict['net_worth']:.2f}"
+def format_currency(currency):
+    return f"${currency:,.2f}"
 
 
 def input_string_bool(column_name):

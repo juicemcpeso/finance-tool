@@ -19,10 +19,6 @@ def test_close():
     assert expected.type == SystemExit
 
 
-def test_net_worth_string():
-    assert text_ui.net_worth_string({'net_worth': 1000.00}) == "Net worth: $1000.00"
-
-
 def test_input_string_bool():
     assert text_ui.input_string_bool('tax_in') == "Input tax in (t = true, f = false): "
 
@@ -68,7 +64,8 @@ def test_markdown_table():
 
 
 def test_print_allocation_dashboard(capsys, test_ui_1):
-    expected = "## Allocation dashboard\n" \
+    expected = \
+        "## Allocation dashboard\n" \
         "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
         "|---|---|---|---|---|---|\n" \
         "|stocks|USA|0.34|34000|0.4|40000|\n" \
@@ -83,12 +80,17 @@ def test_print_allocation_dashboard(capsys, test_ui_1):
 
 
 def test_print_net_worth(capsys, test_ui_1):
+    expected = \
+        "## Net worth\n" \
+        "$100,000.00\n"
     test_ui_1.print_net_worth()
-    assert capsys.readouterr().out == "Net worth: $100000.00\n"
+    assert capsys.readouterr().out == expected
 
 
 def test_call_text_ui(capsys, test_ui_1):
-    expected = "Net worth: $100000.00\n" \
+    expected = \
+        "## Net worth\n" \
+        "$100,000.00\n" \
         "## Allocation dashboard\n" \
         "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
         "|---|---|---|---|---|---|\n" \
@@ -100,3 +102,7 @@ def test_call_text_ui(capsys, test_ui_1):
     test_ui_1()
 
     assert capsys.readouterr().out == expected
+
+
+def test_format_currency():
+    assert text_ui.format_currency(1000.567) == '$1,000.57'

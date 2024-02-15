@@ -218,7 +218,7 @@ def test_read_allocation_dashboard(test_ft_1):
 
 
 def test_read_net_worth(test_ft_1):
-    assert test_ft_1.read_net_worth() == {'net_worth': 100000}
+    assert test_ft_1.read_net_worth() == 100000
 
 
 @pytest.mark.parametrize('contribution, expected', [(0, []),
