@@ -11,7 +11,12 @@ class TextUI:
     def __init__(self, _finance_tool=None):
         self.ft = _finance_tool
 
+    def __call__(self):
+        self.print_net_worth()
+        self.print_allocation_dashboard()
+
     def print_allocation_dashboard(self):
+        print('## Allocation dashboard')
         print(markdown_table(self.ft.read_allocation_dashboard()))
 
     def print_net_worth(self):
