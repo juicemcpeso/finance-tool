@@ -79,3 +79,8 @@ def test_print_allocation_dashboard(capsys, test_ui_1):
     test_ui_1.print_allocation_dashboard()
 
     assert capsys.readouterr().out == expected
+
+
+def test_print_net_worth(capsys, test_ui_1):
+    test_ui_1.print_net_worth()
+    assert capsys.readouterr().out == "Net worth: $100000.00\n"

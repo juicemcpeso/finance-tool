@@ -14,6 +14,9 @@ class TextUI:
     def print_allocation_dashboard(self):
         print(markdown_table(self.ft.read_allocation_dashboard()))
 
+    def print_net_worth(self):
+        print(net_worth_string(self.ft.read_net_worth()))
+
 
 def close():
     sys.exit()
