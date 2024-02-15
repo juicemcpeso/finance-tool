@@ -42,3 +42,35 @@ def test_input_string_date():
 
 def test_input_string_text():
     assert text_ui.input_string_text('owner_name') == "Input owner name: "
+
+
+markdown_mock = [{'a': 'a1', 'b': 'b1', 'c': 'c1'},
+                 {'a': 'a2', 'b': 'b2', 'c': 'c2'},
+                 {'a': 'a3', 'b': 'b3', 'c': 'c3'}]
+
+
+def test_markdown_header():
+    column_names = ['a', 'b', 'c']
+    assert text_ui.markdown_header(column_names) == "|a|b|c|\n"
+
+
+def test_markdown_hyphen_line():
+    assert text_ui.markdown_hyphen_line(3) == "|---|---|---|\n"
+
+
+def test_markdown_row():
+    assert text_ui.markdown_row(markdown_mock[0]) == '|a1|b1|c1|'
+
+
+def test_markdown_rows():
+    assert text_ui.markdown_rows(markdown_mock) == '|a1|b1|c1|\n' \
+                                                   '|a2|b2|c2|\n' \
+                                                   '|a3|b3|c3|'
+
+
+def test_markdown_table():
+    assert text_ui.markdown_table(markdown_mock) == "|a|b|c|\n" \
+                                                    "|---|---|---|\n" \
+                                                    "|a1|b1|c1|\n" \
+                                                    "|a2|b2|c2|\n" \
+                                                    "|a3|b3|c3|"

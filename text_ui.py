@@ -125,3 +125,26 @@ def input_string_date(column_name):
 
 def input_string_text(column_name):
     return f"Input {column_name.replace('_', ' ')}: "
+
+
+def markdown_header(column_names):
+    return f"|{'|'.join(column_names)}|\n"
+
+
+def markdown_hyphen_line(number_of_columns):
+    return ''.join('|---' for _ in range(number_of_columns)) + '|\n'
+
+
+def markdown_row(row):
+    return f"|{'|'.join(row.values())}|"
+
+
+def markdown_rows(list_of_rows):
+    return '\n'. join(markdown_row(row) for row in list_of_rows)
+
+
+def markdown_table(list_of_dictionaries):
+    header = markdown_header(list_of_dictionaries[0].keys())
+    hyphen_line = markdown_hyphen_line(len(list_of_dictionaries[0]))
+    rows = markdown_rows(list_of_dictionaries)
+    return header + hyphen_line + rows
