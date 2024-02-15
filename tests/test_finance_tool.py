@@ -182,6 +182,41 @@ def test_create_function_no_id(test_ft_0, table_name):
     assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == create_function_expected[table_name]
 
 # Test READ
+def test_read_allocation_dashboard(test_ft_1):
+    expected = [{'asset_class': 'stocks',
+                 'location': 'USA',
+                 'current_percent': .3400,
+                 'current_value': 34000,
+                 'plan_percent': .4000,
+                 'plan_value': 40000},
+                {'asset_class': 'stocks',
+                 'location': 'International',
+                 'current_percent': .1400,
+                 'current_value': 14000,
+                 'plan_percent': .2000,
+                 'plan_value': 20000},
+                {'asset_class': 'cash',
+                 'location': 'USA',
+                 'current_percent': .1400,
+                 'current_value': 14000,
+                 'plan_percent': .1000,
+                 'plan_value': 10000},
+                {'asset_class': 'bonds',
+                 'location': 'USA',
+                 'current_percent': .3400,
+                 'current_value': 34000,
+                 'plan_percent': .2500,
+                 'plan_value': 25000},
+                {'asset_class': 'bonds',
+                 'location': 'International',
+                 'current_percent': .0400,
+                 'current_value': 4000,
+                 'plan_percent': .0500,
+                 'plan_value': 5000}]
+
+    assert test_ft_1.read_allocation_dashboard() == expected
+
+
 def test_read_net_worth(test_ft_1):
     assert test_ft_1.read_net_worth() == {'net_worth': 100000}
 

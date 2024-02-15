@@ -282,6 +282,9 @@ class FinanceTool:
                 'amount': amount})
 
     # READ
+    def read_allocation_dashboard(self):
+        return self.fetch_all("SELECT * FROM allocation_dashboard")
+
     def read_net_worth(self):
         return self.fetch_one("SELECT * FROM net_worth_formatted")
 

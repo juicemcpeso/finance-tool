@@ -57,6 +57,7 @@ table_names = {'account',
                'price'}
 
 view_names = {'account_value_current_by_asset',
+              'allocation_dashboard',
               'allocation_deviation',
               'allocation_deviation_all_levels',
               'asset_price_newest',
@@ -183,6 +184,41 @@ def test_view_account_value_current_by_asset(test_db_2):
                 {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 200000000}]
 
     assert fetch_all(database=test_db_2, cmd="SELECT * FROM account_value_current_by_asset") == expected
+
+
+def test_view_allocation_dashboard(test_db_1):
+    expected = [{'asset_class': 'stocks',
+                 'location': 'USA',
+                 'current_percent': .3400,
+                 'current_value': 34000,
+                 'plan_percent': .4000,
+                 'plan_value': 40000},
+                {'asset_class': 'stocks',
+                 'location': 'International',
+                 'current_percent': .1400,
+                 'current_value': 14000,
+                 'plan_percent': .2000,
+                 'plan_value': 20000},
+                {'asset_class': 'cash',
+                 'location': 'USA',
+                 'current_percent': .1400,
+                 'current_value': 14000,
+                 'plan_percent': .1000,
+                 'plan_value': 10000},
+                {'asset_class': 'bonds',
+                 'location': 'USA',
+                 'current_percent': .3400,
+                 'current_value': 34000,
+                 'plan_percent': .2500,
+                 'plan_value': 25000},
+                {'asset_class': 'bonds',
+                 'location': 'International',
+                 'current_percent': .0400,
+                 'current_value': 4000,
+                 'plan_percent': .0500,
+                 'plan_value': 5000}]
+
+    assert fetch_all(database=test_db_1, cmd="SELECT * FROM allocation_dashboard") == expected
 
 
 def test_view_allocation_deviation(test_db_1):
