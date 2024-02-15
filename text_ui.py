@@ -33,6 +33,9 @@ class TextUI:
     def __call__(self):
         self.menus['main']
 
+    def print_allocation_dashboard(self):
+        print(markdown_table(self.ft.read_allocation_dashboard()))
+
 
 # User - input
 # TODO - test
@@ -136,7 +139,7 @@ def markdown_hyphen_line(number_of_columns):
 
 
 def markdown_row(row):
-    return f"|{'|'.join(row.values())}|"
+    return f"|{'|'.join(str(cell) for cell in row.values())}|"
 
 
 def markdown_rows(list_of_rows):
@@ -148,3 +151,4 @@ def markdown_table(list_of_dictionaries):
     hyphen_line = markdown_hyphen_line(len(list_of_dictionaries[0]))
     rows = markdown_rows(list_of_dictionaries)
     return header + hyphen_line + rows
+

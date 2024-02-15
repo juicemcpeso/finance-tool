@@ -74,3 +74,17 @@ def test_markdown_table():
                                                     "|a1|b1|c1|\n" \
                                                     "|a2|b2|c2|\n" \
                                                     "|a3|b3|c3|"
+
+
+def test_print_allocation_dashboard(capsys, test_ui_1):
+    expected = "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
+        "|---|---|---|---|---|---|\n" \
+        "|stocks|USA|0.34|34000|0.4|40000|\n" \
+        "|stocks|International|0.14|14000|0.2|20000|\n" \
+        "|cash|USA|0.14|14000|0.1|10000|\n" \
+        "|bonds|USA|0.34|34000|0.25|25000|\n" \
+        "|bonds|International|0.04|4000|0.05|5000|\n"
+
+    test_ui_1.print_allocation_dashboard()
+
+    assert capsys.readouterr().out == expected
