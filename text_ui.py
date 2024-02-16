@@ -10,10 +10,10 @@ import sys
 
 class TextUI:
     def __init__(self, _finance_tool=None):
-        self.ft = _finance_tool
+        self.ft = _finance_tool if _finance_tool is not None else finance_tool.FinanceTool(new_portfolio(input('Portfolio name: ')))
 
     def __call__(self):
-        self.ft = finance_tool.FinanceTool(new_portfolio(input('Portfolio name: ')))
+        self.insert_from_csv()
         self.main_dashboard()
 
     def main_dashboard(self):
@@ -27,6 +27,9 @@ class TextUI:
     def print_net_worth(self):
         print("## Net worth")
         print(format_currency(self.ft.read_net_worth()))
+
+    def insert_from_csv(self):
+        self.ft.insert_from_csv_directory(Path(__file__).parent / 'csv_files/')
 
 
 def new_portfolio(name):

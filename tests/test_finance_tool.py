@@ -4,6 +4,7 @@
 
 import finance_tool
 import pytest
+from pathlib import Path
 
 table_names = {'account',
                'account_type',
@@ -102,10 +103,10 @@ data_formatted = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 
 
 
 def test_csv_directory_to_dict():
-    assert data_strings == finance_tool.csv_directory_to_dict(directory_path='./test_csv_data/')
+    assert data_strings == finance_tool.csv_directory_to_dict(directory_path=Path('./test_csv_data/'))
 
 def test_insert_from_csv_directory(test_ft_0):
-    test_ft_0.insert_from_csv_directory(directory_path='./test_csv_data/')
+    test_ft_0.insert_from_csv_directory(directory_path=Path('./test_csv_data/'))
     results_dict = {}
 
     for table_name in data_strings.keys():

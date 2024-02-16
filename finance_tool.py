@@ -24,9 +24,8 @@ def csv_loader(file_path):
 
 def csv_directory_to_dict(directory_path):
     csv_dict = {}
-    for file_name in os.listdir(directory_path):
-        file_path = directory_path + file_name
-        table_name = os.path.splitext(file_name)[0]
+    for file_path in directory_path.iterdir():
+        table_name = os.path.splitext(file_path.name)[0]
         csv_dict.update({table_name: csv_loader(file_path)})
     return csv_dict
 

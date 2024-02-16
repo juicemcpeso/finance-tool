@@ -3,13 +3,34 @@
 # 2024-01-23
 # @juicemcpeso
 
+import os
+import shutil
 import text_ui
 import pytest
+
+
+def add_test_csvs():
+    shutil.copytree('./test_csv_data/', '../csv_files', dirs_exist_ok=True)
+
+
+def remove_test_csvs():
+    shutil.rmtree('../csv_files')
+    os.makedirs('../csv_files')
 
 
 @pytest.fixture
 def test_ui_1(test_ft_1):
     return text_ui.TextUI(test_ft_1)
+
+
+@pytest.fixture
+def test_ui_csv(test_ft_0):
+    add_test_csvs()
+    ui = text_ui.TextUI(test_ft_0)
+    ui.insert_from_csv()
+    remove_test_csvs()
+
+    return ui
 
 
 def test_close():
@@ -104,5 +125,58 @@ def test_main_dashboard(capsys, test_ui_1):
     assert capsys.readouterr().out == expected
 
 
+def test_print_allocation_dashboard_csv(capsys, test_ui_csv):
+    expected = \
+        "## Allocation dashboard\n" \
+        "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
+        "|---|---|---|---|---|---|\n" \
+        "|stocks|USA|0.34|34000|0.4|40000|\n" \
+        "|stocks|International|0.14|14000|0.2|20000|\n" \
+        "|cash|USA|0.14|14000|0.1|10000|\n" \
+        "|bonds|USA|0.34|34000|0.25|25000|\n" \
+        "|bonds|International|0.04|4000|0.05|5000|\n"
+
+    test_ui_csv.print_allocation_dashboard()
+
+    assert capsys.readouterr().out == expected
+
+
+def test_print_net_worth_csv(capsys, test_ui_csv):
+    expected = \
+        "## Net worth\n" \
+        "$100,000.00\n"
+    test_ui_csv.print_net_worth()
+    assert capsys.readouterr().out == expected
+
+
+def test_main_dashboard(capsys, test_ui_csv):
+    expected = \
+        "## Net worth\n" \
+        "$100,000.00\n" \
+        "## Allocation dashboard\n" \
+        "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
+        "|---|---|---|---|---|---|\n" \
+        "|stocks|USA|0.34|34000|0.4|40000|\n" \
+        "|stocks|International|0.14|14000|0.2|20000|\n" \
+        "|cash|USA|0.14|14000|0.1|10000|\n" \
+        "|bonds|USA|0.34|34000|0.25|25000|\n" \
+        "|bonds|International|0.04|4000|0.05|5000|\n"
+    test_ui_csv.main_dashboard()
+
+    assert capsys.readouterr().out == expected
+
+
 def test_format_currency():
     assert text_ui.format_currency(1000.567) == '$1,000.57'
+
+
+def test_add_test_csvs():
+    file_set = set(file for file in os.listdir('./test_csv_data/'))
+    add_test_csvs()
+    assert set(file for file in os.listdir('../csv_files/')) == file_set
+
+
+def test_remove_test_csvs():
+    add_test_csvs()
+    remove_test_csvs()
+    assert os.listdir('../csv_files') == []
