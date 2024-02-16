@@ -17,7 +17,7 @@ def test_ft_0(tmp_path):
     return create_test_ft_from_json(tmp_path)
 
 
-# # Use for simplified allocation data
+# Use for simplified allocation data
 @pytest.fixture
 def test_ft_1(tmp_path):
     return create_test_ft_from_json(tmp_path, '../tests/data/test_db_1.json')

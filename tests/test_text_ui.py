@@ -87,7 +87,7 @@ def test_print_net_worth(capsys, test_ui_1):
     assert capsys.readouterr().out == expected
 
 
-def test_call_text_ui(capsys, test_ui_1):
+def test_main_dashboard(capsys, test_ui_1):
     expected = \
         "## Net worth\n" \
         "$100,000.00\n" \
@@ -99,7 +99,7 @@ def test_call_text_ui(capsys, test_ui_1):
         "|cash|USA|0.14|14000|0.1|10000|\n" \
         "|bonds|USA|0.34|34000|0.25|25000|\n" \
         "|bonds|International|0.04|4000|0.05|5000|\n"
-    test_ui_1()
+    test_ui_1.main_dashboard()
 
     assert capsys.readouterr().out == expected
 

@@ -6,6 +6,7 @@
 import csv
 import json
 import os
+from pathlib import Path
 import sql
 import sqlite3
 
@@ -39,7 +40,9 @@ def json_loader(file_path):
 class FinanceTool:
     def __init__(self, db_path=None):
         self.db = db_path
-        self.execute_file('../db.sql')
+        sql_database = Path(__file__).parent / 'db.sql'
+
+        self.execute_file(sql_database)
 
         self.create = {'account': self.create_account,
                        'account_type': self.create_account_type,
@@ -283,10 +286,12 @@ class FinanceTool:
 
     # READ
     def read_allocation_dashboard(self):
-        return self.fetch_all("SELECT * FROM allocation_dashboard")
+        allocation_dashboard = self.fetch_all("SELECT * FROM allocation_dashboard")
+        return allocation_dashboard if allocation_dashboard is not None else {}
 
     def read_net_worth(self):
-        return self.fetch_one("SELECT * FROM net_worth_formatted")['net_worth']
+        net_worth_dict = self.fetch_one("SELECT * FROM net_worth_formatted")
+        return net_worth_dict['net_worth'] if net_worth_dict is not None else 0
 
     def read_where_to_contribute(self, contribution):
         return self.fetch_all(

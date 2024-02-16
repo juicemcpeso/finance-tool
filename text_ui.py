@@ -4,6 +4,7 @@
 # @juicemcpeso
 
 import finance_tool
+from pathlib import Path
 import sys
 
 
@@ -12,6 +13,10 @@ class TextUI:
         self.ft = _finance_tool
 
     def __call__(self):
+        self.ft = finance_tool.FinanceTool(new_portfolio(input('Portfolio name: ')))
+        self.main_dashboard()
+
+    def main_dashboard(self):
         self.print_net_worth()
         self.print_allocation_dashboard()
 
@@ -22,6 +27,10 @@ class TextUI:
     def print_net_worth(self):
         print("## Net worth")
         print(format_currency(self.ft.read_net_worth()))
+
+
+def new_portfolio(name):
+    return Path.cwd() / f"portfolios/{name}"
 
 
 def close():
@@ -61,8 +70,8 @@ def markdown_rows(list_of_rows):
 
 
 def markdown_table(list_of_dictionaries):
-    header = markdown_header(list_of_dictionaries[0].keys())
-    hyphen_line = markdown_hyphen_line(len(list_of_dictionaries[0]))
-    rows = markdown_rows(list_of_dictionaries)
-    return header + hyphen_line + rows
-
+    if list_of_dictionaries:
+        header = markdown_header(list_of_dictionaries[0].keys())
+        hyphen_line = markdown_hyphen_line(len(list_of_dictionaries[0]))
+        rows = markdown_rows(list_of_dictionaries)
+        return header + hyphen_line + rows
