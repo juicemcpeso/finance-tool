@@ -89,13 +89,13 @@ def test_print_allocation_dashboard(capsys, request, ui_fixture):
     ui = request.getfixturevalue(ui_fixture)
     expected = \
         "## Allocation dashboard\n" \
-        "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
+        "|Asset class|Location|Current %|Current value|Plan %|Plan value|\n" \
         "|---|---|---|---|---|---|\n" \
-        "|stocks|USA|0.34|34000|0.4|40000|\n" \
-        "|stocks|International|0.14|14000|0.2|20000|\n" \
-        "|cash|USA|0.14|14000|0.1|10000|\n" \
-        "|bonds|USA|0.34|34000|0.25|25000|\n" \
-        "|bonds|International|0.04|4000|0.05|5000|\n"
+        "|stocks|USA|34%|$34,000.00|40%|$40,000.00|\n" \
+        "|stocks|International|14%|$14,000.00|20%|$20,000.00|\n" \
+        "|cash|USA|14%|$14,000.00|10%|$10,000.00|\n" \
+        "|bonds|USA|34%|$34,000.00|25%|$25,000.00|\n" \
+        "|bonds|International|4%|$4,000.00|5%|$5,000.00|\n"
 
     ui.print_allocation_dashboard()
 
@@ -161,13 +161,13 @@ def test_main_dashboard(capsys, request, ui_fixture):
         "## Net worth\n" \
         "$100,000.00\n" \
         "## Allocation dashboard\n" \
-        "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
+        "|Asset class|Location|Current %|Current value|Plan %|Plan value|\n" \
         "|---|---|---|---|---|---|\n" \
-        "|stocks|USA|0.34|34000|0.4|40000|\n" \
-        "|stocks|International|0.14|14000|0.2|20000|\n" \
-        "|cash|USA|0.14|14000|0.1|10000|\n" \
-        "|bonds|USA|0.34|34000|0.25|25000|\n" \
-        "|bonds|International|0.04|4000|0.05|5000|\n"
+        "|stocks|USA|34%|$34,000.00|40%|$40,000.00|\n" \
+        "|stocks|International|14%|$14,000.00|20%|$20,000.00|\n" \
+        "|cash|USA|14%|$14,000.00|10%|$10,000.00|\n" \
+        "|bonds|USA|34%|$34,000.00|25%|$25,000.00|\n" \
+        "|bonds|International|4%|$4,000.00|5%|$5,000.00|\n"
 
     ui.main_dashboard()
 

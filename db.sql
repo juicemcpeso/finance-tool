@@ -124,12 +124,12 @@ GROUP BY
 
 CREATE VIEW IF NOT EXISTS allocation_dashboard AS
 SELECT
-    asset_class.name as asset_class,
-    location.name as location,
-    CAST(current_values.current_value AS FLOAT) / net_worth.net_worth as current_percent,
-    current_values.current_value / decimal.constant as current_value,
-    CAST(allocation.percentage AS FLOAT) / decimal.constant AS plan_percent,
-    allocation.percentage * net_worth.net_worth / (decimal.constant * decimal.constant) AS plan_value
+    asset_class.name as "Asset class",
+    location.name as Location,
+    printf("%.f%", (100 * CAST(current_values.current_value AS FLOAT) / net_worth.net_worth)) AS "Current %",
+    printf("$%,.2f", (current_values.current_value / decimal.constant)) AS "Current value",
+    printf("%.f%", (100 * CAST(allocation.percentage AS FLOAT) / decimal.constant)) AS "Plan %",
+    printf("$%,.2f", (allocation.percentage * net_worth.net_worth / (decimal.constant * decimal.constant))) AS "Plan value"
 FROM
     allocation,
     asset_class,
@@ -143,7 +143,7 @@ WHERE
     asset_class.id == allocation.asset_class_id AND
     location.id == allocation.location_id
 ORDER BY
-    asset_class DESC,
+    asset_class.name DESC,
     location DESC
 ;
 
