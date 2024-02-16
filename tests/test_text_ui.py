@@ -84,7 +84,9 @@ def test_markdown_table():
                                                     "|a3|b3|c3|"
 
 
-def test_print_allocation_dashboard(capsys, test_ui_1):
+@pytest.mark.parametrize('ui_fixture', ['test_ui_1', 'test_ui_csv'])
+def test_print_allocation_dashboard(capsys, request, ui_fixture):
+    ui = request.getfixturevalue(ui_fixture)
     expected = \
         "## Allocation dashboard\n" \
         "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
@@ -95,20 +97,24 @@ def test_print_allocation_dashboard(capsys, test_ui_1):
         "|bonds|USA|0.34|34000|0.25|25000|\n" \
         "|bonds|International|0.04|4000|0.05|5000|\n"
 
-    test_ui_1.print_allocation_dashboard()
+    ui.print_allocation_dashboard()
 
     assert capsys.readouterr().out == expected
 
 
-def test_print_net_worth(capsys, test_ui_1):
+@pytest.mark.parametrize('ui_fixture', ['test_ui_1', 'test_ui_csv'])
+def test_print_net_worth(capsys, request, ui_fixture):
+    ui = request.getfixturevalue(ui_fixture)
     expected = \
         "## Net worth\n" \
         "$100,000.00\n"
-    test_ui_1.print_net_worth()
+    ui.print_net_worth()
     assert capsys.readouterr().out == expected
 
 
-def test_main_dashboard(capsys, test_ui_1):
+@pytest.mark.parametrize('ui_fixture', ['test_ui_1', 'test_ui_csv'])
+def test_main_dashboard(capsys, request, ui_fixture):
+    ui = request.getfixturevalue(ui_fixture)
     expected = \
         "## Net worth\n" \
         "$100,000.00\n" \
@@ -120,48 +126,7 @@ def test_main_dashboard(capsys, test_ui_1):
         "|cash|USA|0.14|14000|0.1|10000|\n" \
         "|bonds|USA|0.34|34000|0.25|25000|\n" \
         "|bonds|International|0.04|4000|0.05|5000|\n"
-    test_ui_1.main_dashboard()
-
-    assert capsys.readouterr().out == expected
-
-
-def test_print_allocation_dashboard_csv(capsys, test_ui_csv):
-    expected = \
-        "## Allocation dashboard\n" \
-        "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
-        "|---|---|---|---|---|---|\n" \
-        "|stocks|USA|0.34|34000|0.4|40000|\n" \
-        "|stocks|International|0.14|14000|0.2|20000|\n" \
-        "|cash|USA|0.14|14000|0.1|10000|\n" \
-        "|bonds|USA|0.34|34000|0.25|25000|\n" \
-        "|bonds|International|0.04|4000|0.05|5000|\n"
-
-    test_ui_csv.print_allocation_dashboard()
-
-    assert capsys.readouterr().out == expected
-
-
-def test_print_net_worth_csv(capsys, test_ui_csv):
-    expected = \
-        "## Net worth\n" \
-        "$100,000.00\n"
-    test_ui_csv.print_net_worth()
-    assert capsys.readouterr().out == expected
-
-
-def test_main_dashboard(capsys, test_ui_csv):
-    expected = \
-        "## Net worth\n" \
-        "$100,000.00\n" \
-        "## Allocation dashboard\n" \
-        "|asset_class|location|current_percent|current_value|plan_percent|plan_value|\n" \
-        "|---|---|---|---|---|---|\n" \
-        "|stocks|USA|0.34|34000|0.4|40000|\n" \
-        "|stocks|International|0.14|14000|0.2|20000|\n" \
-        "|cash|USA|0.14|14000|0.1|10000|\n" \
-        "|bonds|USA|0.34|34000|0.25|25000|\n" \
-        "|bonds|International|0.04|4000|0.05|5000|\n"
-    test_ui_csv.main_dashboard()
+    ui.main_dashboard()
 
     assert capsys.readouterr().out == expected
 
