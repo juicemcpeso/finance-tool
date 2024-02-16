@@ -28,6 +28,9 @@ class TextUI:
         print("## Net worth")
         print(format_currency(self.ft.read_net_worth()))
 
+    def print_where_to_contribute(self, contribution):
+        print(markdown_table(self.ft.read_where_to_contribute(contribution)))
+
     def insert_from_csv(self):
         self.ft.insert_from_csv_directory(Path(__file__).parent / 'csv_files/')
 

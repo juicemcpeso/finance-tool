@@ -113,6 +113,48 @@ def test_print_net_worth(capsys, request, ui_fixture):
 
 
 @pytest.mark.parametrize('ui_fixture', ['test_ui_1', 'test_ui_csv'])
+def test_print_where_to_contribute_1000(capsys, request, ui_fixture):
+    ui = request.getfixturevalue(ui_fixture)
+    expected = "" \
+        "|asset_class|location|contribution|\n" \
+        "|---|---|---|\n" \
+        "|stocks|International|$1,000.00|\n" \
+
+    ui.print_where_to_contribute(1000)
+    assert capsys.readouterr().out == expected
+
+
+@pytest.mark.parametrize('ui_fixture', ['test_ui_1', 'test_ui_csv'])
+def test_print_where_to_contribute_10000(capsys, request, ui_fixture):
+    ui = request.getfixturevalue(ui_fixture)
+    expected = "" \
+               "|asset_class|location|contribution|\n" \
+               "|---|---|---|\n" \
+               "|stocks|USA|$4,153.85|\n" \
+               "|stocks|International|$5,076.92|\n" \
+               "|bonds|International|$769.23|\n"
+
+    ui.print_where_to_contribute(10000)
+    assert capsys.readouterr().out == expected
+
+
+@pytest.mark.parametrize('ui_fixture', ['test_ui_1', 'test_ui_csv'])
+def test_print_where_to_contribute_100000(capsys, request, ui_fixture):
+    ui = request.getfixturevalue(ui_fixture)
+    expected = "" \
+        "|asset_class|location|contribution|\n" \
+        "|---|---|---|\n" \
+        "|stocks|USA|$46,000.00|\n" \
+        "|stocks|International|$26,000.00|\n" \
+        "|bonds|USA|$16,000.00|\n" \
+        "|bonds|International|$6,000.00|\n" \
+        "|cash|USA|$6,000.00|\n"
+
+    ui.print_where_to_contribute(100000)
+    assert capsys.readouterr().out == expected
+
+
+@pytest.mark.parametrize('ui_fixture', ['test_ui_1', 'test_ui_csv'])
 def test_main_dashboard(capsys, request, ui_fixture):
     ui = request.getfixturevalue(ui_fixture)
     expected = \
@@ -126,6 +168,7 @@ def test_main_dashboard(capsys, request, ui_fixture):
         "|cash|USA|0.14|14000|0.1|10000|\n" \
         "|bonds|USA|0.34|34000|0.25|25000|\n" \
         "|bonds|International|0.04|4000|0.05|5000|\n"
+
     ui.main_dashboard()
 
     assert capsys.readouterr().out == expected
