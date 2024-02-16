@@ -15,6 +15,7 @@ class TextUI:
     def __call__(self):
         self.insert_from_csv()
         self.main_dashboard()
+        self.print_where_to_contribute(float(input('How much to contribute: $')))
 
     def main_dashboard(self):
         self.print_net_worth()
@@ -81,3 +82,7 @@ def markdown_table(list_of_dictionaries):
         hyphen_line = markdown_hyphen_line(len(list_of_dictionaries[0]))
         rows = markdown_rows(list_of_dictionaries)
         return header + hyphen_line + rows
+
+
+if __name__ == "__main__":
+    TextUI()()
