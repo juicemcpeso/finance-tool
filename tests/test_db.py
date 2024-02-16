@@ -57,6 +57,7 @@ table_names = {'account',
                'price'}
 
 view_names = {'account_value_current_by_asset',
+              'allocation_dashboard',
               'allocation_deviation',
               'allocation_deviation_all_levels',
               'asset_price_newest',
@@ -183,6 +184,41 @@ def test_view_account_value_current_by_asset(test_db_2):
                 {'account_id': 5, 'asset_id': 1, 'balance_date': '2022-01-01', 'current_value': 200000000}]
 
     assert fetch_all(database=test_db_2, cmd="SELECT * FROM account_value_current_by_asset") == expected
+
+
+def test_view_allocation_dashboard(test_db_1):
+    expected = [{'Asset class': 'stocks',
+                 'Location': 'USA',
+                 'Current %': '34%',
+                 'Current value': '$34,000.00',
+                 'Plan %': '40%',
+                 'Plan value': '$40,000.00'},
+                {'Asset class': 'stocks',
+                 'Location': 'International',
+                 'Current %': '14%',
+                 'Current value': '$14,000.00',
+                 'Plan %': '20%',
+                 'Plan value': '$20,000.00'},
+                {'Asset class': 'cash',
+                 'Location': 'USA',
+                 'Current %': '14%',
+                 'Current value': '$14,000.00',
+                 'Plan %': '10%',
+                 'Plan value': '$10,000.00'},
+                {'Asset class': 'bonds',
+                 'Location': 'USA',
+                 'Current %': '34%',
+                 'Current value': '$34,000.00',
+                 'Plan %': '25%',
+                 'Plan value': '$25,000.00'},
+                {'Asset class': 'bonds',
+                 'Location': 'International',
+                 'Current %': '4%',
+                 'Current value': '$4,000.00',
+                 'Plan %': '5%',
+                 'Plan value': '$5,000.00'}]
+
+    assert fetch_all(database=test_db_1, cmd="SELECT * FROM allocation_dashboard") == expected
 
 
 def test_view_allocation_deviation(test_db_1):
@@ -592,6 +628,73 @@ def test_remaining_amount(test_db_1, contribution, expected):
                                                                'contribution': 60000000}])])
 def test_assign_remainder(test_db_1, contribution, expected):
     assert fetch_all(database=test_db_1, cmd=sql.assign_remainder, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class_id': 1,
+                                                             'location_id': 2,
+                                                             'contribution': 10000000}]),
+                                                    (10000, [{'asset_class_id': 1,
+                                                              'location_id': 1,
+                                                              'contribution': 41538461},
+                                                             {'asset_class_id': 1,
+                                                              'location_id': 2,
+                                                              'contribution': 50769230},
+                                                             {'asset_class_id': 2,
+                                                              'location_id': 2,
+                                                              'contribution': 7692307}]),
+                                                    (100000, [{'asset_class_id': 1,
+                                                               'location_id': 1,
+                                                               'contribution': 460000000},
+                                                              {'asset_class_id': 1,
+                                                               'location_id': 2,
+                                                               'contribution': 260000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 1,
+                                                               'contribution': 160000000},
+                                                              {'asset_class_id': 2,
+                                                               'location_id': 2,
+                                                               'contribution': 60000000},
+                                                              {'asset_class_id': 3,
+                                                               'location_id': 1,
+                                                               'contribution': 60000000}])])
+def test_where_to_contribute(test_db_1, contribution, expected):
+    assert fetch_all(database=test_db_1, cmd=sql.where_to_contribute, params={'contribution': contribution}) == expected
+
+
+@pytest.mark.parametrize('contribution, expected', [(0, []),
+                                                    (1000, [{'asset_class': 'stocks',
+                                                             'location': 'International',
+                                                             'contribution': '$1,000.00'}]),
+                                                    (10000, [{'asset_class': 'stocks',
+                                                              'location': 'USA',
+                                                              'contribution': '$4,153.85'},
+                                                             {'asset_class': 'stocks',
+                                                              'location': 'International',
+                                                              'contribution': '$5,076.92'},
+                                                             {'asset_class': 'bonds',
+                                                              'location': 'International',
+                                                              'contribution': '$769.23'}]),
+                                                    (100000, [{'asset_class': 'stocks',
+                                                               'location': 'USA',
+                                                               'contribution': '$46,000.00'},
+                                                              {'asset_class': 'stocks',
+                                                               'location': 'International',
+                                                               'contribution': '$26,000.00'},
+                                                              {'asset_class': 'bonds',
+                                                               'location': 'USA',
+                                                               'contribution': '$16,000.00'},
+                                                              {'asset_class': 'bonds',
+                                                               'location': 'International',
+                                                               'contribution': '$6,000.00'},
+                                                              {'asset_class': 'cash',
+                                                               'location': 'USA',
+                                                               'contribution': '$6,000.00'}])])
+def test_where_to_contribute_formatted(test_db_1, contribution, expected):
+    assert fetch_all(
+        database=test_db_1,
+        cmd=sql.where_to_contribute_formatted,
+        params={'contribution': contribution}) == expected
 
 
 # Test constraints

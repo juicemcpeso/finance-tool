@@ -6,6 +6,7 @@
 import csv
 import json
 import os
+from pathlib import Path
 import sql
 import sqlite3
 
@@ -23,9 +24,8 @@ def csv_loader(file_path):
 
 def csv_directory_to_dict(directory_path):
     csv_dict = {}
-    for file_name in os.listdir(directory_path):
-        file_path = directory_path + file_name
-        table_name = os.path.splitext(file_name)[0]
+    for file_path in directory_path.iterdir():
+        table_name = os.path.splitext(file_path.name)[0]
         csv_dict.update({table_name: csv_loader(file_path)})
     return csv_dict
 
@@ -39,7 +39,9 @@ def json_loader(file_path):
 class FinanceTool:
     def __init__(self, db_path=None):
         self.db = db_path
-        self.execute_file('../db.sql')
+        sql_database = Path(__file__).parent / 'db.sql'
+
+        self.execute_file(sql_database)
 
         self.create = {'account': self.create_account,
                        'account_type': self.create_account_type,
@@ -58,7 +60,11 @@ class FinanceTool:
     def execute(self, cmd, params=None):
         con = sqlite3.connect(self.db)
         cur = con.cursor()
-        cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+        try:
+            cur.execute(cmd, params) if params is not None else cur.execute(cmd)
+        except sqlite3.IntegrityError:
+            raise DatabaseException
+
         con.commit()
         con.close()
 
@@ -278,10 +284,19 @@ class FinanceTool:
                 'amount': amount})
 
     # READ
+    def read_allocation_dashboard(self):
+        allocation_dashboard = self.fetch_all("SELECT * FROM allocation_dashboard")
+        return allocation_dashboard if allocation_dashboard is not None else {}
+
     def read_net_worth(self):
-        return self.fetch_one("SELECT * FROM net_worth_formatted")
+        net_worth_dict = self.fetch_one("SELECT * FROM net_worth_formatted")
+        return net_worth_dict['net_worth'] if net_worth_dict is not None else 0
 
     def read_where_to_contribute(self, contribution):
         return self.fetch_all(
             cmd=sql.where_to_contribute_formatted,
             params={'contribution': contribution})
+
+
+class DatabaseException(sqlite3.IntegrityError):
+    pass

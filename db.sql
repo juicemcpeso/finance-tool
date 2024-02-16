@@ -122,6 +122,31 @@ GROUP BY
     b.account_id, b.asset_id
 ;
 
+CREATE VIEW IF NOT EXISTS allocation_dashboard AS
+SELECT
+    asset_class.name as "Asset class",
+    location.name as Location,
+    printf("%.f%", (100 * CAST(current_values.current_value AS FLOAT) / net_worth.net_worth)) AS "Current %",
+    printf("$%,.2f", (current_values.current_value / decimal.constant)) AS "Current value",
+    printf("%.f%", (100 * CAST(allocation.percentage AS FLOAT) / decimal.constant)) AS "Plan %",
+    printf("$%,.2f", (allocation.percentage * net_worth.net_worth / (decimal.constant * decimal.constant))) AS "Plan value"
+FROM
+    allocation,
+    asset_class,
+    decimal,
+    location,
+    net_worth
+JOIN
+    asset_class_value_by_location AS current_values ON current_values.asset_class_id == allocation.asset_class_id AND
+    current_values.location_id == allocation.location_id
+WHERE
+    asset_class.id == allocation.asset_class_id AND
+    location.id == allocation.location_id
+ORDER BY
+    asset_class.name DESC,
+    location DESC
+;
+
 -- TODO: test to make sure this works with decimal contributions
 -- Divide by the decimal constant at the end, otherwise integer division results in 0
 --

@@ -4,28 +4,7 @@
 
 import finance_tool
 import pytest
-
-
-def create_test_ft_from_json(tmp_path, json_file_name=None):
-    test_ft = finance_tool.FinanceTool(tmp_path / "test.db")
-
-    if json_file_name is not None:
-        test_ft.insert_from_json(json_file_name)
-
-    return test_ft
-
-
-# Finance tool with empty database
-@pytest.fixture
-def test_ft_0(tmp_path):
-    return create_test_ft_from_json(tmp_path)
-
-
-# # Use for simplified allocation data
-@pytest.fixture
-def test_ft_1(tmp_path):
-    return create_test_ft_from_json(tmp_path, '../tests/data/test_db_1.json')
-
+from pathlib import Path
 
 table_names = {'account',
                'account_type',
@@ -124,10 +103,10 @@ data_formatted = {'account': [{'id': 1, 'name': 'Work 401k', 'account_type_id': 
 
 
 def test_csv_directory_to_dict():
-    assert data_strings == finance_tool.csv_directory_to_dict(directory_path='./test_csv_data/')
+    assert data_strings == finance_tool.csv_directory_to_dict(directory_path=Path('./test_csv_data/'))
 
 def test_insert_from_csv_directory(test_ft_0):
-    test_ft_0.insert_from_csv_directory(directory_path='./test_csv_data/')
+    test_ft_0.insert_from_csv_directory(directory_path=Path('./test_csv_data/'))
     results_dict = {}
 
     for table_name in data_strings.keys():
@@ -204,37 +183,161 @@ def test_create_function_no_id(test_ft_0, table_name):
     assert test_ft_0.fetch_one(cmd=f"SELECT * FROM {table_name}") == create_function_expected[table_name]
 
 # Test READ
+# TODO: determine if redundant
+def test_read_allocation_dashboard(test_ft_1):
+    expected = [{'Asset class': 'stocks',
+                 'Location': 'USA',
+                 'Current %': '34%',
+                 'Current value': '$34,000.00',
+                 'Plan %': '40%',
+                 'Plan value': '$40,000.00'},
+                {'Asset class': 'stocks',
+                 'Location': 'International',
+                 'Current %': '14%',
+                 'Current value': '$14,000.00',
+                 'Plan %': '20%',
+                 'Plan value': '$20,000.00'},
+                {'Asset class': 'cash',
+                 'Location': 'USA',
+                 'Current %': '14%',
+                 'Current value': '$14,000.00',
+                 'Plan %': '10%',
+                 'Plan value': '$10,000.00'},
+                {'Asset class': 'bonds',
+                 'Location': 'USA',
+                 'Current %': '34%',
+                 'Current value': '$34,000.00',
+                 'Plan %': '25%',
+                 'Plan value': '$25,000.00'},
+                {'Asset class': 'bonds',
+                 'Location': 'International',
+                 'Current %': '4%',
+                 'Current value': '$4,000.00',
+                 'Plan %': '5%',
+                 'Plan value': '$5,000.00'}]
+    assert test_ft_1.read_allocation_dashboard() == expected
+
+
 def test_read_net_worth(test_ft_1):
-    assert test_ft_1.read_net_worth() == {'net_worth': 100000}
+    assert test_ft_1.read_net_worth() == 100000
 
 
+# TODO: determine if redundant
 @pytest.mark.parametrize('contribution, expected', [(0, []),
                                                     (1000, [{'asset_class': 'stocks',
                                                              'location': 'International',
-                                                             'contribution': 10000000}]),
+                                                             'contribution': '$1,000.00'}]),
                                                     (10000, [{'asset_class': 'stocks',
                                                               'location': 'USA',
-                                                              'contribution': 41538461},
+                                                              'contribution': '$4,153.85'},
                                                              {'asset_class': 'stocks',
                                                               'location': 'International',
-                                                              'contribution': 50769230},
+                                                              'contribution': '$5,076.92'},
                                                              {'asset_class': 'bonds',
                                                               'location': 'International',
-                                                              'contribution': 7692307}]),
+                                                              'contribution': '$769.23'}]),
                                                     (100000, [{'asset_class': 'stocks',
                                                                'location': 'USA',
-                                                               'contribution': 460000000},
+                                                               'contribution': '$46,000.00'},
                                                               {'asset_class': 'stocks',
                                                                'location': 'International',
-                                                               'contribution': 260000000},
+                                                               'contribution': '$26,000.00'},
                                                               {'asset_class': 'bonds',
                                                                'location': 'USA',
-                                                               'contribution': 160000000},
+                                                               'contribution': '$16,000.00'},
                                                               {'asset_class': 'bonds',
                                                                'location': 'International',
-                                                               'contribution': 60000000},
+                                                               'contribution': '$6,000.00'},
                                                               {'asset_class': 'cash',
                                                                'location': 'USA',
-                                                               'contribution': 60000000}])])
+                                                               'contribution': '$6,000.00'}])])
 def test_read_where_to_contribute(test_ft_1, contribution, expected):
     assert test_ft_1.read_where_to_contribute(contribution) == expected
+
+# Tests exceptions
+# TODO: determine if this is overkill
+expected_constraints = [
+    {'table': 'account',
+     'expected': {'id': None, 'name': None, 'account_type_id': 0, 'institution_id': 0, 'owner_id': 0}},
+    {'table': 'account_type',
+     'expected': {'id': None, 'name': 'test', 'tax_in': 1, 'tax_growth': 4, 'tax_out': 0}},
+    {'table': 'account_type',
+     'expected': {'id': None, 'name': None, 'tax_in': 1, 'tax_growth': 0, 'tax_out': 0}},
+    {'table': 'allocation',
+     'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 3}},
+    {'table': 'allocation',
+     'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': 'test'}},
+    {'table': 'allocation',
+     'expected': {'id': None, 'asset_class_id': 1, 'location_id': 1, 'percentage': None}},
+    {'table': 'asset',
+     'expected': {'id': None, 'name': 'test', 'symbol': None}},
+    {'table': 'asset',
+     'expected': {'id': None, 'name': None, 'symbol': 'TEST'}},
+    {'table': 'asset_class',
+     'expected': {'id': None, 'name': None}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 6, 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'test', 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': 'April 16, 2023', 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2024-15-43', 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': None, 'quantity': 1}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': None}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': 'test'}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': ''}},
+    {'table': 'balance',
+     'expected': {'id': None, 'account_id': 1, 'asset_id': 1, 'balance_date': '2022-01-01', 'quantity': -123}},
+    {'table': 'component',
+     'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': 1.01}},
+    {'table': 'component',
+     'expected': {'id': None, 'asset_id': 1, 'asset_class_id': 1, 'location_id': 1, 'percentage': -0.01}},
+    {'table': 'institution',
+     'expected': {'id': None, 'name': None}},
+    {'table': 'location',
+     'expected': {'id': None, 'name': None}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': None, 'birthday': '2021-01-01'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': 'test'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': ''}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': '2024-15-43'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': 'April 16, 2023'}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': None}},
+    {'table': 'owner',
+     'expected': {'id': None, 'name': 'test', 'birthday': 6}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': ''}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': None}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2022-01-01', 'amount': 'six'}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '2024-51-51', 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': 'test', 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': None, 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': 'April 16, 2023', 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': 6, 'amount': 1}},
+    {'table': 'price',
+     'expected': {'id': None, 'asset_id': 1, 'price_date': '', 'amount': 1}}]
+
+formatted_expected_constraints = [(line['table'], line['expected']) for line in expected_constraints]
+
+
+@pytest.mark.parametrize('table_name, params', formatted_expected_constraints)
+def test_database_exception(test_ft_0, table_name, params):
+    with pytest.raises(finance_tool.DatabaseException):
+        test_ft_0.create[table_name](**params)

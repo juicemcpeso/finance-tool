@@ -163,9 +163,10 @@ WITH where_to_contribute AS ({where_to_contribute})
 SELECT
     asset_class.name AS asset_class,
     location.name AS location,
-    contribution
+    printf("$%,.2f", (CAST(contribution AS FLOAT) / decimal.constant)) AS contribution
 FROM
     asset_class,
+    decimal,
     location,
     where_to_contribute
 WHERE
